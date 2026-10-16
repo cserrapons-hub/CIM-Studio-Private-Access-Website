@@ -5,7 +5,7 @@ mkdir -p public
 cp index.html styles.css script.js public/
 cp "LOGO PNG.png" "public/LOGO PNG.png"
 mkdir -p public/assets
-for asset in cim-studio-logo-ink.png collection.webp collection-detail.webp collection-space.webp; do
+for asset in cim-studio-logo-ink.png collection.webp collection-detail.webp collection-space.webp cover-pool.webp cover-volcan.webp cover-soporte.webp cover-tramuntana.webp; do
   if [ -f "assets/$asset" ]; then
     cp "assets/$asset" "public/assets/$asset"
   fi
