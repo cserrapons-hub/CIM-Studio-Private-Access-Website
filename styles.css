@@ -3,7 +3,7 @@
 body{margin:0;background:var(--page-background);color:var(--ink);font:13px/1.7 Arial,Helvetica,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:inherit}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #6c6b5e;outline-offset:5px}
-.page-shell{--volcan-top:16%;--volcan-width:20.3205cqw;--volcan-height:calc(var(--volcan-width) * 1251 / 1145);--pair-offset:clamp(28px,3.4cqw,48px);--pair-overlap:32px;--pool-top:calc(var(--volcan-top) + var(--pair-offset));--pool-width:13.578cqw;--text-gap-left:clamp(90px,8.4cqw,120px);--text-gap-right:clamp(80px,6.5cqw,90px);position:relative;isolation:isolate;container-type:inline-size;width:86%;max-width:1426px;min-height:max(100svh,min(86vw,1426px) * .75);margin:0 auto;background:var(--page-background);overflow:hidden;overflow:clip;display:flex;flex-direction:column}
+.page-shell{--volcan-top:18.5%;--volcan-width:17.88204cqw;--volcan-height:calc(var(--volcan-width) * 1251 / 1145);--pair-overlap:28px;--pool-top:max(140px,calc(var(--volcan-top) - 64px));--pool-width:11.94864cqw;--text-gap-left:clamp(110px,9.5cqw,142px);--text-gap-right:clamp(96px,7.5cqw,110px);position:relative;isolation:isolate;container-type:inline-size;width:86%;max-width:1426px;min-height:max(100svh,min(86vw,1426px) * .75);margin:0 auto;background:var(--page-background);overflow:hidden;overflow:clip;display:flex;flex-direction:column}
 .preview-notice{margin:0;padding:7px 4%;text-align:center;font-size:8px;line-height:1.6;letter-spacing:.3px;color:var(--muted)}
 .header{padding:15px 3.7% 0;display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}
 .brand{display:block;width:110px;height:84px;text-decoration:none}.brand-image{display:block;width:100%;height:auto;object-fit:contain}
@@ -12,15 +12,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .photographic-composition,.photograph-pair{display:contents}
 .photograph{position:absolute;margin:0;overflow:hidden;z-index:0}
 .photograph img{display:block;width:100%;height:auto;filter:saturate(.85)}
-.photograph-pool{left:calc(40.5% - var(--text-gap-left) - var(--volcan-width) - var(--pool-width) + var(--pair-overlap));top:var(--pool-top);width:13.578%;z-index:1}
+.photograph-pool{left:calc(40.5% - var(--text-gap-left) - var(--volcan-width) - var(--pool-width) + var(--pair-overlap));top:var(--pool-top);width:11.94864%;z-index:1}
 .photograph-volcan{left:calc(40.5% - var(--text-gap-left) - var(--volcan-width));top:var(--volcan-top);width:var(--volcan-width)}
-.photograph-soporte{left:-1.5%;top:calc(var(--volcan-top) + max(var(--volcan-height),var(--pair-offset) + var(--pool-width) * 1016 / 1007) + 40px);width:24.459%}
-.photograph-tramuntana{left:calc(77.5% + var(--text-gap-right));top:16.4%;width:16.9632%}
+.photograph-soporte{left:0;top:calc(var(--volcan-top) + var(--volcan-height) + 28px);width:19.5672%}
+.photograph-tramuntana{left:calc(77.5% + var(--text-gap-right));top:16.4%;width:14.41872%}
 .invitation{position:relative;z-index:1;width:37%;margin:clamp(100px,10vw,155px) 0 100px 40.5%}
-h1{font:normal clamp(42px,4.1vw,62px)/1.1 var(--serif);letter-spacing:-1.8px;margin:0 0 32px}
-.intro{font-size:12px;line-height:1.95;color:#706f68;max-width:none;margin:0 0 33px}.intro:has(+ .intro){margin-bottom:16px}
-.primary{display:inline-block;background:var(--ink);color:var(--paper);font-size:10px;letter-spacing:.25px;padding:16px 24px;min-height:46px}.primary:hover{background:#45463d}.invitation .primary{padding:18px 27px}
-.professional{display:block;text-align:left;padding:0;font-size:10px;line-height:1.8;color:var(--muted);max-width:none;margin-top:28px;text-decoration:underline;text-decoration-color:#c6c3ba;text-underline-offset:4px}.professional:hover{color:var(--ink)}
+h1{font:normal clamp(42px,4.1vw,62px)/1.1 var(--serif);letter-spacing:-1.8px;margin:0 0 40px}
+.intro{font-size:12px;line-height:1.95;color:#706f68;max-width:none;margin:0 0 40px}.intro:has(+ .intro){margin-bottom:20px}
+.primary{display:inline-block;background:var(--ink);color:var(--paper);font-size:10px;letter-spacing:.25px;padding:16px 24px;min-height:46px}.primary:hover{background:#45463d}.invitation .primary{background:transparent;border:1px solid var(--ink);border-radius:0;color:var(--ink);padding:17px 28px;letter-spacing:.8px}.invitation .primary:hover{background:rgb(41 42 38 / .025)}
+.professional{display:block;text-align:left;padding:0;font-size:10px;line-height:1.8;color:var(--muted);max-width:none;margin-top:32px;text-decoration:underline;text-decoration-color:#c6c3ba;text-underline-offset:4px}.professional:hover{color:var(--ink)}
 footer{position:relative;z-index:1;display:flex;justify-content:space-between;gap:20px;margin:0 3.7%;padding:0 0 26px;color:#8b8880;font-size:9px}.legal-links{display:flex;gap:22px}.legal-links button{font-size:9px;padding:0;color:inherit}.legal-links button:hover{text-decoration:underline}
 dialog{border:0;background:var(--paper);color:var(--ink);padding:50px;width:min(540px,calc(100% - 36px));max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain}dialog::backdrop{background:#24241e66}body:has(dialog[open]){overflow:hidden}.close{position:absolute;top:12px;right:15px;width:36px;height:36px;font:25px/1 Arial;font-weight:200;color:var(--muted)}.overline{font-size:8px;letter-spacing:2px;margin:0 0 28px}h2{font:normal 36px/1.15 var(--serif);letter-spacing:-.8px;margin:0 0 20px}.dialog-intro{font-size:12px;line-height:1.9;color:var(--muted);margin:0 0 28px}form label{font-size:10px}input:not([type=checkbox]),textarea,select{display:block;width:100%;background:transparent;border:0;border-radius:0;border-bottom:1px solid #aaa89e;padding:10px 0;margin:0;font-size:12px;min-height:40px}textarea{resize:vertical}.consent{display:flex;align-items:flex-start;gap:9px;line-height:1.6;font-size:10px;color:var(--muted);margin:22px 0 0}.consent input{flex-shrink:0;accent-color:var(--ink);margin:3px 0 0}.demo{font-size:9px;color:var(--muted);margin:15px 0 22px}.status{font-size:11px;line-height:1.7;margin:20px 0 0}.status:empty{display:none}.fields{display:grid;grid-template-columns:1fr 1fr;gap:20px}.wide{grid-column:1/-1}
 [hidden]{display:none!important}
@@ -29,16 +29,16 @@ dialog{border:0;background:var(--paper);color:var(--ink);padding:50px;width:min(
  .preview-notice{font-size:7px;padding:7px 5%}
  .header{padding:18px 6% 0}.brand{width:80px;height:68px}
  .composition{padding:0 6%;margin:30px 0 42px}
- .photographic-composition{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,20px);align-items:start}
+ .photographic-composition{display:grid;width:100%;max-width:600px;margin-inline:auto;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,20px);align-items:start}
  .photograph{position:relative;left:auto;top:auto;width:100%;margin:0;align-self:start}
  .photograph-pair{display:block;position:relative;grid-column:1/-1;grid-row:1;aspect-ratio:1.45}
  .photograph-pair .photograph{position:absolute;margin:0}
- .photograph-pool{left:0;top:12%;width:45%}
- .photograph-volcan{left:auto;right:0;top:0;width:62%}
- .photograph-soporte{grid-column:1;grid-row:2}
- .photograph-tramuntana{grid-column:2;grid-row:2}
- .invitation{width:100%;margin:34px 0 0}
- h1{font-size:43px;line-height:1.08;margin-bottom:22px}.intro{font-size:12px;line-height:1.9;margin-bottom:25px}.intro:has(+ .intro){margin-bottom:16px}
+ .photograph-pool{left:0;top:0;width:39.6%}
+ .photograph-volcan{left:34.6%;right:auto;top:12%;width:54.56%}
+ .photograph-soporte{grid-column:1;grid-row:2;width:80%}
+ .photograph-tramuntana{grid-column:2;grid-row:2;width:85%;justify-self:end}
+ .invitation{width:100%;max-width:620px;margin:40px auto 0}
+ h1{font-size:43px;line-height:1.08;margin-bottom:28px}.intro{font-size:12px;line-height:1.9;margin-bottom:25px}.intro:has(+ .intro){margin-bottom:20px}
  .primary,.invitation .primary{font-size:10px;padding:15px 23px}.professional{font-size:10px;margin-top:23px}
  footer{margin:0 6%;font-size:8px;padding-bottom:22px;align-items:baseline}.legal-links{gap:14px}.legal-links button{font-size:8px}
  dialog{padding:43px 25px 28px}h2{font-size:32px}.fields{gap:19px 16px}
