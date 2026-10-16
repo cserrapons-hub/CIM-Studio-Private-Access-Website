@@ -4,12 +4,18 @@ La rama de trabajo y producción seleccionada es `design/private-access-v1`. No 
 
 ## 1. Aprobar los documentos antes de activar envíos
 
-Completar `legal/content.js` en ES y EN y subirlo en esta rama. Faltan:
+Los documentos ES/EN están redactados en `legal/content.js` con el titular CIM STUDIO ESPJ, NIF E88749155, domicilio y contacto facilitados. Permanecen como borrador: `approved: false` y versión sin asignar. Las condiciones comerciales están también incluidas en el aviso legal para su acceso desde el enlace existente, sin añadir elementos a la portada.
 
-- Nombre o razón social del titular, NIF/CIF, domicilio y email para privacidad; datos registrales cuando proceda.
-- Aviso legal y política de privacidad aprobados: finalidad y base jurídica por formulario, responsable, proveedores (Cloudflare/Turnstile/D1, GetResponse y Resend), destinatarios, transferencias y garantías aplicables, conservación, derechos y reclamación ante AEPD. El consentimiento de muestras **no suscribe a marketing**.
-- Política de cookies/tecnologías ajustada al uso real de Turnstile. No se instala analítica ni almacenamiento persistente en el navegador. No publicar que no existen terceros cuando los formularios estén activos.
-- Condiciones de Tarifa Fundadores: todas las altas **completadas/confirmadas hasta el 31/12/2026 inclusive**, sin límite de plazas; 15 % permanente en compras de piezas. Confirmar alcance, exclusiones, acumulación y aplicación comercial, sin inventarlas. El cierre se interpreta en `Europe/Madrid` (`2027-01-01T00:00:00+01:00`, exclusivo).
+Revisar `pendingReview` en ese archivo antes de aprobar:
+
+- Bases jurídicas por finalidad, ponderaciones de interés legítimo y proporcionalidad de los documentos de verificación profesional.
+- Criterios y procedimiento de conservación/supresión en cada sistema y buzón, con evidencia mínima de Fundadores separada del marketing y eliminación de copias fiscales innecesarias.
+- Contratos reales, entidades proveedoras, encargos, ubicaciones y garantías de transferencias de Cloudflare, GetResponse, Resend y Microsoft 365.
+- Inventario del despliegue de Turnstile y tecnologías de navegador; seguimiento de aperturas/clics de email y consentimiento que corresponda.
+- Criterio horario del cierre: se propone `Europe/Madrid` (`2027-01-01T00:00:00+01:00`, exclusivo), pendiente de validación. Elegibilidad por confirmación efectiva, nunca por la fecha de solicitud/API ni la de verificación profesional.
+- Criterios de Precio Profesional y operativa comercial, condiciones de venta/muestras y datos registrales o información de reclamaciones que resulten exigibles.
+
+Confirmado: altas confirmadas hasta el 31/12/2026 inclusive, sin límite; descuento permanente del 15 % sobre PVP para particulares y adicional sobre Precio Profesional para profesionales verificados; aplicable a colección y encargos a medida, compatible con Precio Profesional y no acumulable con otras promociones. No se inventan exclusiones ni se condiciona la baja de marketing a renunciar al beneficio.
 
 Asignar una versión estable (por ejemplo la fecha real de aprobación, no una fecha inventada), rellenar los documentos completos y marcar `approved: true` **solo tras su revisión**. Los diálogos legales existentes leerán estos textos desde `/api/config`. Las casillas mantienen su redacción aprobada y se enlaza a la privacidad dentro del formulario. El servidor archiva versión, texto exacto aceptado, idioma y hora UTC; no acepta el texto de consentimiento enviado por el navegador.
 
