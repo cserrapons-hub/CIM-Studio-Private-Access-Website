@@ -12,15 +12,18 @@
 .photograph-detail .photo-placeholder,.photograph-space .photo-placeholder{padding:12px}
 .photograph-detail .photo-placeholder span,.photograph-space .photo-placeholder span{font-size:8px;text-align:center}
 .intro:has(+ .intro){margin-bottom:16px}
-@media(max-width:600px){.photographic-composition{width:100%;gap:18px}.photograph-main{width:100%;aspect-ratio:1.18}.photograph-detail{aspect-ratio:1}.photograph-space{aspect-ratio:4/5;margin-top:25px}.logo-pending{font-size:8px;padding-top:8px}}
+@media(max-width:600px){.photographic-composition{width:100%;gap:18px}.photograph-main{width:100%;aspect-ratio:1.18}.photograph-detail{aspect-ratio:1}.photograph-space{aspect-ratio:4/5;margin-top:0}.logo-pending{font-size:8px;padding-top:8px}}
 
-/* Keep all three photographs within the opening desktop composition. */
+/* The main photograph occupies 64% of the width. A grid places both
+   secondary photographs in the remaining column with an exact 20px gap
+   horizontally and vertically. Padding retains the staggered top position;
+   the main photograph stays at top:0, independently of the secondary rows. */
 @media(min-width:601px){
-  .photographic-composition{display:block;position:relative;aspect-ratio:1.15;align-self:center}
-  .photographic-composition .photograph{position:absolute;margin:0}
-  .photograph-main{width:64%;top:0;left:0;aspect-ratio:5/6}
-  .photograph-detail{width:30%;top:7%;right:0;aspect-ratio:1}
-  .photograph-space{width:30%;bottom:0;right:4%;aspect-ratio:4/5}
+  .photographic-composition{display:grid;position:relative;aspect-ratio:1.15;align-self:center;--photo-gap:20px;grid-template-columns:64% minmax(0,1fr);gap:var(--photo-gap);align-content:start;padding-top:var(--photo-gap)}
+  .photographic-composition .photograph{margin:0}
+  .photograph-main{position:absolute;width:64%;top:0;left:0;aspect-ratio:5/6}
+  .photograph-detail{position:relative;grid-column:2;grid-row:1;width:100%;aspect-ratio:1}
+  .photograph-space{position:relative;grid-column:2;grid-row:2;width:100%;aspect-ratio:4/5}
 }
 @media(min-width:601px) and (max-height:850px){.composition{margin-top:30px;margin-bottom:40px}}
 
