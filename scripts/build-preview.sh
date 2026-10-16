@@ -4,7 +4,7 @@ set -eu
 mkdir -p public
 cp index.html styles.css script.js public/
 mkdir -p public/assets
-for asset in cim-studio-logo.png collection.jpg; do
+for asset in cim-studio-logo.png collection.jpg collection-detail.jpg collection-space.jpg; do
   if [ -f "assets/$asset" ]; then
     cp "assets/$asset" "public/assets/$asset"
   fi

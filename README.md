@@ -12,7 +12,9 @@ Sin dependencias ni compilación. `index.html` también se puede abrir directame
 
 ## Imágenes pendientes
 
-- `assets/cim-studio-logo.png`: colocar aquí el archivo original del logotipo adjunto. El adjunto del chat no estaba disponible como archivo en el entorno. Hasta entonces se muestra una marca tipográfica provisional, no una reproducción exacta del logotipo.
+- `assets/cim-studio-logo.png`: colocar aquí el archivo original del logotipo adjunto. El adjunto del chat no estaba disponible como archivo en el entorno. Hasta recibirlo se muestra únicamente un aviso de archivo pendiente: no se recrea el logotipo con texto ni código. El original se presenta completo, sin recorte, filtros ni mezcla de colores.
+- `assets/collection-detail.jpg`: fotografía secundaria de detalle.
+- `assets/collection-space.jpg`: fotografía secundaria de ambiente.
 - `assets/collection.jpg`: colocar aquí la fotografía real. Mientras falte, se muestra un espacio neutro identificado. No hay fotografía genérica ni producto inventado. La imagen se adapta con `object-fit: cover`; revisar el encuadre al añadir el original.
 
 ## Comportamiento
