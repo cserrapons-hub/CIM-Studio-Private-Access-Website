@@ -43,3 +43,12 @@ La web muestra un aviso ES/EN de versión de prueba. Lleva `noindex` tanto en HT
 8. Revisar desde móvil y escritorio: aviso de prueba, ES inicial, cambio completo a EN, apertura/cierre de ambos formularios, mensajes de demostración y enlaces legales provisionales. Las imágenes y textos legales definitivos siguen pendientes. Comprobar `X-Robots-Tag` en las cabeceras del documento mediante las herramientas del navegador.
 
 A partir de esta conexión, los nuevos pushes a la rama seleccionada pueden actualizar automáticamente esa vista previa. No seleccionar `main` ni activar despliegues de otras ramas por accidente. No se ha realizado ningún commit, push ni despliegue durante esta preparación.
+
+
+## Tarifa Fundadores — integración pendiente
+
+Etiqueta propuesta para GetResponse: `cim_founders_2026`. El formulario de suscripción la declara mediante `data-getresponse-eligibility-tag`; no es un campo que conceda derechos, ni se envía o se crea todavía en GetResponse. La solicitud de muestras no incluye esta etiqueta.
+
+En la futura integración, asignarla a **todos** los contactos que completen su suscripción hasta el 31 de diciembre de 2026 inclusive, sin límite de plazas. Beneficio: 15 % de descuento de por vida. Mantener la etiqueta tras el cierre de la campaña; la fecha limita el alta, no la duración del beneficio.
+
+La automatización o servidor debe verificar la fecha real de suscripción completada (confirmada si se utiliza doble opt-in), no el clic en enviar ni el reloj del navegador. Utilizar el cierre inclusivo en `Europe/Madrid`: fecha anterior a `2027-01-01T00:00:00+01:00`. Registrar esa fecha en un campo de auditoría al integrar y evitar etiquetar nuevas altas posteriores al cierre. No confiar en el atributo del HTML para decidir la elegibilidad. Esta preparación no conecta formularios ni modifica GetResponse.
