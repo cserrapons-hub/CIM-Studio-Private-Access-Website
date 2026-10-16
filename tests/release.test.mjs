@@ -1,0 +1,6 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+import {onRequest} from '../functions/_middleware.js';
+test('static build includes integration, favicon and security headers but no server files',()=>{for(const file of ['index.html','styles.css','script.js','integrations.js','favicon.png','apple-touch-icon.png','_headers','robots.txt','sitemap.xml'])assert.ok(existsSync('public/'+file));for(const file of ['server/forms.js','legal/content.js','.dev.vars','migrations/0001_forms.sql','package.json'])assert.ok(!existsSync('public/'+file));assert.ok(readFileSync('public/index.html','utf8').includes('noindex, nofollow, noarchive'));assert.ok(readFileSync('public/robots.txt','utf8').includes('Disallow: /'));});
+test('middleware forbids indexing an unlaunched or preview site and preserves responses',async()=>{const response=await onRequest({request:new Request('https://cimstudio.es/'),env:{},next:async()=>new Response('test',{headers:{'Content-Type':'text/html'}})});assert.equal(response.headers.get('X-Robots-Tag'),'noindex, nofollow, noarchive');assert.equal(await response.text(),'test');assert.equal(response.headers.get('X-Content-Type-Options'),'nosniff');});
