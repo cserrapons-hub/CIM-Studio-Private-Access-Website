@@ -12,6 +12,5 @@ document.querySelectorAll('dialog').forEach(dialog=>{dialog.querySelector('[data
 document.querySelectorAll('form').forEach(form=>form.addEventListener('submit',event=>{event.preventDefault();form.querySelector('.status').textContent=copy[language].status}));
 // Optional local assets: no external services or generic product photography.
 function revealImage(image, placeholder){const reveal=()=>{image.hidden=false;placeholder.hidden=true};image.addEventListener('load',reveal);if(image.complete&&image.naturalWidth)reveal();}
-revealImage(document.querySelector('.brand-image'),document.querySelector('.logo-pending'));
 document.querySelectorAll('.photograph').forEach(figure=>revealImage(figure.querySelector('img'),figure.querySelector('.photo-placeholder')));
 document.getElementById('year').textContent=new Date().getFullYear();setLanguage('es');
