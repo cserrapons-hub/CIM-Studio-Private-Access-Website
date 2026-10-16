@@ -10,4 +10,10 @@ document.querySelectorAll('[data-open]').forEach(button=>button.addEventListener
 document.querySelectorAll('dialog').forEach(dialog=>{dialog.querySelector('[data-close]').addEventListener('click',()=>dialog.close());dialog.addEventListener('click',event=>{if(event.target===dialog){const rect=dialog.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)dialog.close()}})});
 // Preview only. Future GetResponse integration belongs here; no network or storage.
 document.querySelectorAll('form').forEach(form=>form.addEventListener('submit',event=>{event.preventDefault();form.querySelector('.status').textContent=copy[language].status}));
+// Immediate press feedback on touch and pointer devices; submission is unchanged.
+const primaryButton=document.querySelector('.invitation .primary');
+const clearPrimaryPress=()=>primaryButton.classList.remove('is-pressed');
+primaryButton.addEventListener('pointerdown',()=>primaryButton.classList.add('is-pressed'));
+for(const event of ['pointerup','pointercancel','blur'])window.addEventListener(event,clearPrimaryPress);
+primaryButton.addEventListener('blur',clearPrimaryPress);
 document.getElementById('year').textContent=new Date().getFullYear();setLanguage('es');
