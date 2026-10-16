@@ -1,1 +1,43 @@
-# CIM-Studio-Private-Access-Website
+# CIM Studio — Private Access
+
+Composición única en HTML, CSS y JavaScript nativos. Español por defecto, selector ES / EN. Rama `design/private-access-v1`.
+
+## Desarrollo
+
+```sh
+python3 -m http.server 3000 --bind 0.0.0.0
+```
+
+Sin dependencias ni compilación. `index.html` también se puede abrir directamente en un navegador.
+
+## Imágenes pendientes
+
+- `assets/cim-studio-logo.png`: colocar aquí el archivo original del logotipo adjunto. El adjunto del chat no estaba disponible como archivo en el entorno. Hasta entonces se muestra una marca tipográfica provisional, no una reproducción exacta del logotipo.
+- `assets/collection.jpg`: colocar aquí la fotografía real. Mientras falte, se muestra un espacio neutro identificado. No hay fotografía genérica ni producto inventado. La imagen se adapta con `object-fit: cover`; revisar el encuadre al añadir el original.
+
+## Comportamiento
+
+Los dos formularios están en diálogos nativos independientes con cierre mediante botón, Escape o fondo exterior, enfoque modal y devolución del foco. Validación nativa. Sin peticiones, cookies o almacenamiento de datos. `data-integration="getresponse-pending"` identifica el futuro punto de integración. No se han conectado servicios.
+
+Aviso legal, privacidad y cookies se abren en un diálogo; son avisos provisionales de maqueta, no textos jurídicos definitivos. Aprobar los datos legales, privacidad y consentimientos antes de activar formularios o publicar.
+
+No se ha publicado, configurado ningún dominio ni fusionado con main.
+
+## Vista previa en Netlify
+
+Preparación verificada: `sh scripts/build-preview.sh` genera `public/` únicamente con los archivos estáticos seleccionados. `netlify.toml` define ese comando y directorio. No hay variables de entorno ni dependencias necesarias. Los originales de imagen siguen pendientes.
+
+La web muestra un aviso ES/EN de versión de prueba. Lleva `noindex` tanto en HTML como en las cabeceras configuradas para Netlify. Esto no protege el acceso: quien tenga la URL pública puede verla.
+
+### Conexión con GitHub, sin fusionar
+
+1. Confirmar el repositorio: el origen actual es `cserrapons-hub/CIM-Studio-Private-Access-Website`, no `Cim-Web`. Si se ha renombrado en GitHub, comprobar que `Cim-Web` contiene esta rama y estos archivos antes de seleccionarlo.
+2. Guardar los cambios de `design/private-access-v1` en un commit y subir esa misma rama a GitHub. Revisar la lista de archivos antes de confirmar; no añadir secretos, `.env`, `.git` ni archivos ajenos. No hace falta crear o fusionar una PR.
+3. En Netlify Free, crear un proyecto nuevo mediante la opción de importar un proyecto existente desde Git. Seleccionar GitHub y autorizar solamente el repositorio necesario. Las etiquetas de la interfaz pueden variar.
+4. Seleccionar el repositorio confirmado y elegir explícitamente `design/private-access-v1` como rama que se desplegará, en lugar de `main`.
+5. Comprobar los ajustes: directorio base vacío (raíz), comando `sh scripts/build-preview.sh`, directorio de publicación `public`, sin variables de entorno ni framework.
+6. Usar un nombre provisional, por ejemplo `cim-studio-prueba` si está disponible. No añadir dominio personalizado, DNS ni servicios externos. No habilitar Netlify Forms ni recogida de datos.
+7. Solo cuando se quiera publicar la prueba, pulsar la acción de despliegue. Netlify proporcionará una dirección bajo `netlify.app`. Aunque Netlify pueda denominarlo despliegue de producción de ese proyecto, será un sitio independiente de prueba, no el lanzamiento oficial ni el dominio de CIM Studio.
+8. Revisar desde móvil y escritorio: aviso de prueba, ES inicial, cambio completo a EN, apertura/cierre de ambos formularios, mensajes de demostración y enlaces legales provisionales. Las imágenes y textos legales definitivos siguen pendientes. Comprobar `X-Robots-Tag` en las cabeceras del documento mediante las herramientas del navegador.
+
+A partir de esta conexión, los nuevos pushes a la rama seleccionada pueden actualizar automáticamente esa vista previa. No seleccionar `main` ni activar despliegues de otras ramas por accidente. No se ha realizado ningún commit, push ni despliegue durante esta preparación.

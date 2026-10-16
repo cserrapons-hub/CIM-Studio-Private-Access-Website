@@ -1,0 +1,4 @@
+/public/
+/.netlify/
+.env
+.env.*
