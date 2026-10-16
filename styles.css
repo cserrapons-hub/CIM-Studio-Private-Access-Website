@@ -13,3 +13,13 @@
 .photograph-detail .photo-placeholder span,.photograph-space .photo-placeholder span{font-size:8px;text-align:center}
 .intro:has(+ .intro){margin-bottom:16px}
 @media(max-width:600px){.photographic-composition{width:100%;gap:18px}.photograph-main{width:100%;aspect-ratio:1.18}.photograph-detail{aspect-ratio:1}.photograph-space{aspect-ratio:4/5;margin-top:25px}.logo-pending{font-size:8px;padding-top:8px}}
+
+/* Keep all three photographs within the opening desktop composition. */
+@media(min-width:601px){
+  .photographic-composition{display:block;position:relative;aspect-ratio:1.15;align-self:center}
+  .photographic-composition .photograph{position:absolute;margin:0}
+  .photograph-main{width:64%;top:0;left:0;aspect-ratio:5/6}
+  .photograph-detail{width:30%;top:7%;right:0;aspect-ratio:1}
+  .photograph-space{width:30%;bottom:0;right:4%;aspect-ratio:4/5}
+}
+@media(min-width:601px) and (max-height:850px){.composition{margin-top:30px;margin-bottom:40px}}
