@@ -33,3 +33,8 @@
 .brand{grid-column:1;justify-self:start}
 .brand-image{height:auto}
 .languages{grid-column:3;justify-self:end}
+
+/* Preserve the product within the existing photographic positions. */
+.photograph-main img{object-position:50% 50%}
+.photograph-space img{object-position:30% 50%}
+@media(max-width:600px){.photograph-main{aspect-ratio:4/5}}
