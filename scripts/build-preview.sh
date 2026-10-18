@@ -12,4 +12,5 @@ for asset in cim-studio-logo-ink.png collection.webp collection-detail.webp coll
   fi
 done
 
+node scripts/prepare-legal.mjs
 node scripts/prepare-launch.mjs

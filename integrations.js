@@ -1,8 +1,8 @@
 /* No credentials belong here. Same-origin Functions are the only form endpoints. */
 (()=>{
  const messages={
-  es:{privacyRead:'Leer la política de privacidad',testing:'Demostración de conexión: utiliza solo datos de prueba. Estos envíos sí se procesan por los servicios externos.',sending:'Enviando…',receivedSubscribe:'Solicitud recibida. Revisa tu correo y confirma la suscripción si recibes un mensaje de verificación.',receivedSamples:'Solicitud enviada. Te responderemos por email.',invalid:'Revisa los campos y vuelve a intentarlo.',consent:'Acepta el consentimiento y revisa la política de privacidad actualizada.',challenge:'Completa la comprobación de seguridad e inténtalo de nuevo.',rate:'Has realizado varios intentos. Espera una hora antes de volver a intentarlo.',unavailable:'No hemos podido confirmar el envío. Tus datos siguen en el formulario; inténtalo más tarde.',pending:'Tu solicitud está pendiente de confirmación técnica. No podemos confirmar el envío todavía; no es necesario repetirla.',conflict:'La solicitud ha cambiado. Cierra y vuelve a abrir la página antes de intentarlo de nuevo.'},
-  en:{privacyRead:'Read the privacy policy',testing:'Connection demonstration: use test details only. These submissions are processed by external services.',sending:'Sending…',receivedSubscribe:'Request received. Check your inbox and confirm your subscription if you receive a verification email.',receivedSamples:'Request sent. We will reply by email.',invalid:'Please review the fields and try again.',consent:'Please accept the consent and review the updated privacy policy.',challenge:'Complete the security check and try again.',rate:'There have been several attempts. Please wait an hour before trying again.',unavailable:'We could not confirm your submission. Your details remain in the form; please try again later.',pending:'Your request is awaiting technical confirmation. We cannot confirm submission yet; there is no need to repeat it.',conflict:'The request has changed. Close and reopen the page before trying again.'}
+  es:{receivedCareers:'Solicitud recibida. Revisa tu correo para confirmar los avisos laborales si recibes un mensaje de verificación.',privacyRead:'Leer la política de privacidad',testing:'Demostración de conexión: utiliza solo datos de prueba. Estos envíos sí se procesan por los servicios externos.',sending:'Enviando…',receivedSubscribe:'Solicitud recibida. Revisa tu correo y confirma la suscripción si recibes un mensaje de verificación.',receivedSamples:'Solicitud enviada. Te responderemos por email.',invalid:'Revisa los campos y vuelve a intentarlo.',consent:'Acepta el consentimiento y revisa la política de privacidad actualizada.',challenge:'Completa la comprobación de seguridad e inténtalo de nuevo.',rate:'Has realizado varios intentos. Espera una hora antes de volver a intentarlo.',unavailable:'No hemos podido confirmar el envío. Tus datos siguen en el formulario; inténtalo más tarde.',pending:'Tu solicitud está pendiente de confirmación técnica. No podemos confirmar el envío todavía; no es necesario repetirla.',conflict:'La solicitud ha cambiado. Cierra y vuelve a abrir la página antes de intentarlo de nuevo.'},
+  en:{receivedCareers:'Request received. Check your inbox to confirm career updates if you receive a verification email.',privacyRead:'Read the privacy policy',testing:'Connection demonstration: use test details only. These submissions are processed by external services.',sending:'Sending…',receivedSubscribe:'Request received. Check your inbox and confirm your subscription if you receive a verification email.',receivedSamples:'Request sent. We will reply by email.',invalid:'Please review the fields and try again.',consent:'Please accept the consent and review the updated privacy policy.',challenge:'Complete the security check and try again.',rate:'There have been several attempts. Please wait an hour before trying again.',unavailable:'We could not confirm your submission. Your details remain in the form; please try again later.',pending:'Your request is awaiting technical confirmation. We cannot confirm submission yet; there is no need to repeat it.',conflict:'The request has changed. Close and reopen the page before trying again.'}
  };
  for(const lang of ['es','en'])Object.assign(copy[lang],messages[lang]);
  const forms=[...document.querySelectorAll('form[data-form-kind]')],widgets=new Map(),widgetSizes=new Map(),requests=new Map();
@@ -28,12 +28,13 @@
  window.addEventListener('resize',()=>{if(forms.some(form=>form.closest('dialog').open&&widgets.has(form)&&widgetSizes.get(form)!==(form.querySelector('.challenge-slot').clientWidth<300?'compact':'flexible')))renderChallenges();});
  forms.forEach(form=>form.addEventListener('submit',async event=>{
   event.preventDefault();if(form.getAttribute('aria-busy')==='true')return;
+  if(form.dataset.formKind==='careers'&&!form.reportValidity())return;
   if(!settings?.enabled[form.dataset.formKind]){status(form,'status');return;}
   if(!form.reportValidity())return;
   const widget=widgets.get(form),token=widget!==undefined?window.turnstile?.getResponse(widget):null;
   if(!token){status(form,'challenge',true);return;}
   const values=new FormData(form),kind=form.dataset.formKind;
-  const data={email:values.get('email'),consent:values.get(kind==='subscribe'?'marketing_consent':'contact_consent')==='on',language,website:values.get('website')||'',legalVersion:settings.legalVersion};
+  const data={email:values.get('email'),consent:values.get(kind==='subscribe'?'marketing_consent':kind==='careers'?'careers_consent':'contact_consent')==='on',language,website:values.get('website')||'',legalVersion:settings.legalVersion};
   if(kind==='samples')for(const field of ['name','company','discipline','project'])data[field]=values.get(field);
   const fingerprint=JSON.stringify(data);let entry=requests.get(form);if(!entry||entry.fingerprint!==fingerprint){entry={fingerprint,id:crypto.randomUUID()};requests.set(form,entry);}
   const button=form.querySelector('button[type=submit]');button.disabled=true;form.setAttribute('aria-busy','true');status(form,'sending');
@@ -41,7 +42,7 @@
    const response=await fetch('/api/'+kind,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,token,requestId:entry.id}),signal:AbortSignal.timeout(45000)});
    const result=await response.json();
    if(!response.ok||result.ok!==true){const key=Object.hasOwn(messages[language],result.error)?result.error:'unavailable';status(form,key,true);return;}
-   status(form,kind==='subscribe'?'receivedSubscribe':'receivedSamples');form.reset();requests.delete(form);
+   status(form,kind==='subscribe'?'receivedSubscribe':kind==='careers'?'receivedCareers':'receivedSamples');form.reset();requests.delete(form);
   }catch{status(form,'unavailable',true);}
   finally{button.disabled=false;form.removeAttribute('aria-busy');if(widget!==undefined)window.turnstile?.reset(widget);}
  }));

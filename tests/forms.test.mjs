@@ -34,3 +34,53 @@ test('concurrent subscriptions cannot issue two provider POST requests',async()=
 test('samples validate field lengths, profession and required project',async()=>{const s=setup('samples');for(const changes of [{name:''},{company:''},{discipline:'admin'},{project:''},{project:'x'.repeat(5001)}])assert.equal((await handleSubmission(s.request(changes),s.env,'samples',s.fetcher)).status,400);assert.equal(s.calls.length,0);});
 test('retry after a definite failure records the consent currently accepted',async()=>{const s=setup('samples');await handleSubmission(s.request(),s.env,'samples',async(url,opts)=>url.includes('resend.com')?new Response(null,{status:401}):s.fetcher(url,opts));legal.version='test-policy-2';assert.equal((await handleSubmission(s.request({legalVersion:'test-policy-2'}),s.env,'samples',s.fetcher,new Date('2026-10-17T15:00:00Z'))).status,202);const row=s.sqlite.prepare('SELECT * FROM form_requests').get();assert.equal(row.consent_version,'test-policy-2');assert.equal(row.accepted_at,'2026-10-17T15:00:00.000Z');});
 test('a provider 5xx is treated as uncertain, never automatically resent',async()=>{const s=setup('samples');const fetcher=async(url,opts)=>url.includes('resend.com')?new Response(null,{status:500}):s.fetcher(url,opts);assert.equal((await handleSubmission(s.request(),s.env,'samples',fetcher)).status,503);assert.equal(s.sqlite.prepare('SELECT state FROM form_requests').get().state,'unknown');assert.equal((await handleSubmission(s.request(),s.env,'samples',s.fetcher)).status,409);assert.equal(s.calls.filter(c=>c.url.includes('resend.com')).length,0);});
+
+function setupCareers(){
+ const s=setup('careers');
+ const sqlite=new DatabaseSync(':memory:');sqlite.exec(readFileSync(new URL('../migrations/careers/0001_careers.sql',import.meta.url),'utf8'));
+ s.careersSqlite=sqlite;s.env.CAREERS_DB={prepare(sql){let args=[];return{bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}}}};
+ Object.assign(s.env,{CAREERS_ENABLED:'true',CAREERS_VERIFIED:'true',GETRESPONSE_CAREERS_CAMPAIGN_ID:'test-careers-list'});
+ return s;
+}
+test('career submissions require separate configured and verified storage and campaign',async()=>{
+ const s=setupCareers();
+ for(const overrides of [{CAREERS_ENABLED:'false'},{CAREERS_VERIFIED:'false'},{CAREERS_DB:null},{GETRESPONSE_CAREERS_CAMPAIGN_ID:''},{GETRESPONSE_CAREERS_CAMPAIGN_ID:s.env.GETRESPONSE_CAMPAIGN_ID},{CAREERS_DB:s.env.FORMS_DB}]){
+  assert.equal((await handleSubmission(s.request(),{...s.env,...overrides},'careers',s.fetcher)).status,503);
+ }
+ assert.equal(s.calls.length,0);
+ assert.equal(s.careersSqlite.prepare('SELECT COUNT(*) AS n FROM form_requests').get().n,0);
+});
+test('career acceptance is recorded separately with exact consent and no commercial or founders data',async()=>{
+ const s=setupCareers();s.env.FORMS_ENABLED='false';
+ assert.equal((await handleSubmission(s.request(),s.env,'careers',s.fetcher)).status,202);
+ const post=s.calls.find(c=>c.url.endsWith('/contacts'));
+ const payload=JSON.parse(post.options.body);
+ assert.equal(payload.campaign.campaignId,'test-careers-list');
+ assert.ok(!JSON.stringify(payload).includes('founders'));
+ const row=s.careersSqlite.prepare('SELECT * FROM form_requests').get();
+ assert.equal(row.kind,'careers');assert.match(row.id,/^careers:/);assert.equal(row.state,'accepted');assert.equal(row.consent_text,legalConsent('es'));
+ assert.equal(row.consent_version,legal.version);assert.equal(row.language,'es');assert.ok(row.accepted_at);assert.ok(!JSON.stringify(row).includes('person@example.test'));
+ assert.equal(s.sqlite.prepare('SELECT COUNT(*) AS n FROM form_requests').get().n,0);
+ assert.equal((await handleSubmission(s.request(),s.env,'careers',s.fetcher)).status,202);
+ assert.equal(s.calls.filter(c=>c.url.endsWith('/contacts')).length,1);
+});
+function legalConsent(lang){return lang==='es'?'Acepto recibir comunicaciones sobre oportunidades profesionales de CIM Studio y he leído la Política de Privacidad.':'I agree to receive updates about career opportunities at CIM Studio and have read the Privacy Policy.';}
+test('career email, specific consent, honeypot and Turnstile action are validated',async()=>{
+ const s=setupCareers();
+ for(const changes of [{email:'not-an-email'},{consent:false},{website:'bot'}])assert.equal((await handleSubmission(s.request(changes),s.env,'careers',s.fetcher)).status,400);
+ const wrong=async(url,opts)=>url.includes('siteverify')?Response.json({success:true,hostname:'cim.test',action:'subscribe'}):s.fetcher(url,opts);
+ assert.equal((await handleSubmission(s.request(),s.env,'careers',wrong)).status,403);
+ assert.equal(s.careersSqlite.prepare('SELECT COUNT(*) AS n FROM form_requests').get().n,0);
+ assert.equal(s.calls.length,0);
+});
+test('career provider failure never reports success; ambiguous sends are not repeated',async()=>{
+ const s=setupCareers();let posts=0;
+ const broken=async(url,opts)=>{if(url.endsWith('/contacts')){posts++;throw Error('Unknown provider outcome');}return s.fetcher(url,opts);};
+ assert.equal((await handleSubmission(s.request(),s.env,'careers',broken)).status,503);
+ assert.equal(s.careersSqlite.prepare('SELECT state FROM form_requests').get().state,'unknown');
+ assert.equal((await handleSubmission(s.request(),s.env,'careers',broken)).status,409);assert.equal(posts,1);
+});
+test('English career consent uses the same independent purpose',async()=>{
+ const s=setupCareers();assert.equal((await handleSubmission(s.request({language:'en'}),s.env,'careers',s.fetcher)).status,202);
+ assert.equal(s.careersSqlite.prepare('SELECT consent_text FROM form_requests').get().consent_text,legalConsent('en'));
+});

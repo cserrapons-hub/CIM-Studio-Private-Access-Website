@@ -73,3 +73,18 @@ dialog{border:0;background:var(--paper);color:var(--ink);padding:50px;width:min(
 .privacy-inline{display:block;padding:0;margin:12px 0;font-size:9px;text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
 .challenge-slot:not(:empty){margin:16px 0;min-height:65px}
 .status[data-error="true"]{font-weight:500}
+
+/* Legal documents only: retain paragraph boundaries and fit long contact strings. */
+#legal-body{white-space:pre-line;overflow-wrap:anywhere}
+#legal-navigation{display:block;margin-bottom:28px;line-height:1.9}
+#legal-navigation button{padding:0;text-decoration:underline;font-size:inherit}
+
+/* The career invitation shares the copyright baseline without moving either footer edge. */
+footer .careers-link{position:absolute;left:50%;transform:translateX(-50%);top:0;padding:0;font:inherit;line-height:inherit;white-space:nowrap}
+footer .careers-link:hover{text-decoration:underline;text-underline-offset:3px}
+.careers-policy-reference{white-space:nowrap}
+.careers-privacy{display:inline;padding:0;text-decoration:underline;text-underline-offset:3px;font:inherit}
+@media(max-width:1100px){
+ footer{flex-wrap:wrap;align-items:baseline}
+ footer .careers-link{position:static;transform:none;order:3;flex-basis:100%;width:100%;text-align:center;white-space:normal}
+}

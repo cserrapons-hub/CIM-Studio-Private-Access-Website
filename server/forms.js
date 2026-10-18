@@ -43,7 +43,7 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
     if(!ready(env,kind)) return json({error:'unavailable'},503);
     const raw=await readJson(request),data=validate(raw,kind);
     if(raw.legalVersion!==legal.version) throw new Rejection('consent');
-    const db=env.FORMS_DB,at=now.toISOString(),subject=await hash(env.AUDIT_HASH_SECRET,'email:'+data.email);
+    const db=kind==='careers'?env.CAREERS_DB:env.FORMS_DB;const at=now.toISOString(),subject=await hash(env.AUDIT_HASH_SECRET,'email:'+data.email);
     const ip=request.headers.get('CF-Connecting-IP'); if(!ip) throw new Rejection('unavailable',503);
     const bucket=Math.floor(now.getTime()/3600000),rateKey=await hash(env.AUDIT_HASH_SECRET,`rate:${ip}:${bucket}`);
     const rate=await db.prepare('INSERT INTO form_rate_limits(id,count,expires_at) VALUES (?,1,?) ON CONFLICT(id) DO UPDATE SET count=count+1 RETURNING count').bind(rateKey,(bucket+1)*3600000).first();
@@ -53,12 +53,12 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
     if(!verification.ok) throw new Rejection('unavailable',503);
     const challenge=await verification.json();
     if(!challenge.success || challenge.hostname!==url.hostname || challenge.action!==kind) throw new Rejection('challenge',403);
-    id=kind==='subscribe'?'subscribe:'+subject:'samples:'+raw.requestId;
+    id=kind==='samples'?'samples:'+raw.requestId:kind+':'+subject;
     const fingerprint=await hash(env.AUDIT_HASH_SECRET,JSON.stringify(data));
     const inserted=await db.prepare('INSERT INTO form_requests(id,kind,subject_hash,fingerprint,state,accepted_at,consent_version,consent_text,language,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING RETURNING id').bind(id,kind,subject,fingerprint,'processing',at,legal.version,consent[data.language][kind],data.language,at).first();
     if(!inserted) {
       const prior=await db.prepare('SELECT state,fingerprint FROM form_requests WHERE id=?').bind(id).first();
-      if(prior.state==='accepted' && (kind==='subscribe'||prior.fingerprint===fingerprint)) return json({ok:true},202);
+      if(prior.state==='accepted' && (kind!=='samples'||prior.fingerprint===fingerprint)) return json({ok:true},202);
       if(prior.fingerprint!==fingerprint) throw new Rejection('conflict',409);
       if(prior.state!=='failed') return json({error:'pending'},409);
       const reclaimed=await db.prepare("UPDATE form_requests SET state='processing',updated_at=?,accepted_at=?,consent_version=?,consent_text=?,language=? WHERE id=? AND state='failed' RETURNING id").bind(at,at,legal.version,consent[data.language][kind],data.language,id).first();
@@ -66,24 +66,25 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
     }
     owns=true;
     let providerId=null;
-    if(kind==='subscribe') {
+    if(kind==='subscribe'||kind==='careers') {
+      const campaignId=kind==='careers'?env.GETRESPONSE_CAREERS_CAMPAIGN_ID:env.GETRESPONSE_CAMPAIGN_ID;
       const headers={'X-Auth-Token':'api-key '+env.GETRESPONSE_API_KEY,'Content-Type':'application/json'};
-      const query=new URLSearchParams({'query[email]':data.email,'query[campaignId]':env.GETRESPONSE_CAMPAIGN_ID});
+      const query=new URLSearchParams({'query[email]':data.email,'query[campaignId]':campaignId});
       const existing=await remote(fetcher,'https://api.getresponse.com/v3/contacts?'+query,{headers});
       if(!existing.ok) throw new Rejection('unavailable',503);
       const contacts=await existing.json();
       if(!Array.isArray(contacts)) throw new Rejection('unavailable',503);
-      const match=contacts.find(c=>c.email?.toLowerCase()===data.email && c.campaign?.campaignId===env.GETRESPONSE_CAMPAIGN_ID);
+      const match=contacts.find(c=>c.email?.toLowerCase()===data.email && c.campaign?.campaignId===campaignId);
       if(match) providerId=match.contactId;
       else {
         const customFieldValues=[
           {customFieldId:env.GR_CONSENT_AT_FIELD_ID,value:[at]},
           {customFieldId:env.GR_CONSENT_VERSION_FIELD_ID,value:[legal.version]},
-          {customFieldId:env.GR_CONSENT_TEXT_FIELD_ID,value:[consent[data.language].subscribe]},
+          {customFieldId:env.GR_CONSENT_TEXT_FIELD_ID,value:[consent[data.language][kind]]},
           {customFieldId:env.GR_LANGUAGE_FIELD_ID,value:[data.language]}
         ];
         submitted=true;
-        const response=await remote(fetcher,'https://api.getresponse.com/v3/contacts',{method:'POST',headers,body:JSON.stringify({email:data.email,campaign:{campaignId:env.GETRESPONSE_CAMPAIGN_ID},customFieldValues})});
+        const response=await remote(fetcher,'https://api.getresponse.com/v3/contacts',{method:'POST',headers,body:JSON.stringify({email:data.email,campaign:{campaignId},customFieldValues})});
         if(response.status!==202){submitted=response.status>=500||response.status===409||response.ok;throw new Rejection('unavailable',503);}
       }
     } else {
@@ -96,7 +97,7 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
     await db.prepare("UPDATE form_requests SET state='accepted',provider_id=?,updated_at=? WHERE id=?").bind(providerId,at,id).run();
     return json({ok:true},202);
   } catch(error) {
-    if(id && owns) {try{await env.FORMS_DB.prepare('UPDATE form_requests SET state=?,updated_at=? WHERE id=? AND state=\'processing\'').bind(submitted?'unknown':'failed',now.toISOString(),id).run();}catch{/* Never log personal data or provider responses. */}}
+    if(id && owns) {try{await (kind==='careers'?env.CAREERS_DB:env.FORMS_DB).prepare('UPDATE form_requests SET state=?,updated_at=? WHERE id=? AND state=\'processing\'').bind(submitted?'unknown':'failed',now.toISOString(),id).run();}catch{/* Never log personal data or provider responses. */}}
     return json({error:error instanceof Rejection?error.code:'unavailable'},error instanceof Rejection?error.status:503);
   }
 }

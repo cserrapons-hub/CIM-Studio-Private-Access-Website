@@ -4,7 +4,7 @@ La rama de trabajo y producción seleccionada es `design/private-access-v1`. No 
 
 ## 1. Aprobar los documentos antes de activar envíos
 
-Los documentos ES/EN están redactados en `legal/content.js` con el titular CIM STUDIO ESPJ, NIF E88749155, domicilio y contacto facilitados. Permanecen como borrador: `approved: false` y versión sin asignar. Las condiciones comerciales están también incluidas en el aviso legal para su acceso desde el enlace existente, sin añadir elementos a la portada.
+Los documentos ES/EN están redactados en `legal/content.js` con el titular CIM STUDIO ESPJ, NIF E88749155, domicilio facilitado y contacto legal/privacidad admin@cimstudio.es. Permanecen como borrador: `approved: false` y versión sin asignar. Los enlaces existentes abren los documentos con navegación discreta dentro del mismo diálogo, incluida Tarifa Fundadores. La compilación genera `public/legal-content.js` desde la única fuente `legal/content.js`: permite leer los borradores claramente identificados aunque `/api/config` siga sin exponer documentos no aprobados. Esto no altera la autorización de envíos. No subir esta rama ni desplegar sin nueva autorización.
 
 Revisar `pendingReview` en ese archivo antes de aprobar:
 
@@ -12,10 +12,10 @@ Revisar `pendingReview` en ese archivo antes de aprobar:
 - Criterios y procedimiento de conservación/supresión en cada sistema y buzón, con evidencia mínima de Fundadores separada del marketing y eliminación de copias fiscales innecesarias.
 - Contratos reales, entidades proveedoras, encargos, ubicaciones y garantías de transferencias de Cloudflare, GetResponse, Resend y Microsoft 365.
 - Inventario del despliegue de Turnstile y tecnologías de navegador; seguimiento de aperturas/clics de email y consentimiento que corresponda.
-- Criterio horario del cierre: se propone `Europe/Madrid` (`2027-01-01T00:00:00+01:00`, exclusivo), pendiente de validación. Elegibilidad por confirmación efectiva, nunca por la fecha de solicitud/API ni la de verificación profesional.
+- Criterio horario confirmado: `Europe/Madrid` (`2027-01-01T00:00:00+01:00`, exclusivo). Elegibilidad por confirmación efectiva, nunca por la fecha de solicitud/API ni la de verificación profesional.
 - Criterios de Precio Profesional y operativa comercial, condiciones de venta/muestras y datos registrales o información de reclamaciones que resulten exigibles.
 
-Confirmado: altas confirmadas hasta el 31/12/2026 inclusive, sin límite; descuento permanente del 15 % sobre PVP para particulares y adicional sobre Precio Profesional para profesionales verificados; aplicable a colección y encargos a medida, compatible con Precio Profesional y no acumulable con otras promociones. No se inventan exclusiones ni se condiciona la baja de marketing a renunciar al beneficio.
+Confirmado: altas confirmadas hasta el 31/12/2026 inclusive, sin límite; descuento permanente del 15 % sobre PVP para particulares y adicional sobre Precio Profesional para profesionales verificados; aplicable a colección y encargos a medida, compatible con Precio Profesional y no acumulable con otras promociones. El descuento es de por vida desde la confirmación, sin permanencia mínima; se aplica al PVP o Precio Profesional vigentes. La baja de la newsletter no supone perderlo. Mantener el registro de acreditación del beneficio separado de la autorización de marketing: la tabla actual de evidencias de solicitudes no constituye ese registro de confirmaciones y no debe utilizarse como tal. Definir su base jurídica y conservación antes de implementarlo, sin inventar plazos.
 
 Asignar una versión estable (por ejemplo la fecha real de aprobación, no una fecha inventada), rellenar los documentos completos y marcar `approved: true` **solo tras su revisión**. Los diálogos legales existentes leerán estos textos desde `/api/config`. Las casillas mantienen su redacción aprobada y se enlaza a la privacidad dentro del formulario. El servidor archiva versión, texto exacto aceptado, idioma y hora UTC; no acepta el texto de consentimiento enviado por el navegador.
 
@@ -94,3 +94,18 @@ Favicon y apple-touch-icon son derivados del logotipo original, sin modificarlo.
 ## Verificación local sin servicios reales
 
 Node 24: `sh scripts/build-preview.sh` y `npm test`. Pruebas con SQLite real en memoria y proveedores/Turnstile simulados, sin credenciales ni envíos. Para compilar Functions sin desplegar: `npx wrangler@4 pages functions build --outdir /tmp/cim-functions-build`. Para ejecutar Pages localmente se requiere configurar un binding D1 local con Wrangler; no sustituir por el servidor Python para probar Functions. El servidor estático solo sirve la maqueta y permanece en demostración.
+
+## Avisos laborales: preparación independiente, aún desactivada
+
+El enlace centrado del pie abre `careers-dialog` en ES/EN. El formulario solo solicita email y consentimiento específico; no pide CV ni teléfono. En demostración no se guarda nada ni se realiza una petición de alta. El endpoint preparado es `/api/careers` y reutiliza validación, Turnstile (acción `careers`), comprobación de origen, limitación de frecuencia, deduplicación y evidencia verificable de los otros endpoints, sin cambiar su funcionamiento.
+
+Para la activación futura, previa autorización:
+
+1. Aprobar la privacidad ampliada y definir conservación/supresión de la lista y evidencias laborales, sin suponer plazos. Mantener por ahora `approved: false`.
+2. Crear una lista distinta en GetResponse, con finalidad laboral y mensajes/confirmación y baja propios; configurar su ID real en `GETRESPONSE_CAREERS_CAMPAIGN_ID`. Debe ser distinto de `GETRESPONSE_CAMPAIGN_ID`. No añadir estos contactos a automatizaciones comerciales ni Fundadores. La misma cuenta puede usar los cuatro campos de evidencia ya documentados, conservando cada consentimiento en su lista.
+3. Crear una base D1 propia, enlazarla como `CAREERS_DB` y aplicar **solo** `migrations/careers/0001_careers.sql` a esa base. No aplicar esta migración sobre `FORMS_DB`. No se permite usar el mismo binding/objeto de base que los formularios comerciales. La tabla laboral solo admite `kind=careers`.
+4. Reutilizar las claves de servidor de GetResponse y Turnstile y los IDs de campos de consentimiento ya descritos; no hay valores nuevos inventados. El widget debe aceptar el hostname real y validar la acción `careers`. Configurar `CAREERS_ENABLED=false` y `CAREERS_VERIFIED=false` en todos los entornos hasta autorizar una prueba controlada.
+5. En un entorno de pruebas autorizado y separado, con documentos aprobados y datos propios, activar temporalmente ambos flags para comprobar confirmación de email, evidencias (fecha UTC, texto, versión, idioma, identificador seudonimizado y estado), duplicados, errores y baja efectiva. La aceptación API significa solicitud recibida, no confirmación final de inscripción. Comprobar que no cambian la lista comercial ni Fundadores. Desactivar los flags si alguna prueba falla. No habilitar un entorno público hasta que las pruebas estén documentadas.
+6. Solo con autorización de publicación y pruebas superadas conservar ambos flags en true. La activación laboral no depende de `FORMS_ENABLED` ni habilita los otros formularios. Tampoco bloquea ni activa por sí sola el lanzamiento de la portada. Las claves siguen siendo exclusivamente de servidor; el navegador solo recibe el estado público y la sitekey.
+
+La baja se gestionará en la lista laboral de GetResponse, con enlace en todas sus comunicaciones y atención en admin@cimstudio.es. No reactivar automáticamente contactos existentes/bajas. La evidencia D1 no sustituye el estado de confirmación/baja del proveedor; las solicitudes de derechos deben resolverse también en la base laboral y conforme al procedimiento de conservación aprobado.

@@ -1,37 +1,38 @@
 // Draft for express owner/legal review. Never enable forms by merely filling these texts.
-// Commercial terms are included in the existing legal-notice dialog; no new UI is required.
+// Documents have one source; the existing legal dialog provides navigation between them.
 const business = {
   name: 'CIM STUDIO ESPJ',
   taxId: 'E88749155',
   postalAddress: 'C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.',
-  privacyEmail: 'info@cimstudio.es'
+  privacyEmail: 'admin@cimstudio.es',
+  domain: 'cimstudio.es'
 };
 
 const termsEs = `CONDICIONES COMERCIALES — TARIFA FUNDADORES Y PRECIO PROFESIONAL
 
-La Tarifa Fundadores corresponde a todas las personas que confirmen su suscripción hasta el 31 de diciembre de 2026 inclusive. No existe límite de plazas. La fecha determinante es la confirmación efectiva de la suscripción, no el envío del formulario ni la aceptación de la solicitud por la API de GetResponse. El criterio horario de cierre debe validarse antes de la activación.
+La Tarifa Fundadores corresponde a todas las personas que confirmen su suscripción hasta el 31 de diciembre de 2026 inclusive. No existe límite de plazas. El plazo se computa en horario Europe/Madrid e incluye todo el 31 de diciembre de 2026: finaliza al comenzar el 1 de enero de 2027 (00:00, Europe/Madrid). La fecha determinante es la confirmación efectiva de la suscripción a la newsletter, no el envío del formulario ni la aceptación de la solicitud por la API de GetResponse.
 
-El beneficio es un 15 % de descuento permanente en la compra de piezas de colección y en encargos a medida. Para particulares, se aplica un 15 % sobre el precio de venta al público (PVP). Para profesionales verificados, se aplica un 15 % adicional sobre el Precio Profesional: el importe resultante es el Precio Profesional multiplicado por 0,85. Es compatible con el Precio Profesional, pero no acumulable con otras promociones.
+El beneficio es un 15 % de descuento de por vida desde la confirmación, sin permanencia mínima, aplicable a piezas de colección y proyectos personalizados. Para particulares, se aplica un 15 % sobre el precio de venta al público (PVP) vigente. Para profesionales acreditados, se aplica un 15 % adicional sobre el Precio Profesional vigente: el importe resultante es el Precio Profesional multiplicado por 0,85. Es compatible con el Precio Profesional, pero no acumulable con otras promociones.
 
 El acceso al Precio Profesional está dirigido a interioristas, arquitectos, hoteles, hostelería, tiendas, distribuidores y profesionales relacionados. CIM Studio verificará personalmente la actividad antes de concederlo. Para comprobarla podrá solicitar por email un certificado de situación censal, un modelo 036 con los datos innecesarios ocultos o un documento equivalente. No es necesario aportar todos estos documentos: solo la acreditación pertinente solicitada. La información ajena a la comprobación de la actividad debe ocultarse.
 
 El derecho a la Tarifa Fundadores depende de la fecha de confirmación de suscripción, no de la fecha de verificación profesional. Una verificación posterior al 31 de diciembre de 2026 no excluye a quien hubiera confirmado su suscripción dentro del plazo. La etiqueta interna de Fundadores sirve para gestionar el beneficio; debe corresponder a una confirmación comprobada y no sustituye esa prueba.
 
-La suscripción es voluntaria. Se puede retirar el consentimiento para recibir comunicaciones sin coste. No se establece aquí que la baja de comunicaciones haga perder un beneficio permanente ya adquirido. La forma de conservar una acreditación mínima de ese derecho tras una baja debe concretarse en el procedimiento de privacidad.
+La suscripción es voluntaria. Se puede retirar el consentimiento para recibir comunicaciones sin coste. La baja de la newsletter no supone perder el descuento. El registro que acredita el derecho al descuento se mantendrá separado de la autorización para recibir comunicaciones comerciales. La forma de conservar esa acreditación mínima, su base jurídica justificada y sus criterios de conservación deben concretarse en el procedimiento de privacidad, sin presumir una conservación indefinida de todos los datos.
 
 Esta portada y sus formularios permiten solicitar información, acceso y muestras; no son un proceso de compra ni formalizan por sí solos un encargo. Antes de contratar, CIM Studio deberá facilitar el presupuesto y las condiciones de venta aplicables, incluidos impuestos, gastos, pago, entrega y derechos legalmente exigibles. Estas condiciones de Fundadores no sustituyen esa información ni limitan los derechos imperativos de consumidores. Las condiciones de venta, la operativa de aplicación del descuento y los criterios concretos de acceso al Precio Profesional requieren revisión antes de aceptar pedidos. No se promete aquí un importe de Precio Profesional, una entrega gratuita de muestras ni un plazo de fabricación o envío.`;
 
 const termsEn = `COMMERCIAL TERMS — FOUNDERS RATE AND PROFESSIONAL PRICING
 
-The Founders Rate is available to everyone who confirms their subscription on or before December 31, 2026. There is no limit on places. Eligibility is determined by the effective subscription confirmation date, not by submission of the form or acceptance of a request by the GetResponse API. The time zone used for the closing deadline must be validated before activation.
+The Founders Rate is available to everyone who confirms their subscription on or before December 31, 2026. There is no limit on places. Eligibility is determined by the effective subscription confirmation date, not by submission of the form or acceptance of a request by the GetResponse API. The deadline is calculated in Europe/Madrid time and includes the whole of December 31, 2026, ending at 00:00 on January 1, 2027 (Europe/Madrid).
 
-The benefit is a permanent 15% discount on collection pieces and bespoke commissions. For private customers, this is 15% off the retail price. For verified professionals, it is an additional 15% off the Professional Price: the resulting amount is the Professional Price multiplied by 0.85. It can be combined with Professional Pricing, but not with other promotions.
+The benefit is a lifetime 15% discount from subscription confirmation, with no minimum subscription period, on collection pieces and bespoke projects. For private customers, this is 15% off the current retail price. For accredited professionals, it is an additional 15% off the current Professional Price: the resulting amount is the Professional Price multiplied by 0.85. It can be combined with Professional Pricing, but not with other promotions.
 
 Professional Pricing is intended for interior designers, architects, hotels, hospitality businesses, shops, distributors and related professionals. CIM Studio will personally verify professional activity before granting access. It may request by email a Spanish certificate of tax registration status, a Modelo 036 tax registration form with unnecessary information concealed, or an equivalent document. Applicants need only provide the relevant evidence requested, rather than all these documents. Information unrelated to verification of professional activity should be concealed.
 
 Entitlement to the Founders Rate depends on the subscription confirmation date, not the date of professional verification. Verification after December 31, 2026 does not exclude someone whose subscription was confirmed within the qualifying period. The internal Founders tag helps administer the benefit; it must reflect a verified confirmation and does not replace evidence of it.
 
-Subscription is voluntary. Consent to receive communications may be withdrawn free of charge. These terms do not make withdrawal of marketing consent a reason to remove a permanent benefit already acquired. The procedure for retaining minimal evidence of that entitlement after withdrawal must be finalised as part of the privacy arrangements.
+Subscription is voluntary. Consent to receive communications may be withdrawn free of charge. Unsubscribing from the newsletter does not remove the discount. The record evidencing discount entitlement will be kept separate from permission to receive marketing communications. The procedure for retaining that minimal evidence, its justified lawful basis and retention criteria must be finalised as part of the privacy arrangements, without assuming indefinite retention of all information.
 
 This website and its forms allow visitors to request information, access and samples; they are not a checkout and do not in themselves conclude a commission. Before a purchase, CIM Studio must provide the quotation and applicable sale terms, including taxes, charges, payment, delivery and statutory rights. These Founders terms do not replace that information or restrict mandatory consumer rights. Sale terms, the practical application of the discount and the specific criteria for Professional Pricing require review before orders are accepted. No Professional Price amount, free sample delivery or manufacturing or dispatch period is promised here.`;
 
@@ -45,7 +46,7 @@ export default {
     'Adopt retention/deletion criteria and procedures for each store, including minimal Founders evidence after marketing withdrawal and deletion of verification documents.',
     'Verify contracting entities, processing agreements, locations, subprocessors and international-transfer safeguards for Cloudflare, GetResponse, Resend and Microsoft 365.',
     'Audit the deployed Turnstile configuration, browser technologies and email tracking; determine any consent requirements before enabling non-essential technologies.',
-    'Validate Europe/Madrid as the inclusive deadline time zone; configure evidence of confirmed subscriptions and the Founders entitlement process.',
+    'Configure evidence of confirmed subscriptions using the confirmed Europe/Madrid deadline and a separate Founders entitlement record independent of marketing permission.',
     'Finalise Professional Pricing criteria, discount administration and full sale/sample terms; confirm any legally required registration, consumer-information and dispute-resolution details.',
     'Review both languages, remove outstanding drafting qualifications, assign the approved version and expressly approve; keep forms disabled until then.'
   ],
@@ -54,7 +55,7 @@ export default {
 
 Titular del sitio: CIM STUDIO ESPJ. NIF: E88749155.
 Domicilio: C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
-Contacto y privacidad: info@cimstudio.es.
+Contacto y privacidad: admin@cimstudio.es. Dominio: cimstudio.es.
 
 CIM Studio presenta su trabajo de diseño y cerámica artesanal y permite solicitar acceso a comunicaciones de la colección y muestras para proyectos profesionales. El envío de un formulario no constituye una compra ni garantiza la concesión de Precio Profesional. Los datos registrales o autorizaciones adicionales que resulten legalmente exigibles deben comprobarse antes de la publicación definitiva; no se han facilitado datos registrales para incorporarlos.
 
@@ -62,14 +63,14 @@ Los contenidos, fotografías, identidad visual y diseños están sujetos a los d
 
 La información comercial deberá concretarse en cada propuesta o contratación. Los enlaces a servicios de terceros se rigen también por la información y condiciones de esos servicios. Nada de este aviso excluye responsabilidades o derechos que no puedan excluirse por ley. La aplicación de la legislación española se entiende sin perjuicio de las normas imperativas y de la protección que corresponda al consumidor. No se impone un fuero exclusivo que limite sus derechos.
 
-Las consultas pueden dirigirse a info@cimstudio.es. Deben completarse, cuando correspondan, los datos sobre mecanismos de resolución de reclamaciones y obligaciones específicas de contratación antes de aceptar ventas.
+Las consultas pueden dirigirse a admin@cimstudio.es. Deben completarse, cuando correspondan, los datos sobre mecanismos de resolución de reclamaciones y obligaciones específicas de contratación antes de aceptar ventas.
 
-${termsEs}`,
+Las condiciones de la Tarifa Fundadores están disponibles en el enlace de este diálogo.`,
     terms: termsEs,
     privacy: `POLÍTICA DE PRIVACIDAD
 
 1. Responsable y alcance
-CIM STUDIO ESPJ, NIF E88749155, con domicilio en C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España, es responsable de los tratamientos descritos. Contacto para privacidad y ejercicio de derechos: info@cimstudio.es. No se identifica un delegado de protección de datos porque no se ha confirmado su designación.
+CIM STUDIO ESPJ, NIF E88749155, con domicilio en C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España, es responsable de los tratamientos descritos. Contacto para privacidad y ejercicio de derechos: admin@cimstudio.es. No se identifica un delegado de protección de datos porque no se ha confirmado su designación.
 
 Esta política describe el funcionamiento preparado para los formularios y su activación posterior. Mientras la configuración mantenga los formularios deshabilitados, estos son demostraciones y no envían los datos introducidos. El alojamiento puede tratar datos técnicos de navegación incluso en modo de demostración. La activación de pruebas conectadas se indicará expresamente: en esa modalidad sí se envían datos de prueba a los proveedores.
 
@@ -88,7 +89,7 @@ Antes de conceder Precio Profesional, CIM Studio verificará personalmente la ac
 
 Solo se solicitará evidencia adecuada y necesaria. Deben ocultarse datos ajenos a la comprobación, especialmente información económica, identificadores y datos personales que no sean necesarios para acreditar la actividad y su relación con el solicitante. No se solicitan estos documentos mediante los formularios actuales. Se revisarán por personal autorizado y no se incorporarán a las listas de marketing. La base propuesta es la gestión precontractual de la tarifa solicitada para el propio profesional o, si actúa por una entidad, el interés legítimo en verificar esa condición; su necesidad y ponderación deben validarse antes de solicitar documentos.
 
-La fecha de confirmación de suscripción, y no la verificación profesional, determina el derecho a Fundadores. Para gestionar el descuento permanente será necesario conservar una acreditación mínima de la elegibilidad, separada de la finalidad de enviar publicidad. Su base jurídica y el procedimiento de conservación después de una baja deben aprobarse; no se condiciona la posibilidad de retirar el consentimiento publicitario.
+La fecha de confirmación de suscripción, y no la verificación profesional, determina el derecho a Fundadores. Para gestionar el descuento permanente será necesario conservar una acreditación mínima de la elegibilidad, separada de la finalidad de enviar publicidad. Su base jurídica y el procedimiento de conservación después de una baja deben aprobarse; la baja de la newsletter no supone perder el descuento. El registro de este derecho se mantendrá separado de la autorización para recibir comunicaciones comerciales.
 
 5. Seguridad y evidencia
 Cloudflare aloja la web, ejecuta Pages Functions y Turnstile para verificar solicitudes y presta la base de datos D1. La protección frente al abuso trata datos técnicos de conexión y señales del navegador; el servidor comprueba el token, hostname y acción de Turnstile. No se envía expresamente el campo de IP del visitante a la API de verificación, lo que no impide que Cloudflare trate datos de conexión al prestar sus servicios.
@@ -101,17 +102,32 @@ Intervienen Cloudflare (alojamiento, Functions, D1 y Turnstile), GetResponse (su
 Deben verificarse en los contratos reales las entidades contratantes, el papel de cada proveedor, sus encargos de tratamiento, subencargados y ubicaciones. Puede existir tratamiento fuera del Espacio Económico Europeo. Las garantías concretas, como una decisión de adecuación o cláusulas contractuales tipo cuando correspondan, y el modo de obtener información sobre ellas deben completarse tras esa comprobación. No se afirma que todo el tratamiento tenga lugar en la UE ni que un proveedor concreto esté cubierto por una garantía no verificada. Esta revisión es requisito previo a la activación.
 
 7. Conservación y supresión
-Las comunicaciones se gestionarán mientras exista consentimiento; una baja exige cesar el marketing y mantener solo los datos mínimos necesarios para respetarla y justificar actuaciones cuando exista base legal. Las solicitudes de muestras se conservarán durante su tramitación y el seguimiento necesario; una contratación posterior exigirá la conservación legal correspondiente a esa relación. Deben fijarse y documentarse los criterios concretos de revisión y borrado en GetResponse, Resend, D1, Microsoft 365 y los registros técnicos del alojamiento; no se establece un número de años sin una justificación verificada.
+Tarifa Fundadores: se conservarán únicamente los datos necesarios para acreditar y gestionar el descuento de por vida, mientras el derecho siga vigente y exista una base jurídica adecuada para esa conservación. La baja de la newsletter no elimina este derecho. Su acreditación se mantendrá separada de la autorización para recibir comunicaciones comerciales; el carácter permanente del descuento no justifica conservar todos los datos indefinidamente.
+
+Newsletter: los datos se tratarán para comunicaciones comerciales mientras exista consentimiento válido. Tras la baja, cesarán los envíos y solo se conservarán los datos mínimos cuya conservación esté justificada para acreditar la baja, cumplir obligaciones aplicables o impedir comunicaciones no deseadas.
+
+Solicitudes de muestras: los datos se conservarán durante la gestión de la solicitud. Después, solo se conservarán cuando exista una finalidad comercial concreta o una obligación legal que lo justifique, y únicamente en la medida necesaria para esa finalidad u obligación.
+
+Oportunidades laborales: los datos se conservarán mientras exista una finalidad vigente y una base jurídica válida. Se establecerán revisiones periódicas de su necesidad para suprimir los datos que hayan dejado de ser necesarios; no se presume una conservación indefinida por defecto.
+
+Los criterios de revisión y borrado de cada finalidad deben documentarse y aplicarse en GetResponse, Resend, D1, Microsoft 365 y los registros técnicos del alojamiento, según los datos que trate cada sistema. Deben concretarse los procedimientos y la periodicidad de las revisiones, sin inventar plazos legales ni dar por aprobadas bases jurídicas pendientes de justificar. Cuando ya no exista una finalidad o base jurídica adecuada, se procederá a la supresión o, cuando corresponda por una obligación aplicable, al bloqueo de los datos estrictamente necesarios.
 
 Para los documentos de verificación profesional, el criterio propuesto es limitar el acceso al personal que comprueba la actividad, registrar únicamente el resultado y la evidencia mínima necesaria y suprimir las copias completas cuando concluya la verificación y dejen de ser necesarias para resolver incidencias o cumplir una obligación aplicable. La retención por defecto del buzón no debe sustituir este procedimiento. La decisión final sobre el momento de borrado, responsables, copias y posibles bloqueos por obligaciones o reclamaciones está pendiente de aprobación antes de solicitar documentación.
 
 Las pruebas de consentimiento y de derecho al descuento requieren un criterio propio y proporcionado; no se fija una conservación indefinida de todos los datos por el carácter permanente del beneficio. Los contadores de frecuencia tienen una ventana horaria y los vencidos se limpian al recibir nuevas solicitudes; no existe una tarea programada que garantice su borrado inmediato al vencer. La supresión de evidencias y solicitudes no está automatizada todavía. Debe aprobarse un procedimiento que contemple también las condiciones de conservación y borrado de los proveedores.
 
-8. Derechos y reclamaciones
-Puede solicitar acceso, rectificación, supresión, limitación, oposición y portabilidad cuando procedan, y retirar el consentimiento, escribiendo a info@cimstudio.es. Solo se solicitará información adicional para comprobar identidad cuando sea necesaria y proporcionada. También puede reclamar ante la Agencia Española de Protección de Datos (https://www.aepd.es). La baja de publicidad no impide ejercer otros derechos ni autoriza conservar información innecesaria. Las revisiones pendientes indicadas en este borrador deberán resolverse antes de su aprobación y de habilitar tratamientos reales.`,
+8. Avisos de oportunidades profesionales
+El formulario «Forma parte de CIM Studio» permite dejar únicamente el email para recibir avisos de oportunidades laborales del estudio. La base jurídica propuesta es el consentimiento específico de la casilla obligatoria, inicialmente desmarcada (artículo 6.1.a del RGPD). No se solicitan CV, teléfono ni otros datos de candidatura. Este registro no constituye una candidatura a una vacante ni garantiza una oferta de empleo.
+
+El destino preparado es una lista de GetResponse independiente de la newsletter comercial, con evidencias en una base D1 separada. No implica suscripción comercial, verificación profesional ni derecho a Tarifa Fundadores. Se registrarán el idioma, la fecha de aceptación, la versión de la información y el texto exacto del consentimiento, con un identificador seudonimizado del email, estado y referencia del proveedor cuando exista. Cloudflare/Turnstile verificará el envío y limitará abusos; GetResponse recibirá el email y las evidencias necesarias para gestionar exclusivamente estos avisos. Las condiciones y transferencias de estos proveedores siguen pendientes de la revisión indicada en esta política.
+
+Puede darse de baja de los avisos laborales mediante el enlace de baja que debe incluirse en cada comunicación o escribiendo a admin@cimstudio.es, sin afectar a otras suscripciones independientes. Al retirar el consentimiento cesarán esos avisos. La conservación de la lista laboral y de sus evidencias seguirá el criterio específico del apartado 7: finalidad vigente, base jurídica válida y revisiones periódicas de necesidad. Deben aprobarse los procedimientos de revisión y supresión, conservando tras la baja solo lo mínimo que tenga una base jurídica justificada, incluida la gestión de bajas; no se fija un plazo de años ni una conservación indefinida. Mientras no estén configurados y probados la lista, el almacenamiento y la gestión de bajas, el formulario permanecerá en demostración y no enviará ni guardará los datos introducidos.
+
+9. Derechos y reclamaciones
+Puede solicitar acceso, rectificación, supresión, limitación, oposición y portabilidad cuando procedan, y retirar el consentimiento, escribiendo a admin@cimstudio.es. Solo se solicitará información adicional para comprobar identidad cuando sea necesaria y proporcionada. También puede reclamar ante la Agencia Española de Protección de Datos (https://www.aepd.es). La baja de publicidad no impide ejercer otros derechos ni autoriza conservar información innecesaria. Las revisiones pendientes indicadas en este borrador deberán resolverse antes de su aprobación y de habilitar tratamientos reales.`,
     cookies: `POLÍTICA DE COOKIES Y TECNOLOGÍAS
 
-Responsable: CIM STUDIO ESPJ, NIF E88749155. Contacto: info@cimstudio.es. Domicilio: C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
+Responsable: CIM STUDIO ESPJ, NIF E88749155. Contacto: admin@cimstudio.es. Domicilio: C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
 
 El código de esta web no incorpora analítica publicitaria ni utiliza cookies propias, localStorage o sessionStorage para guardar preferencias o datos de los formularios. El idioma y el estado del formulario se mantienen en memoria durante la visita. Esta descripción del código no significa que los servicios de alojamiento o seguridad no traten datos técnicos o no puedan utilizar tecnologías del navegador.
 
@@ -121,14 +137,14 @@ GetResponse y Resend se invocan desde el servidor, no mediante un script de segu
 
 Antes de activar servicios deben inventariarse las tecnologías realmente observadas, su proveedor, finalidad, duración y carácter propio o de tercero. Si se utilizan tecnologías no exentas del consentimiento, deberán permanecer bloqueadas hasta obtenerlo y ofrecerse mecanismos de rechazo y retirada con la información correspondiente. No hay actualmente un gestor de consentimiento para tecnologías opcionales; no deben añadirse ni activarse sin resolver este punto. La calificación de necesidad técnica de Turnstile debe validarse en función de su configuración efectiva.
 
-Puede revisar o eliminar almacenamiento del sitio mediante los ajustes de su navegador; bloquear recursos técnicos puede impedir la verificación o el envío. Para cuestiones de privacidad o asistencia: info@cimstudio.es. El tratamiento de datos personales y sus derechos se describen en la política de privacidad. El inventario y las decisiones pendientes deben completarse antes de aprobar esta política.`
+Puede revisar o eliminar almacenamiento del sitio mediante los ajustes de su navegador; bloquear recursos técnicos puede impedir la verificación o el envío. Para cuestiones de privacidad o asistencia: admin@cimstudio.es. El tratamiento de datos personales y sus derechos se describen en la política de privacidad. El inventario y las decisiones pendientes deben completarse antes de aprobar esta política.`
   },
   en: {
     notice: `LEGAL NOTICE
 
 Website operator: CIM STUDIO ESPJ. Spanish tax identification number (NIF): E88749155.
 Address: C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
-Contact and privacy enquiries: info@cimstudio.es.
+Contact and privacy enquiries: admin@cimstudio.es. Domain: cimstudio.es.
 
 CIM Studio presents its design and handcrafted ceramics and allows visitors to request collection communications and samples for professional projects. Submitting a form does not constitute a purchase or guarantee access to Professional Pricing. Any additional registration or authorisation details required by law must be checked before the final publication; no registration details have been supplied for inclusion.
 
@@ -136,14 +152,14 @@ The content, photographs, visual identity and designs are subject to their respe
 
 Commercial information must be confirmed in each proposal or contract. Links to third-party services are also subject to those services’ own information and terms. Nothing in this notice excludes liabilities or rights that cannot lawfully be excluded. Spanish law applies without prejudice to mandatory rules and the protection available to consumers. No exclusive jurisdiction is imposed that would restrict their rights.
 
-Enquiries may be sent to info@cimstudio.es. Where applicable, information on complaint resolution and specific contracting obligations must be completed before sales are accepted.
+Enquiries may be sent to admin@cimstudio.es. Where applicable, information on complaint resolution and specific contracting obligations must be completed before sales are accepted.
 
-${termsEn}`,
+The Founders Rate terms are available through the link in this dialog.`,
     terms: termsEn,
     privacy: `PRIVACY POLICY
 
 1. Controller and scope
-CIM STUDIO ESPJ, NIF E88749155, at C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España, is the controller for the processing described here. For privacy enquiries and rights requests, contact info@cimstudio.es. No data protection officer is identified because an appointment has not been confirmed.
+CIM STUDIO ESPJ, NIF E88749155, at C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España, is the controller for the processing described here. For privacy enquiries and rights requests, contact admin@cimstudio.es. No data protection officer is identified because an appointment has not been confirmed.
 
 This policy describes the prepared form integrations and their subsequent activation. While the forms remain disabled in the configuration, they are demonstrations and do not send the details entered. Hosting may process technical browsing data even in demonstration mode. Connected testing will be expressly identified: in that mode, real test data is sent to providers.
 
@@ -162,7 +178,7 @@ CIM Studio will personally verify the activity of interior designers, architects
 
 Only suitable and necessary evidence will be requested. Information unrelated to verification should be concealed, especially financial information, identifiers and personal details not needed to establish the activity and the applicant’s connection to it. These documents are not requested through the current forms. They will be reviewed by authorised personnel and will not be added to marketing lists. The proposed basis is precontractual administration of the pricing requested by the professional personally or, when acting for an organisation, the legitimate interest in verifying that status; necessity and the balancing assessment must be validated before requesting documents.
 
-The subscription confirmation date, rather than professional verification, determines Founders eligibility. Administering the permanent discount requires minimal evidence of entitlement, kept separate from the purpose of sending advertising. Its legal basis and retention procedure after unsubscribe must be approved; the right to withdraw marketing consent is not made conditional on this.
+The subscription confirmation date, rather than professional verification, determines Founders eligibility. Administering the permanent discount requires minimal evidence of entitlement, kept separate from the purpose of sending advertising. Its legal basis and retention procedure after unsubscribe must be approved; unsubscribing from the newsletter does not remove the discount. The entitlement record will be kept separate from permission to receive marketing communications.
 
 5. Security and evidence
 Cloudflare hosts the website, runs Pages Functions and Turnstile for request verification, and provides the D1 database. Abuse prevention processes technical connection data and browser signals; the server checks the Turnstile token, hostname and action. The visitor’s IP field is not expressly sent to the verification API, although Cloudflare may still process connection data when providing its services.
@@ -175,17 +191,32 @@ Services involved are Cloudflare (hosting, Functions, D1 and Turnstile), GetResp
 The actual contracts must be checked for contracting entities, each provider’s role, processing agreements, subprocessors and locations. Processing outside the European Economic Area may occur. Specific safeguards, such as an adequacy decision or standard contractual clauses where applicable, and how to obtain information about them must be completed after that review. We do not state that all processing takes place in the EU or that any particular provider is covered by an unverified safeguard. This review is required before activation.
 
 7. Retention and deletion
-Communications will be managed while consent remains valid; an unsubscribe requires marketing to stop, retaining only the minimum information needed to respect the withdrawal and justify actions where a lawful basis exists. Sample enquiries will be retained while handled and for necessary follow-up; a subsequent contract will require the lawful retention applicable to that relationship. Specific review and deletion criteria must be established and documented for GetResponse, Resend, D1, Microsoft 365 and hosting technical records; no number of years is stipulated without verified justification.
+Founders Rate: only the information necessary to evidence and administer the lifetime discount will be retained, for as long as the entitlement remains valid and there is an appropriate lawful basis for that retention. Unsubscribing from the newsletter does not remove this entitlement. Evidence of entitlement will be kept separate from permission to receive marketing communications; the permanent discount does not justify retaining all information indefinitely.
+
+Newsletter: information will be processed for marketing communications while valid consent exists. After unsubscribe, messages will stop and only the minimum information whose retention is justified to evidence the unsubscribe request, meet applicable obligations or prevent unwanted communications will be retained.
+
+Sample enquiries: information will be retained while the enquiry is being handled. Afterwards, it will only be retained where a specific commercial purpose or legal obligation justifies doing so, and only to the extent necessary for that purpose or obligation.
+
+Career opportunities: information will be retained while there is a current purpose and a valid lawful basis. Periodic reviews of its necessity will be established so that information no longer needed is deleted; indefinite retention is not presumed by default.
+
+Purpose-specific review and deletion criteria must be documented and applied in GetResponse, Resend, D1, Microsoft 365 and hosting technical records, according to the information each system processes. Procedures and review frequency must be defined without inventing statutory retention periods or treating lawful bases awaiting justification as approved. When there is no longer an appropriate purpose or lawful basis, information will be deleted or, where required by an applicable obligation, only the strictly necessary information will be blocked from ordinary use.
 
 For professional verification documents, the proposed approach is to restrict access to those verifying activity, record only the outcome and minimum necessary evidence, and delete full copies once verification is complete and they are no longer needed to resolve issues or meet an applicable obligation. Default mailbox retention must not substitute for this procedure. The final decision on deletion timing, responsible personnel, copies and any restriction on deletion for obligations or claims remains subject to approval before documentation is requested.
 
 Consent evidence and discount entitlement require their own proportionate retention criteria; the permanent benefit does not justify indefinite retention of all information. Rate counters use an hourly window and expired entries are cleaned when new requests arrive; no scheduled task guarantees immediate deletion at expiry. Deletion of request and consent records is not yet automated. An approved procedure must also account for providers’ retention and deletion arrangements.
 
-8. Rights and complaints
-You may request access, rectification, erasure, restriction, objection and portability where applicable, and withdraw consent, by emailing info@cimstudio.es. Additional identity information will only be requested where necessary and proportionate. You may also complain to the Spanish Data Protection Agency (https://www.aepd.es). Unsubscribing does not prevent you from exercising other rights or authorise unnecessary retention. Outstanding reviews identified in this draft must be completed before approval and the activation of real processing.`,
+8. Career opportunity updates
+The “Become part of CIM Studio” form allows you to leave only your email to receive updates about opportunities at the studio. The proposed lawful basis is the specific consent given through the required, initially unchecked checkbox (Article 6(1)(a) GDPR). No CV, telephone number or other application details are requested. Joining this register is not an application for a vacancy and does not guarantee an offer of employment.
+
+The prepared destination is a GetResponse list independent of the commercial newsletter, with evidence held in a separate D1 database. It does not subscribe you to commercial marketing, verify professional status or confer Founders Rate entitlement. The language, acceptance timestamp, information version and exact consent wording will be recorded alongside a pseudonymous email identifier, status and provider reference where available. Cloudflare/Turnstile will verify submissions and limit abuse; GetResponse will receive the email and evidence needed to manage these updates exclusively. These providers’ terms and transfers remain subject to the review described in this policy.
+
+You may unsubscribe from career updates using the unsubscribe link that must be included in every message or by emailing admin@cimstudio.es, without affecting other independent subscriptions. These updates will stop when you withdraw consent. Retention of the career list and its evidence will follow the specific criterion in section 7: a current purpose, a valid lawful basis and periodic necessity reviews. Review and deletion procedures must be approved, retaining after unsubscribe only the minimum information with a justified lawful basis, including respecting unsubscribe requests; no fixed number of years or indefinite retention is stipulated. Until the list, storage and unsubscribe arrangements are configured and tested, the form will remain in demonstration mode and will not send or store the details entered.
+
+9. Rights and complaints
+You may request access, rectification, erasure, restriction, objection and portability where applicable, and withdraw consent, by emailing admin@cimstudio.es. Additional identity information will only be requested where necessary and proportionate. You may also complain to the Spanish Data Protection Agency (https://www.aepd.es). Unsubscribing does not prevent you from exercising other rights or authorise unnecessary retention. Outstanding reviews identified in this draft must be completed before approval and the activation of real processing.`,
     cookies: `COOKIES AND TECHNOLOGIES POLICY
 
-Controller: CIM STUDIO ESPJ, NIF E88749155. Contact: info@cimstudio.es. Address: C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
+Controller: CIM STUDIO ESPJ, NIF E88749155. Contact: admin@cimstudio.es. Address: C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
 
 The website code does not include advertising analytics or use first-party cookies, localStorage or sessionStorage to retain preferences or form details. Language and form state remain in memory during the visit. This description of the code does not mean that hosting or security services process no technical data or cannot use browser technologies.
 
@@ -195,6 +226,6 @@ GetResponse and Resend are called from the server, rather than through a trackin
 
 Before services are enabled, the technologies actually observed must be inventoried, including provider, purpose, lifetime and first- or third-party status. Technologies requiring consent must remain blocked until it is obtained, with appropriate information and mechanisms to refuse and withdraw it. There is currently no consent manager for optional technologies; they must not be added or enabled without resolving this requirement. Whether Turnstile qualifies as technically necessary must be assessed against its effective configuration.
 
-You can inspect or remove site storage through your browser settings; blocking technical resources may prevent verification or submission. For privacy questions or assistance, contact info@cimstudio.es. Personal-data processing and your rights are described in the privacy policy. The inventory and outstanding decisions must be completed before this policy is approved.`
+You can inspect or remove site storage through your browser settings; blocking technical resources may prevent verification or submission. For privacy questions or assistance, contact admin@cimstudio.es. Personal-data processing and your rights are described in the privacy policy. The inventory and outstanding decisions must be completed before this policy is approved.`
   }
 };
