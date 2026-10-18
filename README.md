@@ -15,7 +15,7 @@ Para servir solo la maqueta: `python3 -m http.server 3000 --directory public`. L
 
 ## Activación y dominio
 
-Seguir [LAUNCH.md](LAUNCH.md): documentos legales pendientes, ajustes exactos de Cloudflare/GetResponse/Resend, pruebas reales y conexión de dominio conservando Microsoft 365. No se han realizado envíos reales, configurado cuentas externas ni modificado DNS. Las credenciales deben guardarse en Cloudflare, nunca en este repositorio.
+Seguir [LAUNCH.md](LAUNCH.md): documentos legales pendientes, ajustes exactos de Cloudflare/GetResponse/Resend, pruebas reales y conexión de dominio conservando el servicio de correo actual de Google Workspace (Gmail). No se han realizado envíos reales, configurado cuentas externas ni modificado DNS. Las credenciales deben guardarse en Cloudflare, nunca en este repositorio.
 
 `legal/content.js` contiene una plantilla pendiente de revisión, no una política jurídica aprobada. No activar los tres flags de lanzamiento antes de completar las pruebas indicadas.
 

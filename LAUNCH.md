@@ -1,6 +1,6 @@
 # Activación de CIM Studio en Cloudflare Pages
 
-La rama de trabajo y producción seleccionada es `design/private-access-v1`. No fusionar con `main`. Compilación: `sh scripts/build-preview.sh`; salida `public`; raíz del repositorio; framework None. Pages detecta `functions/` en la raíz y empaqueta el servidor por separado: **no copiar Functions a public**. No se han cambiado DNS, Microsoft 365 ni la composición visual. No hay credenciales reales en el repositorio.
+La rama de trabajo y producción seleccionada es `design/private-access-v1`. No fusionar con `main`. Compilación: `sh scripts/build-preview.sh`; salida `public`; raíz del repositorio; framework None. Pages detecta `functions/` en la raíz y empaqueta el servidor por separado: **no copiar Functions a public**. No se han cambiado DNS, la configuración externa de correo ni la composición visual. El proveedor actual de correo confirmado es Google Workspace (Gmail), y el único buzón confirmado y operativo es admin@cimstudio.es. No hay credenciales reales en el repositorio.
 
 ## 1. Aprobar los documentos antes de activar envíos
 
@@ -10,7 +10,7 @@ Revisar `pendingReview` en ese archivo antes de aprobar:
 
 - Bases jurídicas por finalidad, ponderaciones de interés legítimo y proporcionalidad de los documentos de verificación profesional.
 - Criterios y procedimiento de conservación/supresión en cada sistema y buzón, con evidencia mínima de Fundadores separada del marketing y eliminación de copias fiscales innecesarias.
-- Contratos reales, entidades proveedoras, encargos, ubicaciones y garantías de transferencias de Cloudflare, GetResponse, Resend y Microsoft 365.
+- Contratos reales, entidades proveedoras, encargos, ubicaciones y garantías de transferencias de Cloudflare, GetResponse, Resend y Google Workspace (Gmail).
 - Inventario del despliegue de Turnstile y tecnologías de navegador; seguimiento de aperturas/clics de email y consentimiento que corresponda.
 - Criterio horario confirmado: `Europe/Madrid` (`2027-01-01T00:00:00+01:00`, exclusivo). Elegibilidad por confirmación efectiva, nunca por la fecha de solicitud/API ni la de verificación profesional.
 - Criterios de Precio Profesional y operativa comercial, condiciones de venta/muestras y datos registrales o información de reclamaciones que resulten exigibles.
@@ -27,11 +27,11 @@ Asignar una versión estable (por ejemplo la fecha real de aprobación, no una f
 4. Crear la etiqueta `cim_founders_2026`. Aplicarla solo tras la confirmación efectiva de alta dentro del plazo inclusivo. Usar automatización de la cuenta si permite filtrar la fecha de confirmación; en caso contrario, revisar/exportar las altas confirmadas y etiquetar el segmento manualmente. **No usar la fecha de clic ni el atributo HTML como prueba de elegibilidad**. La etiqueta y beneficio no caducan al terminar 2026. No hemos aplicado etiquetas a personas ni automatizaciones a la cuenta.
 5. Verificar en una prueba real los campos guardados, el correo de confirmación y la condición de fecha. La documentación remota del proveedor estaba bloqueada por la red del entorno; las pruebas automatizadas validan el contrato preparado con respuestas simuladas, no el comportamiento de la cuenta real.
 
-## 3. Correo de muestras sin cambiar Microsoft 365
+## 3. Correo de muestras sin cambiar Google Workspace (Gmail)
 
-Crear una cuenta Resend y verificar un **subdominio de envío**, por ejemplo `envios.cimstudio.es`. Su panel indicará los registros exactos. Añadir en el DNS autoritativo solo esos registros del subdominio (DKIM/SPF y, si el proveedor lo pide, MX de ese subdominio). **No tocar los MX, SPF, DKIM, autodiscover ni credenciales de Microsoft 365 en la raíz**. No crear un segundo SPF en el mismo nombre.
+Crear una cuenta Resend y verificar un **subdominio de envío**, por ejemplo `envios.cimstudio.es`. Su panel indicará los registros exactos. Añadir en el DNS autoritativo solo esos registros del subdominio (DKIM/SPF y, si el proveedor lo pide, MX de ese subdominio). **No modificar los registros de correo vigentes ni las credenciales de Google Workspace. Cotejar la configuración real en el panel del proveedor y el DNS autoritativo antes de cualquier cambio autorizado: aquí no se prescriben valores de MX, SPF o DKIM de Google ni se reutilizan instrucciones del proveedor anterior**. No crear un segundo SPF en el mismo nombre.
 
-Crear una clave Resend de envío para ese dominio. Configurar `MAIL_FROM` con un remitente verificado, por ejemplo `CIM Studio <notificaciones@envios.cimstudio.es>`. El destinatario es fijo en el servidor: `pedidos@cimstudio.es`; el email del solicitante se usa solo como Reply-To. El mensaje es texto plano y contiene nombre, email, empresa, profesión, proyecto y evidencia del consentimiento. Probar entrega real, correo no deseado y respuesta al profesional.
+Crear una clave Resend de envío para ese dominio. Configurar `MAIL_FROM` con un remitente verificado, por ejemplo `CIM Studio <notificaciones@envios.cimstudio.es>`. El destinatario es fijo en el servidor: `admin@cimstudio.es`; el email del solicitante se usa solo como Reply-To. El mensaje es texto plano y contiene nombre, email, empresa, profesión, proyecto y evidencia del consentimiento. Probar entrega real, correo no deseado y respuesta al profesional.
 
 ## 4. Cloudflare: datos y secretos exactos
 
@@ -68,7 +68,7 @@ En esta modalidad el aviso de demostración permanece, pero avisa expresamente d
 
 1. ES y EN: comprobar que un formulario incompleto/no consentido no se envía; completar Turnstile.
 2. Suscribir una dirección propia nueva, comprobar que GetResponse la recibe y guarda los cuatro campos; confirmar el email si la lista lo exige y comprobar fecha/elegibilidad Fundadores. Repetir la misma dirección: no debe crearse otro contacto ni reactivarse una baja anterior automáticamente.
-3. Enviar muestras; verificar recepción efectiva en `pedidos@cimstudio.es` y Reply-To, todos los campos y consentimiento. Reintentar el mismo envío no debe duplicarlo. Aceptación API del proveedor no demuestra entrega.
+3. Enviar muestras; verificar recepción efectiva en `admin@cimstudio.es` y Reply-To, todos los campos y consentimiento. Reintentar el mismo envío no debe duplicarlo. Aceptación API del proveedor no demuestra entrega.
 4. Provocar un fallo controlado (por ejemplo clave de envío desactivada en un entorno separado de pruebas): debe mostrarse error, conservar datos y permitir reintento. No desactivar credenciales de producción en uso.
 5. Revisar D1 y los paneles de proveedores, sin compartir datos personales ni claves por chat. Los tests automatizados no sustituyen estas pruebas.
 
@@ -85,8 +85,8 @@ Definir y documentar la conservación y el borrado de evidencias y solicitudes e
 ## 6. Dominio y retirada del modo de prueba
 
 1. En Cloudflare Pages → Custom domains añadir `cimstudio.es` y seguir la activación propuesta. **No apuntar DNS a mano antes de vincularlo en Pages**.
-2. El dominio raíz en Pages suele requerir que la zona DNS esté en Cloudflare. Si aún está en GoDaddy, exportar TODOS los registros, incorporarlos a Cloudflare y cotejar especialmente MX, TXT de SPF/verificación, DKIM y autodiscover de Microsoft 365. Solo entonces, si Cloudflare lo exige y tras revisar DNSSEC, cambiar en GoDaddy los nameservers a los asignados por Cloudflare. Si la zona ya está en Cloudflare, no cambiar nameservers en GoDaddy. No borrar registros de correo ni modificar Microsoft 365.
-3. Esperar al dominio activo y certificado HTTPS válido; probar que el correo Microsoft 365 sigue enviando/recibiendo y los dos formularios funcionan desde `cimstudio.es` (también autorizado en Turnstile).
+2. El dominio raíz en Pages suele requerir que la zona DNS esté en Cloudflare. Si aún está en GoDaddy, exportar TODOS los registros, incorporarlos a Cloudflare y cotejar todos los registros vigentes de correo y verificación con la configuración real de Google Workspace, sin inventar ni sustituir sus valores. Solo entonces, si Cloudflare lo exige y tras revisar DNSSEC, cambiar en GoDaddy los nameservers a los asignados por Cloudflare. Si la zona ya está en Cloudflare, no cambiar nameservers en GoDaddy. No borrar registros de correo ni modificar la configuración de Google Workspace.
+3. Esperar al dominio activo y certificado HTTPS válido; probar que admin@cimstudio.es sigue enviando y recibiendo mediante Google Workspace (Gmail) y los dos formularios funcionan desde `cimstudio.es` (también autorizado en Turnstile).
 4. Poner `SITE_LIVE=true`, manteniendo los otros dos flags true, y redeploy. El build añade canonical/sitemap/robots y elimina el noindex HTML solo si los documentos están aprobados y las pruebas están confirmadas. El middleware mantiene noindex en páginas de prueba/hostnames distintos de `cimstudio.es` y si falta configuración. La marca global de prueba solo se oculta en el dominio definitivo listo. Verificar noindex/canonical con las herramientas del navegador antes de anunciar el lanzamiento.
 
 Favicon y apple-touch-icon son derivados del logotipo original, sin modificarlo. No hay analítica añadida. La composición de `3f2baa6` permanece; los tres botones de acción comparten ahora estilos, flecha, hover, teclado y pulsación táctil.

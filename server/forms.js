@@ -90,7 +90,7 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
     } else {
       if(/[\r\n]/.test(env.MAIL_FROM) || !env.MAIL_FROM.includes('@')) throw new Rejection('unavailable',503);
       submitted=true;
-      const response=await remote(fetcher,'https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':id},body:JSON.stringify({from:env.MAIL_FROM,to:['pedidos@cimstudio.es'],reply_to:data.email,subject:'CIM Studio — Solicitud de muestras',text:`Nombre: ${data.name}\nEmail: ${data.email}\nEstudio / empresa: ${data.company}\nProfesión: ${data.discipline}\nIdioma: ${data.language}\n\nProyecto:\n${data.project}\n\nConsentimiento: ${consent[data.language].samples}\nAceptado: ${at}\nVersión de privacidad: ${legal.version}`})});
+      const response=await remote(fetcher,'https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':id},body:JSON.stringify({from:env.MAIL_FROM,to:['admin@cimstudio.es'],reply_to:data.email,subject:'CIM Studio — Solicitud de muestras',text:`Nombre: ${data.name}\nEmail: ${data.email}\nEstudio / empresa: ${data.company}\nProfesión: ${data.discipline}\nIdioma: ${data.language}\n\nProyecto:\n${data.project}\n\nConsentimiento: ${consent[data.language].samples}\nAceptado: ${at}\nVersión de privacidad: ${legal.version}`})});
       if(!response.ok){submitted=response.status>=500||response.status===409;throw new Rejection('unavailable',503);}
       const body=await response.json(); if(typeof body.id!=='string') throw new Error('Provider outcome unknown'); providerId=body.id;
     }

@@ -29,7 +29,8 @@ test('both languages include all documents, business identity and accessible com
     assert.ok(!legal[lang].notice.includes(legal[lang].terms), 'terms remain a single document');
     assert.ok(legal[lang].terms.includes('Europe/Madrid'));
     assert.ok(!JSON.stringify(legal[lang]).includes('info@cimstudio.es'));
-    for (const provider of ['Cloudflare','GetResponse','Resend','Microsoft 365','Turnstile','D1']) assert.ok(legal[lang].privacy.includes(provider));
+    assert.ok(!/Microsoft|pedidos@cimstudio\.es/i.test(JSON.stringify(legal[lang])));
+    for (const provider of ['Cloudflare','GetResponse','Resend','Google Workspace (Gmail)','Turnstile','D1']) assert.ok(legal[lang].privacy.includes(provider));
     assert.ok(legal[lang].privacy.includes('036'));
     assert.ok(legal[lang].privacy.includes('https://www.aepd.es'));
   }
