@@ -42,7 +42,8 @@ dialog{border:0;background:var(--paper);color:var(--ink);padding:50px;width:min(
  .photograph-pair .photograph{position:absolute;margin:0}
  .photograph-pool{left:calc(39% - 37.62% - var(--mobile-photo-gap));top:0;width:37.62%}
  .photograph-volcan{left:39%;right:auto;top:12%;width:54.56%}
- .photograph-soporte{grid-column:1;grid-row:2;width:80%}
+ /* Preserve the desktop width ratio and reserve the grid gap before TRAMUNTANA. */
+ .photograph-soporte{grid-column:1;grid-row:2;--mobile-soporte-width:calc((200% + clamp(12px,2vw,20px)) * .5456 * 19.5672 / 17.88204);width:var(--mobile-soporte-width);left:calc(115% - var(--mobile-soporte-width));min-width:0}
  .photograph-tramuntana{grid-column:2;grid-row:2;width:85%;justify-self:end}
  .invitation{width:100%;max-width:620px;margin:40px auto 0}
  h1{font-size:43px;line-height:1.08;margin-bottom:28px}.intro{font-size:12px;line-height:1.9;margin-bottom:25px}.intro:has(+ .intro){margin-bottom:20px}
