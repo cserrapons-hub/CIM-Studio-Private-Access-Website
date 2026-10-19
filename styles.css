@@ -13,9 +13,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .photograph-pair,.photograph-right{display:flex;flex-direction:column;gap:10px;min-width:0}
 .photograph{position:relative;margin:0;overflow:hidden;min-width:0}
 .photograph img{display:block;width:100%;height:auto}
-/* Preserve the existing frame while displaying the complete replacement image. */
-.photograph-soporte{aspect-ratio:1100 / 719}
-.photograph-soporte img{height:100%;object-fit:contain}
 .photograph-volcan,.photograph-tramuntana,.photograph-soporte{width:100%}
 .photograph-pool{width:50%;margin-left:62.5%}
 .invitation{position:relative;z-index:1;width:37%;margin:clamp(100px,10vw,155px) 0 100px 40.5%}
