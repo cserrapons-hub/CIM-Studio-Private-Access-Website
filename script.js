@@ -8,6 +8,18 @@ Object.assign(copy.es,{
 Object.assign(copy.en,{
  careersLink:'WANT TO WORK WITH US?',careersTitle:'Become part of CIM Studio.',careersDetails:"If you'd like to work with us someday, leave us your email. When a new opportunity opens up at the studio, you'll be among the first to hear about it.",careersEmail:'Email address',careersConsent:'I agree to receive updates about career opportunities at CIM Studio and have read the ',careersPrivacy:'Privacy Policy',careersSubmit:'Keep me updated'
 });
+Object.assign(copy.es,{
+ confirmationTitle:'Aún no podemos darte acceso.',
+ confirmationIntro:'Para poder entrar, necesitamos que confirmes tu correo electrónico. Abre tu bandeja de entrada y confirma tu suscripción a nuestra lista de correo.',
+ confirmationHelp:'Si no encuentras el mensaje, revisa la carpeta de spam, promociones o cualquier otra carpeta donde pueda haber llegado.',
+ confirmationClose:'Entendido'
+});
+Object.assign(copy.en,{
+ confirmationTitle:"We can't give you access just yet.",
+ confirmationIntro:'To access our private space, we need you to confirm your email address. Open your inbox and confirm your subscription to our mailing list.',
+ confirmationHelp:"If you can't find the email, check your spam, promotions or other folders where it might have arrived.",
+ confirmationClose:'Got it'
+});
 let language='es';let legal='notice';
 const legalLabels={es:{notice:'Aviso legal',privacy:'Privacidad',cookies:'Cookies y tecnologías',terms:'Tarifa Fundadores',draft:'Borrador pendiente de revisión y aprobación legal. Los formularios permanecen en demostración.',navigation:'Documentos legales'},en:{notice:'Legal notice',privacy:'Privacy',cookies:'Cookies and technologies',terms:'Founders Rate',draft:'Draft awaiting legal review and approval. Forms remain in demonstration mode.',navigation:'Legal documents'}};
 function updateLegal(){

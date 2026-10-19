@@ -10,9 +10,9 @@ function setup(kind='subscribe'){
  Object.assign(legal,{approved:true,version:'test-policy-1',business:{name:'Test business',taxId:'TEST',postalAddress:'Test address',privacyEmail:'privacy@example.test'},es:{notice:'Test legal',privacy:'Test privacy',cookies:'Test cookies'},en:{notice:'Test legal',privacy:'Test privacy',cookies:'Test cookies'}});
  const sqlite=new DatabaseSync(':memory:');sqlite.exec(readFileSync(new URL('../migrations/0001_forms.sql',import.meta.url),'utf8'));
  const db={prepare(sql){let args=[];return{bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}}}};
- const env={FORMS_ENABLED:'true',FORMS_VERIFIED:'false',SITE_LIVE:'false',FORMS_DB:db,TURNSTILE_SITE_KEY:'test-site',TURNSTILE_SECRET_KEY:'test-secret',AUDIT_HASH_SECRET:'test-only-hmac-secret-at-least-32-characters',GETRESPONSE_API_KEY:'test-key',GETRESPONSE_CAMPAIGN_ID:'test-list',GR_CONSENT_AT_FIELD_ID:'at',GR_CONSENT_VERSION_FIELD_ID:'version',GR_CONSENT_TEXT_FIELD_ID:'text',GR_LANGUAGE_FIELD_ID:'lang',RESEND_API_KEY:'test-key',MAIL_FROM:'CIM Test <test@example.test>'};
+ const env={FORMS_ENABLED:'true',NEWSLETTER_ENABLED:'true',FORMS_VERIFIED:'false',SITE_LIVE:'false',FORMS_DB:db,TURNSTILE_SITE_KEY:'test-site',TURNSTILE_SECRET_KEY:'test-secret',AUDIT_HASH_SECRET:'test-only-hmac-secret-at-least-32-characters',GETRESPONSE_API_KEY:'test-key',GETRESPONSE_CAMPAIGN_ID:'test-list',GR_CONSENT_AT_FIELD_ID:'at',GR_CONSENT_VERSION_FIELD_ID:'version',GR_CONSENT_TEXT_FIELD_ID:'text',GR_LANGUAGE_FIELD_ID:'lang',RESEND_API_KEY:'test-key',MAIL_FROM:'CIM Test <test@example.test>'};
  const body={email:'Person@example.test',language:'es',consent:true,website:'',token:'test-token',requestId:'12345678-1234-1234-1234-123456789abc',legalVersion:legal.version,...(kind==='samples'?{name:'Test professional',company:'Test studio',discipline:'architecture',project:'Test ceramic project'}:{})};
- const calls=[];const fetcher=async(url,options)=>{calls.push({url,options});if(url.includes('siteverify'))return Response.json({success:true,hostname:'cim.test',action:kind});if(url.includes('/contacts?'))return Response.json([]);if(url.endsWith('/contacts'))return new Response(null,{status:202});if(url.includes('resend.com'))return Response.json({id:'test-provider-id'});throw Error('Unexpected URL');};
+ const calls=[];const fetcher=async(url,options)=>{calls.push({url,options});if(url.includes('siteverify'))return Response.json({success:true,hostname:'cim.test',action:kind});if(url.includes('/campaigns/'))return Response.json({campaignId:'test-list',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(url.includes('/contacts?'))return Response.json([]);if(url.endsWith('/contacts'))return new Response(null,{status:202});if(url.includes('resend.com'))return Response.json({id:'test-provider-id'});throw Error('Unexpected URL');};
  const request=(changes={},headers={})=>new Request('https://cim.test/api/'+kind,{method:'POST',headers:{Origin:'https://cim.test','Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1',...headers},body:JSON.stringify({...body,...changes})});
  return{env,body,request,fetcher,calls,sqlite};
 }
@@ -83,4 +83,52 @@ test('career provider failure never reports success; ambiguous sends are not rep
 test('English career consent uses the same independent purpose',async()=>{
  const s=setupCareers();assert.equal((await handleSubmission(s.request({language:'en'}),s.env,'careers',s.fetcher)).status,202);
  assert.equal(s.careersSqlite.prepare('SELECT consent_text FROM form_requests').get().consent_text,legalConsent('en'));
+});
+
+test('newsletter has an additional opt-in activation gate independent of other forms',async()=>{
+ const s=setup();delete s.env.NEWSLETTER_ENABLED;
+ assert.equal((await handleSubmission(s.request(),s.env,'subscribe',s.fetcher)).status,503);
+ assert.equal(s.calls.length,0);assert.equal(publicSettings(s.env,new URL('https://cim.test')).enabled.subscribe,false);
+ assert.equal(publicSettings(s.env,new URL('https://cim.test')).enabled.samples,true);
+});
+test('newsletter verifies exact list and API double opt-in before any contact lookup or POST',async()=>{
+ for(const campaign of [
+  {campaignId:'test-list',name:'wrong',optinTypes:{api:'double'}},
+  {campaignId:'other',name:'cim_studio_newsletter',optinTypes:{api:'double'}},
+  {campaignId:'test-list',name:'cim_studio_newsletter',optinTypes:{api:'single'}},
+  {campaignId:'test-list',name:'cim_studio_newsletter',optinTypes:{webform:'double'}},
+  {campaignId:'test-list',name:'cim_studio_newsletter'}
+ ]){
+  const s=setup();const fetcher=(url,options)=>url.includes('/campaigns/')?Promise.resolve(Response.json(campaign)):s.fetcher(url,options);
+  const response=await handleSubmission(s.request(),s.env,'subscribe',fetcher);
+  assert.equal(response.status,503);assert.equal(s.calls.filter(c=>c.url.includes('/contacts')).length,0);
+ }
+});
+test('only a new queued newsletter POST returns confirmation_required; never confirmation or Founders',async()=>{
+ const s=setup();const r=await handleSubmission(s.request(),s.env,'subscribe',s.fetcher);
+ assert.deepEqual(await r.json(),{ok:true,subscription:'confirmation_required'});
+ const payload=JSON.parse(s.calls.find(c=>c.url.endsWith('/contacts')).options.body);
+ assert.deepEqual(Object.keys(payload).sort(),['campaign','customFieldValues','email']);
+ assert.ok(!/founders|confirmed|dayOfCycle|resend/i.test(JSON.stringify(payload)));
+ assert.equal(s.calls.some(c=>c.url.includes('resend.com')),false);
+ const replay=await handleSubmission(s.request(),s.env,'subscribe',s.fetcher);
+ assert.deepEqual(await replay.json(),{ok:true,subscription:'request_recorded'});
+ assert.equal(s.calls.filter(c=>c.url.endsWith('/contacts')).length,1);
+});
+test('existing contacts do not trigger a confirmation promise or another email',async()=>{
+ const s=setup();const fetcher=(url,options)=>url.includes('/contacts?')?Promise.resolve(Response.json([{email:'person@example.test',contactId:'existing',campaign:{campaignId:'test-list'}}])):s.fetcher(url,options);
+ assert.deepEqual(await (await handleSubmission(s.request(),s.env,'subscribe',fetcher)).json(),{ok:true,subscription:'request_recorded'});
+ assert.equal(s.calls.filter(c=>c.url.endsWith('/contacts')).length,0);
+});
+test('newsletter rejection and uncertain outcomes never promise confirmation or retry a possibly sent email',async()=>{
+ for(const status of [400,401,409,429,500,'timeout']){
+  const s=setup();let attempts=0;
+  const fetcher=async(url,options)=>{if(url.endsWith('/contacts')){attempts++;if(status==='timeout')throw new Error('Sensitive provider detail must not escape');return Response.json({email:s.body.email},{status});}return s.fetcher(url,options);};
+  const response=await handleSubmission(s.request(),s.env,'subscribe',fetcher);
+  assert.equal(response.status,503);assert.deepEqual(await response.json(),{error:'unavailable'});
+  if([409,500,'timeout'].includes(status)){
+   assert.equal((await handleSubmission(s.request(),s.env,'subscribe',fetcher)).status,409);
+   assert.equal(attempts,1);
+  }
+ }
 });

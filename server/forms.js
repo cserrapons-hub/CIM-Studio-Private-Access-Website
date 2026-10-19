@@ -1,3 +1,4 @@
+import { verifyNewsletter } from './getresponse-newsletter.js';
 import { ready, legal, consent } from './settings.js';
 const RESPONSE_HEADERS = { 'Content-Type':'application/json; charset=utf-8', 'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff' };
 export function json(body, status = 200, extra = {}) { return new Response(JSON.stringify(body), {status,headers:{...RESPONSE_HEADERS,...extra}}); }
@@ -58,16 +59,17 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
     const inserted=await db.prepare('INSERT INTO form_requests(id,kind,subject_hash,fingerprint,state,accepted_at,consent_version,consent_text,language,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO NOTHING RETURNING id').bind(id,kind,subject,fingerprint,'processing',at,legal.version,consent[data.language][kind],data.language,at).first();
     if(!inserted) {
       const prior=await db.prepare('SELECT state,fingerprint FROM form_requests WHERE id=?').bind(id).first();
-      if(prior.state==='accepted' && (kind!=='samples'||prior.fingerprint===fingerprint)) return json({ok:true},202);
+      if(prior.state==='accepted' && (kind!=='samples'||prior.fingerprint===fingerprint)) return json(kind==='subscribe'?{ok:true,subscription:'request_recorded'}:{ok:true},202);
       if(prior.fingerprint!==fingerprint) throw new Rejection('conflict',409);
       if(prior.state!=='failed') return json({error:'pending'},409);
       const reclaimed=await db.prepare("UPDATE form_requests SET state='processing',updated_at=?,accepted_at=?,consent_version=?,consent_text=?,language=? WHERE id=? AND state='failed' RETURNING id").bind(at,at,legal.version,consent[data.language][kind],data.language,id).first();
       if(!reclaimed) return json({error:'pending'},409);
     }
     owns=true;
-    let providerId=null;
+    let providerId=null, subscription='request_recorded';
     if(kind==='subscribe'||kind==='careers') {
       const campaignId=kind==='careers'?env.GETRESPONSE_CAREERS_CAMPAIGN_ID:env.GETRESPONSE_CAMPAIGN_ID;
+      if(kind==='subscribe') await verifyNewsletter(env.GETRESPONSE_API_KEY,campaignId,fetcher);
       const headers={'X-Auth-Token':'api-key '+env.GETRESPONSE_API_KEY,'Content-Type':'application/json'};
       const query=new URLSearchParams({'query[email]':data.email,'query[campaignId]':campaignId});
       const existing=await remote(fetcher,'https://api.getresponse.com/v3/contacts?'+query,{headers});
@@ -86,6 +88,7 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
         submitted=true;
         const response=await remote(fetcher,'https://api.getresponse.com/v3/contacts',{method:'POST',headers,body:JSON.stringify({email:data.email,campaign:{campaignId},customFieldValues})});
         if(response.status!==202){submitted=response.status>=500||response.status===409||response.ok;throw new Rejection('unavailable',503);}
+        if(kind==='subscribe') subscription='confirmation_required';
       }
     } else {
       if(/[\r\n]/.test(env.MAIL_FROM) || !env.MAIL_FROM.includes('@')) throw new Rejection('unavailable',503);
@@ -95,7 +98,7 @@ export async function handleSubmission(request, env, kind, fetcher=fetch, now=ne
       const body=await response.json(); if(typeof body.id!=='string') throw new Error('Provider outcome unknown'); providerId=body.id;
     }
     await db.prepare("UPDATE form_requests SET state='accepted',provider_id=?,updated_at=? WHERE id=?").bind(providerId,at,id).run();
-    return json({ok:true},202);
+    return json(kind==='subscribe'?{ok:true,subscription}:{ok:true},202);
   } catch(error) {
     if(id && owns) {try{await (kind==='careers'?env.CAREERS_DB:env.FORMS_DB).prepare('UPDATE form_requests SET state=?,updated_at=? WHERE id=? AND state=\'processing\'').bind(submitted?'unknown':'failed',now.toISOString(),id).run();}catch{/* Never log personal data or provider responses. */}}
     return json({error:error instanceof Rejection?error.code:'unavailable'},error instanceof Rejection?error.status:503);

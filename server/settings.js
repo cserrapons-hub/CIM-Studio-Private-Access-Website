@@ -10,6 +10,7 @@ export function legalReady() {
 }
 export function ready(env, kind) {
   if(kind==='careers') return careersReady(env);
+  if(kind==='subscribe' && env.NEWSLETTER_ENABLED!=='true') return false;
   const common = ['TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','AUDIT_HASH_SECRET'];
   const specific = kind === 'subscribe' ? ['GETRESPONSE_API_KEY','GETRESPONSE_CAMPAIGN_ID',
     'GR_CONSENT_AT_FIELD_ID','GR_CONSENT_VERSION_FIELD_ID','GR_CONSENT_TEXT_FIELD_ID','GR_LANGUAGE_FIELD_ID'] : ['RESEND_API_KEY','MAIL_FROM'];

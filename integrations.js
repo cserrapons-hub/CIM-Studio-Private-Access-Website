@@ -7,6 +7,9 @@
  for(const lang of ['es','en'])Object.assign(copy[lang],messages[lang]);
  const forms=[...document.querySelectorAll('form[data-form-kind]')],widgets=new Map(),widgetSizes=new Map(),requests=new Map();
  let settings=null,loadingChallenge=null;
+ const confirmationDialog=document.getElementById('subscription-pending-dialog');
+ confirmationDialog.querySelector('[data-confirmation-close]').addEventListener('click',()=>confirmationDialog.close());
+ confirmationDialog.addEventListener('close',()=>document.querySelector('[data-open="subscribe-dialog"]').focus({preventScroll:true}));
  function status(form,key,error=false){const el=form.querySelector('.status');el.dataset.message=key;el.dataset.error=String(error);el.textContent=copy[language][key];}
  function refresh(){
   document.querySelectorAll('[data-privacy-read]').forEach(e=>e.textContent=copy[language].privacyRead);
@@ -43,6 +46,11 @@
    const result=await response.json();
    if(!response.ok||result.ok!==true){const key=Object.hasOwn(messages[language],result.error)?result.error:'unavailable';status(form,key,true);return;}
    status(form,kind==='subscribe'?'receivedSubscribe':kind==='careers'?'receivedCareers':'receivedSamples');form.reset();requests.delete(form);
+   // A queued API request is not a confirmed subscriber or a Founders entitlement.
+   // Replays/existing contacts have no promise that a new confirmation email was sent.
+   if(kind==='subscribe'&&response.status===202&&result.subscription==='confirmation_required'){
+    form.closest('dialog').close();confirmationDialog.showModal();
+   }
   }catch{status(form,'unavailable',true);}
   finally{button.disabled=false;form.removeAttribute('aria-busy');if(widget!==undefined)window.turnstile?.reset(widget);}
  }));

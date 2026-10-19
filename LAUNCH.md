@@ -21,6 +21,9 @@ Asignar una versión estable (por ejemplo la fecha real de aprobación, no una f
 
 ## 2. GetResponse
 
+**Newsletter pendiente de activación:** consultar [NEWSLETTER.md](NEWSLETTER.md) para la comprobación de solo lectura de `cim_studio_newsletter`, el double opt-in API y la primera prueba restringida. Se requiere además `NEWSLETTER_ENABLED=true`; mantenerlo `false` por ahora. `FORMS_ENABLED=true` por sí solo ya no habilita la newsletter. El registro de solicitudes no acredita confirmación ni concede Fundadores.
+
+
 1. Crear/seleccionar la lista de CIM Studio; obtener su `campaignId` (API `GET /v3/campaigns`). Crear una clave API limitada a la cuenta adecuada.
 2. Crear cuatro campos personalizados **de tipo texto** y copiar sus IDs (`GET /v3/custom-fields`): `cim_consent_at`, `cim_consent_version`, `cim_consent_text`, `cim_language`. No son nombres de variables: configurar abajo sus `customFieldId` reales.
 3. Configurar remitente y confirmación/doble opt-in en GetResponse. El servidor envía `POST https://api.getresponse.com/v3/contacts` con lista y campos, y comprueba contactos existentes por email/lista antes de añadirlos. Una respuesta 202 significa petición en cola, no suscripción confirmada ni entrega del email.
