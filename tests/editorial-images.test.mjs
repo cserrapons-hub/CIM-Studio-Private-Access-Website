@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 const assets=[
  ['cover-pool-s135-b120-srgb.webp',700,706],
  ['cover-volcan-s135-b120-srgb.webp',1000,1093],
- ['cover-soporte-s135-b120-srgb.webp',1100,719],
+ ['cover-jaboneras-s135-b120-srgb.webp',1004,844],
  ['cover-tramuntana-s135-b120-srgb.webp',694,1536]
 ];
 function chunks(bytes){

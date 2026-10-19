@@ -22,5 +22,5 @@ render() {
 # Auto-orient precedes metadata removal.
 render 'POOL.jpg' '700x706' 'assets/cover-pool-s135-b120-srgb.webp'
 render 'VOLCAN.jpg' '1000x1093' 'assets/cover-volcan-s135-b120-srgb.webp'
-render 'SOPORTE JABONERAS.jpg' '1100x719' 'assets/cover-soporte-s135-b120-srgb.webp'
+render 'JABONERAS.jpg' '1004x844' 'assets/cover-jaboneras-s135-b120-srgb.webp'
 render 'APLIQUE.jpg' '694x1536' 'assets/cover-tramuntana-s135-b120-srgb.webp'
