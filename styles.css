@@ -3,7 +3,7 @@
 body{margin:0;background:var(--page-background);color:var(--ink);font:13px/1.7 Arial,Helvetica,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:inherit}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #6c6b5e;outline-offset:5px}
-.page-shell{--volcan-top:18.5%;--volcan-width:17.88204cqw;--volcan-height:calc(var(--volcan-width) * 1251 / 1145);--pair-overlap:28px;--pool-top:max(140px,calc(var(--volcan-top) - 64px));--pool-width:11.94864cqw;--text-gap-left:clamp(110px,9.5cqw,142px);--text-gap-right:clamp(96px,7.5cqw,110px);position:relative;isolation:isolate;container-type:inline-size;width:86%;max-width:1426px;min-height:max(100svh,min(86vw,1426px) * .75);margin:0 auto;background:var(--page-background);overflow:hidden;overflow:clip;display:flex;flex-direction:column}
+.page-shell{--volcan-top:18.5%;--volcan-width:17.88204cqw;--volcan-height:calc(var(--volcan-width) * 1251 / 1145);--photo-gap:28px;--volcan-left:max(calc(var(--pool-width) + var(--photo-gap)),calc(40.5cqw - var(--text-gap-left) - var(--volcan-width) + clamp(12px,1.4cqw,20px)));--pool-top:max(140px,calc(var(--volcan-top) - 64px));--pool-width:11.351208cqw;--text-gap-left:clamp(110px,9.5cqw,142px);--text-gap-right:clamp(96px,7.5cqw,110px);position:relative;isolation:isolate;container-type:inline-size;width:86%;max-width:1426px;min-height:max(100svh,min(86vw,1426px) * .75);margin:0 auto;background:var(--page-background);overflow:hidden;overflow:clip;display:flex;flex-direction:column}
 .preview-notice{margin:0;padding:7px 4%;text-align:center;font-size:8px;line-height:1.6;letter-spacing:.3px;color:var(--muted)}
 .header{padding:15px 3.7% 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;position:relative;z-index:1}
 .brand{grid-column:1;grid-row:1;justify-self:start;display:block;width:110px;height:84px;text-decoration:none}.brand-image{display:block;width:100%;height:auto;object-fit:contain}
@@ -12,8 +12,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .photographic-composition,.photograph-pair{display:contents}
 .photograph{position:absolute;margin:0;overflow:hidden;z-index:0}
 .photograph img{display:block;width:100%;height:auto;filter:saturate(1.35) brightness(1.20)}
-.photograph-pool{left:calc(40.5% - var(--text-gap-left) - var(--volcan-width) - var(--pool-width) + var(--pair-overlap));top:var(--pool-top);width:11.94864%;z-index:1}
-.photograph-volcan{left:calc(40.5% - var(--text-gap-left) - var(--volcan-width));top:var(--volcan-top);width:var(--volcan-width)}
+.photograph-pool{left:calc(var(--volcan-left) - var(--pool-width) - var(--photo-gap));top:var(--pool-top);width:var(--pool-width);z-index:1}
+.photograph-volcan{left:var(--volcan-left);top:var(--volcan-top);width:var(--volcan-width)}
 .photograph-soporte{left:0;top:calc(var(--volcan-top) + var(--volcan-height) + 28px);width:19.5672%}
 .photograph-tramuntana{left:calc(77.5% + var(--text-gap-right));top:16.4%;width:14.41872%}
 .invitation{position:relative;z-index:1;width:37%;margin:clamp(100px,10vw,155px) 0 100px 40.5%}
@@ -37,10 +37,11 @@ dialog{border:0;background:var(--paper);color:var(--ink);padding:50px;width:min(
  .composition{padding:0 6%;margin:30px 0 42px}
  .photographic-composition{display:grid;width:100%;max-width:600px;margin-inline:auto;grid-template-columns:1fr 1fr;gap:clamp(12px,2vw,20px);align-items:start}
  .photograph{position:relative;left:auto;top:auto;width:100%;margin:0;align-self:start}
- .photograph-pair{display:block;position:relative;grid-column:1/-1;grid-row:1;aspect-ratio:1.45}
+ /* Match the pair gap to the existing vertical space above SOPORTE. */
+ .photograph-pair{display:block;position:relative;grid-column:1/-1;grid-row:1;aspect-ratio:1.45;container-type:inline-size;--mobile-photo-gap:calc(100cqw * .88 / 1.45 + clamp(12px,2vw,20px) - 54.56cqw * 1093 / 1000)}
  .photograph-pair .photograph{position:absolute;margin:0}
- .photograph-pool{left:0;top:0;width:39.6%}
- .photograph-volcan{left:34.6%;right:auto;top:12%;width:54.56%}
+ .photograph-pool{left:calc(39% - 37.62% - var(--mobile-photo-gap));top:0;width:37.62%}
+ .photograph-volcan{left:39%;right:auto;top:12%;width:54.56%}
  .photograph-soporte{grid-column:1;grid-row:2;width:80%}
  .photograph-tramuntana{grid-column:2;grid-row:2;width:85%;justify-self:end}
  .invitation{width:100%;max-width:620px;margin:40px auto 0}
