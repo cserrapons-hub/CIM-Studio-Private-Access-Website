@@ -11,7 +11,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .composition{margin:0;padding:0;display:block;flex:1}
 .photographic-composition,.photograph-pair{display:contents}
 .photograph{position:absolute;margin:0;overflow:hidden;z-index:0}
-.photograph img{display:block;width:100%;height:auto;filter:saturate(.85)}
+.photograph img{display:block;width:100%;height:auto;filter:saturate(.95)}
 .photograph-pool{left:calc(40.5% - var(--text-gap-left) - var(--volcan-width) - var(--pool-width) + var(--pair-overlap));top:var(--pool-top);width:11.94864%;z-index:1}
 .photograph-volcan{left:calc(40.5% - var(--text-gap-left) - var(--volcan-width));top:var(--volcan-top);width:var(--volcan-width)}
 .photograph-soporte{left:0;top:calc(var(--volcan-top) + var(--volcan-height) + 28px);width:19.5672%}
