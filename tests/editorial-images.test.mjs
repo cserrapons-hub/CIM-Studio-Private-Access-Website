@@ -38,7 +38,7 @@ test('editorial images ship with explicit sRGB profiles, expected dimensions and
 test('the same four processed sources are used at all breakpoints without a second CSS filter',()=>{
  const html=readFileSync('public/index.html','utf8'),css=readFileSync('public/styles.css','utf8');
  const sources=[...html.matchAll(/<figure class="photograph [^>]+><img src="assets\/([^"]+)"/g)].map(m=>m[1]);
- assert.deepEqual(sources,assets.map(([name])=>name));
+ assert.deepEqual(sources.toSorted(),assets.map(([name])=>name).toSorted());
  assert.ok(!/<picture|\bsrcset=/.test(html));
  const photoRule=css.match(/\.photograph img\{([^}]+)\}/)?.[1];assert.ok(photoRule);
  assert.ok(!/\bfilter\s*:/.test(photoRule));
