@@ -11,3 +11,8 @@
   X-Robots-Tag: noindex, nofollow, noarchive
   Cache-Control: no-store
   Referrer-Policy: no-referrer
+
+/careers/preferences/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: no-store
+  Referrer-Policy: no-referrer

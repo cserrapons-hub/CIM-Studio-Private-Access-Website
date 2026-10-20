@@ -1,2 +1,2 @@
-import { handleSubmission } from '../../server/forms.js';
-export const onRequest=({request,env})=>handleSubmission(request,env,'samples');
+import {handleRegistration} from '../../server/registrations.js';
+export const onRequest=({request,env})=>handleRegistration(request,env,'samples');

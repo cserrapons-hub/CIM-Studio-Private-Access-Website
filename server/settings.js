@@ -1,3 +1,4 @@
+import {registrationReady} from './registration-settings.js';
 import {getresponseWebhookContract} from './getresponse-webhook-contract.js';
 import {htmlFormReady,GETRESPONSE_FORM_ID} from './getresponse-form.js';
 import legal from '../legal/content.js';
@@ -29,10 +30,10 @@ export function careersReady(env) {
     Boolean(env.GETRESPONSE_CAMPAIGN_ID?.trim()) && env.GETRESPONSE_CAREERS_CAMPAIGN_ID.trim()!==env.GETRESPONSE_CAMPAIGN_ID.trim();
 }
 export function publicSettings(env, url) {
-  const enabled = { subscribe: htmlFormReady(env,legalReady()), samples: ready(env,'samples'), careers: careersReady(env) };
+  const enabled = { subscribe: htmlFormReady(env,legalReady()), samples: registrationReady(env,'samples',legalReady()), careers: registrationReady(env,'careers',legalReady()) };
   const verified = env.FORMS_VERIFIED === 'true';
   return { enabled, verified, newsletter:{provider:'getresponse-html',nativeWidgetId:GETRESPONSE_FORM_ID,reviewRequired:true}, siteKey: (enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
-    siteLive: env.SITE_LIVE === 'true' && verified && legalReady() && enabled.subscribe && env.FOUNDERS_RECORDING_VERIFIED === 'true' && env.GETRESPONSE_WEBHOOK_GRANTS_ENABLED === 'true' && getresponseWebhookContract.confirmationSemanticsVerified && getresponseWebhookContract.authenticationVerified && getresponseWebhookContract.sourceBindingVerified && getresponseWebhookContract.customerDeliveryVerified && env.CIM_PRODUCTION_DELIVERY_ENABLED === 'true' && url.hostname === 'cimstudio.es',
+    siteLive: env.SITE_LIVE === 'true' && verified && env.SAMPLES_VERIFIED==='true' && env.CAREERS_VERIFIED==='true' && env.MAIL_RECEIPTS_VERIFIED==='true' && legalReady() && enabled.subscribe && enabled.samples && enabled.careers && env.FOUNDERS_RECORDING_VERIFIED === 'true' && env.GETRESPONSE_WEBHOOK_GRANTS_ENABLED === 'true' && getresponseWebhookContract.confirmationSemanticsVerified && getresponseWebhookContract.authenticationVerified && getresponseWebhookContract.sourceBindingVerified && getresponseWebhookContract.customerDeliveryVerified && env.CIM_PRODUCTION_DELIVERY_ENABLED === 'true' && url.hostname === 'cimstudio.es',
     legalVersion: legalReady() ? legal.version : null, legal: legalReady() ? { es: legal.es, en: legal.en } : null };
 }
 export { legal };

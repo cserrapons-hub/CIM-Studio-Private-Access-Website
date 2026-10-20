@@ -35,6 +35,7 @@ test('samples validate field lengths, profession and required project',async()=>
 test('retry after a definite failure records the consent currently accepted',async()=>{const s=setup('samples');await handleSubmission(s.request(),s.env,'samples',async(url,opts)=>url.includes('resend.com')?new Response(null,{status:401}):s.fetcher(url,opts));legal.version='test-policy-2';assert.equal((await handleSubmission(s.request({legalVersion:'test-policy-2'}),s.env,'samples',s.fetcher,new Date('2026-10-17T15:00:00Z'))).status,202);const row=s.sqlite.prepare('SELECT * FROM form_requests').get();assert.equal(row.consent_version,'test-policy-2');assert.equal(row.accepted_at,'2026-10-17T15:00:00.000Z');});
 test('a provider 5xx is treated as uncertain, never automatically resent',async()=>{const s=setup('samples');const fetcher=async(url,opts)=>url.includes('resend.com')?new Response(null,{status:500}):s.fetcher(url,opts);assert.equal((await handleSubmission(s.request(),s.env,'samples',fetcher)).status,503);assert.equal(s.sqlite.prepare('SELECT state FROM form_requests').get().state,'unknown');assert.equal((await handleSubmission(s.request(),s.env,'samples',s.fetcher)).status,409);assert.equal(s.calls.filter(c=>c.url.includes('resend.com')).length,0);});
 
+// Historical non-routed API adapter regression only. Public D1/receipt tests are in registrations.test.mjs.
 function setupCareers(){
  const s=setup('careers');
  const sqlite=new DatabaseSync(':memory:');sqlite.exec(readFileSync(new URL('../migrations/careers/0001_careers.sql',import.meta.url),'utf8'));
@@ -89,7 +90,7 @@ test('newsletter has an additional opt-in activation gate independent of other f
  const s=setup();delete s.env.NEWSLETTER_ENABLED;
  assert.equal((await handleSubmission(s.request(),s.env,'subscribe',s.fetcher)).status,503);
  assert.equal(s.calls.length,0);assert.equal(publicSettings(s.env,new URL('https://cim.test')).enabled.subscribe,false);
- assert.equal(publicSettings(s.env,new URL('https://cim.test')).enabled.samples,true);
+ assert.equal(publicSettings(s.env,new URL('https://cim.test')).enabled.samples,false); // The current public route also requires encrypted storage and receipts, unlike the legacy helper.
 });
 test('newsletter verifies exact list and API double opt-in before any contact lookup or POST',async()=>{
  for(const campaign of [

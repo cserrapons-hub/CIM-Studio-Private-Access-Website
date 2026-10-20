@@ -1,16 +1,18 @@
+// Historical non-routed adapter retained for regression reference. Public signup is blocked;
+// public samples/careers use registrations.js. Custom API fields do NOT prove native consent.
 import { verifyNewsletter } from './getresponse-newsletter.js';
 import { ready, legal, consent } from './settings.js';
 const RESPONSE_HEADERS = { 'Content-Type':'application/json; charset=utf-8', 'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff' };
 export function json(body, status = 200, extra = {}) { return new Response(JSON.stringify(body), {status,headers:{...RESPONSE_HEADERS,...extra}}); }
-class Rejection extends Error { constructor(code, status=400) { super(code); this.code=code; this.status=status; } }
-function text(value, max, min=1) { if(typeof value!=='string') throw new Rejection('invalid'); value=value.trim(); if(value.length<min || value.length>max || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) throw new Rejection('invalid'); return value; }
+export class Rejection extends Error { constructor(code, status=400) { super(code); this.code=code; this.status=status; } }
+function text(value, max, min=1) { if(typeof value!=='string') throw new Rejection('invalid'); value=value.trim(); if(value.length<min || value.length>max || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value)) throw new Rejection('invalid'); return value; }
 export function validate(data, kind) {
   const email=text(data.email,254).toLowerCase();
   if(!/^[^\s@<>\r\n]+@[^\s@<>\r\n]+\.[^\s@<>\r\n]+$/.test(email)) throw new Rejection('invalid');
   if(data.consent!==true || !['es','en'].includes(data.language)) throw new Rejection('consent');
   if(data.website) throw new Rejection('invalid');
   if(typeof data.token!=='string' || !data.token || data.token.length>2048) throw new Rejection('challenge');
-  if(typeof data.requestId!=='string' || !/^[a-f0-9-]{36}$/i.test(data.requestId)) throw new Rejection('invalid');
+  if(typeof data.requestId!=='string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(data.requestId)) throw new Rejection('invalid');
   const result={ email,language:data.language,consent:true };
   if(kind==='samples') {
     result.name=text(data.name,120); result.company=text(data.company,160); result.project=text(data.project,5000);
@@ -19,7 +21,7 @@ export function validate(data, kind) {
   }
   return result;
 }
-async function readJson(request) {
+export async function readJson(request) {
   if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) throw new Rejection('invalid',415);
   if(Number(request.headers.get('Content-Length'))>16384) throw new Rejection('invalid',413);
   const reader=request.body?.getReader(); if(!reader) throw new Rejection('invalid');
@@ -28,7 +30,7 @@ async function readJson(request) {
   const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
   try { const value=JSON.parse(new TextDecoder().decode(bytes)); if(!value || Array.isArray(value) || typeof value!=='object') throw new Error(); return value; } catch {throw new Rejection('invalid');}
 }
-async function hash(secret, value) {
+export async function hash(secret, value) {
   const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
   return [...new Uint8Array(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(value)))].map(x=>x.toString(16).padStart(2,'0')).join('');
 }

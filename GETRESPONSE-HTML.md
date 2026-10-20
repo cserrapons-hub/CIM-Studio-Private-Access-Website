@@ -1,3 +1,5 @@
+> Decisión vigente: lanzamiento solo con los tres formularios probados. Acciones y prueba integral: THREE-FORMS-LAUNCH.md. La rama informativa se conserva intacta como alternativa, no se publica.
+
 # Lanzamiento: HTML independiente de GetResponse, pendiente de contrato oficial
 
 La decisión vigente sustituye la propuesta de formulario alojado. No se instala Web Connect ni Analytics. El formulario de CIM Studio mantiene su marcado, diseño, traducciones y checkbox obligatorio sin premarcar; continúa en demostración.
