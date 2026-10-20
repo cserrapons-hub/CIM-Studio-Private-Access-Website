@@ -21,6 +21,7 @@ async function bodyText(request){
 }
 export async function handleGetResponseWebhook(request,env,fetcher=fetch,now=new Date(),contract=getresponseWebhookContract){
  try{
+  if(env.SITE_MODE==='informational')return json({error:'unavailable'},503);
   if(request.method!=='POST')return json({error:'method'},405,{Allow:'POST'});
   if(env.GETRESPONSE_WEBHOOK_ENABLED!=='true'||env.GETRESPONSE_WEBHOOK_IPS_REVIEWED!=='true'||
    !legalReady()||!contract.shapeVerified||!env.FORMS_DB||!env.GETRESPONSE_CAMPAIGN_ID||

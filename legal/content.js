@@ -47,7 +47,7 @@ export default {
     'Verify contracting entities, processing agreements, locations, subprocessors and international-transfer safeguards for Cloudflare, GetResponse, Resend and Google Workspace (Gmail).',
     'Audit the deployed Turnstile configuration, browser technologies and email tracking; determine any consent requirements before enabling non-essential technologies.',
     'Verify original confirmation evidence and deliver it to CIM Production Customers: normalised email, confirmed timestamp, Founders 2026 status and 15% discount, including prospects without purchases; no second authoritative D1 customer register.',
-    'Verify CIM Production access/hosting, idempotent customer creation and automatic pro forma discount on retail or verified professional prices including bespoke work; repository/API access has not been supplied.',
+    'Verify CIM Production access/hosting, idempotent customer creation and automatic pro forma discount on retail or verified professional prices including bespoke work; local integration has been tested, but live hosting, processing arrangements and release still require verification.',
     'Define only necessary temporary event buffering, maximum failure retention and deletion after confirmed delivery; confirm the starting point of the approved 12-month sample retention period.',
     'Finalise Professional Pricing criteria, discount administration and full sale/sample terms; confirm any legally required registration, consumer-information and dispute-resolution details.',
     'Review both languages, remove outstanding drafting qualifications, assign the approved version and expressly approve; keep forms disabled until then.'

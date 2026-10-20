@@ -1,0 +1,15 @@
+# Informational preview first. No secrets or external integrations required.
+SITE_MODE=informational
+SITE_LIVE=false
+CONTROLLED_TEST_MODE=false
+FORMS_ENABLED=false
+NEWSLETTER_ENABLED=false
+SAMPLES_ENABLED=false
+CAREERS_ENABLED=false
+FORMS_VERIFIED=false
+FOUNDERS_RECORDING_VERIFIED=false
+GETRESPONSE_WEBHOOK_ENABLED=false
+GETRESPONSE_WEBHOOK_GRANTS_ENABLED=false
+CIM_PRODUCTION_DELIVERY_ENABLED=false
+# SITE_LIVE=true only AFTER express approval of legal/informational.js,
+# actual approved version, and explicit authorization to publish.
