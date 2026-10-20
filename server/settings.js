@@ -32,7 +32,7 @@ export function publicSettings(env, url) {
   const enabled = { subscribe: htmlFormReady(env,legalReady()), samples: ready(env,'samples'), careers: careersReady(env) };
   const verified = env.FORMS_VERIFIED === 'true';
   return { enabled, verified, newsletter:{provider:'getresponse-html',nativeWidgetId:GETRESPONSE_FORM_ID,reviewRequired:true}, siteKey: (enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
-    siteLive: env.SITE_LIVE === 'true' && verified && legalReady() && enabled.subscribe && env.FOUNDERS_RECORDING_VERIFIED === 'true' && env.GETRESPONSE_WEBHOOK_GRANTS_ENABLED === 'true' && getresponseWebhookContract.confirmationSemanticsVerified && getresponseWebhookContract.authenticationVerified && getresponseWebhookContract.customerDeliveryVerified && env.CIM_PRODUCTION_DELIVERY_ENABLED === 'true' && url.hostname === 'cimstudio.es',
+    siteLive: env.SITE_LIVE === 'true' && verified && legalReady() && enabled.subscribe && env.FOUNDERS_RECORDING_VERIFIED === 'true' && env.GETRESPONSE_WEBHOOK_GRANTS_ENABLED === 'true' && getresponseWebhookContract.confirmationSemanticsVerified && getresponseWebhookContract.authenticationVerified && getresponseWebhookContract.sourceBindingVerified && getresponseWebhookContract.customerDeliveryVerified && env.CIM_PRODUCTION_DELIVERY_ENABLED === 'true' && url.hostname === 'cimstudio.es',
     legalVersion: legalReady() ? legal.version : null, legal: legalReady() ? { es: legal.es, en: legal.en } : null };
 }
 export { legal };

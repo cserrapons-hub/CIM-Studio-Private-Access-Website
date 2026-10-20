@@ -61,7 +61,7 @@ export async function handleGetResponseWebhook(request,env,fetcher=fetch,now=new
   const contact=await response.json();
   if(contact.contactId!==event.contactId||contact.campaign?.campaignId!==env.GETRESPONSE_CAMPAIGN_ID||
    typeof contact.email!=='string'||contact.email.trim().toLowerCase()!==event.email)return json({error:'forbidden'},403);
-  const proofVerified=contract.authenticationVerified===true&&contract.confirmationSemanticsVerified===true&&event.formId===contract.expectedFormId;
+  const proofVerified=contract.sourceBindingVerified===true&&contract.authenticationVerified===true&&contract.confirmationSemanticsVerified===true&&event.formId===contract.expectedFormId;
   if(proofVerified){
    // These review flags are code-controlled, not request/provider assertions.
    // Never derive an entitlement from list membership or receipt time.

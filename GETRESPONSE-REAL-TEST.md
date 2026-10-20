@@ -4,7 +4,7 @@
 
 Obtener el HTML plano completo oficial para cim_studio_newsletter (token PL6jh; ID de panel 374914302), desde form hasta /form, con action/method, campos ocultos y el campo nativo de consentimiento con su nombre/valor. Adjuntar las instrucciones oficiales sobre consentimiento y protección antispam del destino. No sirve el widget getresponse-form ni Web Connect. No incluir claves API, cookies de sesión ni datos de contactos.
 
-No se deduce un endpoint, un nombre de campo ni un ID de consentimiento a partir del token. La ayuda oficial no es accesible desde el proxy de este entorno. Si el proveedor no documenta cómo acreditar consentimiento o cómo proteger su destino público contra abuso, la conexión permanece bloqueada hasta resolverlo.
+Soporte ha confirmado el endpoint https://app.getresponse.com/add_subscriber.html; no se deduce un nombre de campo ni un ID de consentimiento a partir del token. La ruta preferente de envío desde Cloudflare y la configuración restringida se detallan en CONTROLLED-TEST.md. La ayuda oficial no es accesible desde el proxy de este entorno. Si el proveedor no documenta cómo acreditar consentimiento o cómo proteger su destino público contra abuso, la conexión permanece bloqueada hasta resolverlo.
 
 ## Preparación antes de autorizar la ejecución
 

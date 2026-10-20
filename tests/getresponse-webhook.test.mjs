@@ -10,7 +10,7 @@ const original=structuredClone(legal);
 afterEach(()=>{Object.assign(legal,structuredClone(original));});
 // SIMULATED mapping, not a claim about the real GetResponse payload.
 // Production adapter intentionally remains unverified until real docs/payload review.
-const contract={shapeVerified:true,authenticationVerified:true,confirmationSemanticsVerified:true,eventName:'contact-subscribed',expectedFormId:'9748c724-790b-4c48-bbde-29366c400934',
+const contract={shapeVerified:true,sourceBindingVerified:true,authenticationVerified:true,confirmationSemanticsVerified:true,eventName:'contact-subscribed',expectedFormId:'9748c724-790b-4c48-bbde-29366c400934',
  paths:{type:['simulationType'],email:['simulationContact','email'],contactId:['simulationContact','id'],campaignId:['simulationList'],formId:['simulationForm']}};
 const now=new Date('2027-01-02T12:00:00Z');
 function setup(){
@@ -30,7 +30,7 @@ function setup(){
 }
 test('production webhook defaults and unverified payload contract cannot store data or grant benefits',async()=>{
  const s=setup();
- assert.equal(getresponseWebhookContract.shapeVerified,false);assert.equal(getresponseWebhookContract.confirmationSemanticsVerified,false);
+ assert.equal(getresponseWebhookContract.sourceBindingVerified,false);assert.equal(getresponseWebhookContract.expectedFormId,null);assert.equal(getresponseWebhookContract.shapeVerified,false);assert.equal(getresponseWebhookContract.confirmationSemanticsVerified,false);
  for(const c of [getresponseWebhookContract,contract])assert.equal((await s.run(s.request(),{GETRESPONSE_WEBHOOK_ENABLED:'false'},c)).status,503);
  assert.equal((await s.run(s.request(),{},getresponseWebhookContract)).status,503);
  legal.approved=false;assert.equal((await s.run()).status,503);assert.equal(s.calls.length,0);
@@ -59,9 +59,9 @@ test('verified events wait for CIM Production and cannot grant in a second D1 cu
  assert.ok(!JSON.stringify(receipt).includes('@'));
 });
 test('unverified semantics, missing/wrong form or disabled granting only quarantine; no benefit',async()=>{
- for(const variant of ['semantics','authentication','missingForm','wrongForm']){
+ for(const variant of ['semantics','authentication','source','missingForm','wrongForm']){
   const s=setup(),payload=variant==='missingForm'?{simulationForm:undefined}:variant==='wrongForm'?{simulationForm:'other-form'}:{};
-  const c={...contract,confirmationSemanticsVerified:variant!=='semantics',authenticationVerified:variant!=='authentication'};
+  const c={...contract,sourceBindingVerified:variant!=='source',confirmationSemanticsVerified:variant!=='semantics',authenticationVerified:variant!=='authentication'};
   assert.equal((await s.run(s.request(payload),variant==='flag'?{GETRESPONSE_WEBHOOK_GRANTS_ENABLED:'false'}:{},c)).status,202);
   assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM founders_entitlements').get().n,0);
   assert.equal(s.sqlite.prepare('SELECT state FROM gr_webhook_receipts').get().state,'quarantined');

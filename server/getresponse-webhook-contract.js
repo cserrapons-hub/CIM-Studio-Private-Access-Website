@@ -7,9 +7,11 @@ export const getresponseWebhookContract=Object.freeze({
  customerDestination:'cim-production',
  customerDeliveryVerified:false,
  confirmationSemanticsVerified:false,
+ sourceBindingVerified:false,
  paths:null,
  eventName:'contact-subscribed',
- expectedFormId:'9748c724-790b-4c48-bbde-29366c400934'
+ // Standalone HTML is NOT the native Web Connect widget. Review its actual event source.
+ expectedFormId:null
 });
 function read(payload,path){
  if(!Array.isArray(path)||!path.length||path.some(key=>typeof key!=='string'||['__proto__','prototype','constructor'].includes(key)))throw Error('Unverified path');

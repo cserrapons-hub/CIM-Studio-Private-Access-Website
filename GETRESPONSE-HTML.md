@@ -13,7 +13,7 @@ Estos datos se conservan como referencias inmutables en server/getresponse-form.
 
 ## Acceso a documentación y bloqueo concreto
 
-En la nueva consulta, tanto la solicitud a la ayuda como al índice oficial https://www.getresponse.com/help/ han fallado con CONNECT tunnel failed, response 403, antes de recibir una página HTTP (HTTP 000). Es una restricción del proxy de este entorno, no una respuesta de la documentación que permita determinar el formato. No se ha recibido HTML auténtico. Siguen faltando el action/method exactos, nombres/valores de campos obligatorios y consentimiento, respuesta del proveedor y protección antispam en su destino. El token y el ID confirmados no bastan para inventarlos.
+En la nueva consulta, tanto la solicitud a la ayuda como al índice oficial https://www.getresponse.com/help/ han fallado con CONNECT tunnel failed, response 403, antes de recibir una página HTTP (HTTP 000). Es una restricción del proxy de este entorno, no una respuesta de la documentación que permita determinar el formato. No se ha recibido HTML auténtico. El action ha sido confirmado después por soporte (véase el apartado final); siguen faltando el contrato method/enctype, nombres/valores de campos obligatorios y consentimiento, respuesta del proveedor y protección antispam en su destino. El token y el ID confirmados no bastan para inventarlos.
 
 ## Investigación y bloqueo concreto
 
@@ -57,3 +57,7 @@ Exige acreditar por separado la vinculación de lista, double opt-in, consentimi
 ## Prueba real
 
 El procedimiento único vigente está en GETRESPONSE-REAL-TEST.md. No está autorizado ejecutarlo todavía. La siguiente entrada necesaria es el HTML plano completo que GetResponse genera o documenta para esta lista, junto con sus indicaciones de consentimiento y protección en el destino.
+
+## Endpoint comunicado por soporte
+
+Se incorpora como referencia confirmada https://app.getresponse.com/add_subscriber.html. Esto resuelve el destino, pero todavía no los nombres/valores obligatorios ni la equivalencia del consentimiento al reenviar desde Cloudflare. No se inventan ni conectan. La preparación preferente del proxy es pura y bloqueada hasta revisión. Configuración y acciones vigentes: CONTROLLED-TEST.md.

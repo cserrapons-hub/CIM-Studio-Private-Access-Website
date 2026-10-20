@@ -1,3 +1,5 @@
+// Endpoint expressly confirmed by support; field mapping/server proxy semantics are still unverified.
+export const GETRESPONSE_HTML_ENDPOINT='https://app.getresponse.com/add_subscriber.html';
 // This UUID identifies the native Web Connect widget, not a standalone HTML export.
 // Never derive an action URL, campaign token or consent field ID from it.
 export const GETRESPONSE_FORM_ID='9748c724-790b-4c48-bbde-29366c400934';
@@ -52,4 +54,15 @@ export function htmlFormReady(){
  // DOI behaviour and provider-side abuse protection have not been reviewed yet.
  // Environment flags cannot turn an unknown submission contract into a verified one.
  return false;
+}
+
+// Pure request preparation only; no fetch and no connection to /api/subscribe.
+// A server proxy is not assumed equivalent to a provider-rendered consent form.
+export function prepareCloudflareHtmlRequest(review,input){
+ if(review?.serverSubmissionVerified!==true||review?.serverConsentEvidenceVerified!==true||
+    review?.providerAbuseControlsVerified!==true||review?.responseContractVerified!==true||
+    review?.enctype!=='application/x-www-form-urlencoded'||review?.action!==GETRESPONSE_HTML_ENDPOINT)
+  throw new Error('cloudflare_submission_not_verified');
+ const prepared=prepareOfficialHtmlSubmission(review,input);
+ return {url:prepared.action,options:{method:'POST',redirect:'manual',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(prepared.fields).toString()}};
 }
