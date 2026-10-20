@@ -1,5 +1,9 @@
 # Newsletter: implementación preparada, todavía desactivada
 
+**ACTUALIZACIÓN:** el flujo de alta por API ha sido retirado del acceso público. Seguir únicamente [GETRESPONSE-LAUNCH.md](GETRESPONSE-LAUNCH.md) para el formulario alojado y el webhook. Las instrucciones de activación siguientes son históricas y no deben ejecutarse para este lanzamiento.
+
+**Continuación del lanzamiento:** [LAUNCH-CHECKLIST.md](LAUNCH-CHECKLIST.md) incorpora bienvenida, registro privado de evidencias Fundadores y lanzamiento solo de newsletter. La propuesta final de este documento se concreta allí como carga privada revisada, sin automatización no verificada.
+
 La rama Production de Pages es `design/private-access-v1`. Este cambio se mantiene en un commit local: no hacer push ni desplegar sin autorización. No se han utilizado credenciales reales, consultado la cuenta ni creado suscripciones reales. El secreto `GETRESPONSE_API_KEY` confirmado por la titular existe en Cloudflare, pero no está disponible en este entorno de desarrollo; no se puede leer desde aquí ni debe exportarse al navegador.
 
 ## Flujo y límites

@@ -55,3 +55,14 @@ test('static legal preview reuses the source without exposing internal metadata 
  assert.match(legal.es.terms,/sin permanencia mínima/);
  assert.match(legal.en.terms,/Unsubscribing from the newsletter does not remove the discount/);
 });
+test('final launch decisions name CIM Production as authoritative and specify proportionate retention',()=>{
+ for(const lang of ['es','en']){
+  assert.ok(legal[lang].privacy.includes('CIM Production'));
+  assert.ok(legal[lang].terms.includes('CIM Production'));
+  for(const technology of ['Google Analytics','Meta Pixel','GetResponse Analytics'])assert.ok(legal[lang].cookies.includes(technology));
+ }
+ assert.ok(legal.es.privacy.includes('12 meses'));assert.ok(legal.en.privacy.includes('12 months'));
+ assert.ok(legal.es.privacy.includes('Facturas:'));assert.ok(legal.en.privacy.includes('Invoices:'));
+ assert.ok(legal.es.terms.includes('aunque nunca haya comprado'));assert.ok(legal.en.terms.includes('even if they have never purchased'));
+ assert.equal(legal.approved,false);
+});

@@ -1,5 +1,9 @@
 # Activación de CIM Studio en Cloudflare Pages
 
+**ACTUALIZACIÓN:** el flujo de alta por API ha sido retirado del acceso público. Seguir únicamente [GETRESPONSE-LAUNCH.md](GETRESPONSE-LAUNCH.md) para el formulario alojado y el webhook. Las instrucciones de activación siguientes son históricas y no deben ejecutarse para este lanzamiento.
+
+**Alcance actual: solo newsletter.** Seguir primero [LAUNCH-CHECKLIST.md](LAUNCH-CHECKLIST.md), que actualiza flags, bienvenida y registro Fundadores. Muestras y oportunidades laborales quedan desactivadas; no configurar Resend ahora. Las secciones de esos servicios son preparación posterior.
+
 La rama de trabajo y producción seleccionada es `design/private-access-v1`. No fusionar con `main`. Compilación: `sh scripts/build-preview.sh`; salida `public`; raíz del repositorio; framework None. Pages detecta `functions/` en la raíz y empaqueta el servidor por separado: **no copiar Functions a public**. No se han cambiado DNS, la configuración externa de correo ni la composición visual. El proveedor actual de correo confirmado es Google Workspace (Gmail), y el único buzón confirmado y operativo es admin@cimstudio.es. No hay credenciales reales en el repositorio.
 
 ## 1. Aprobar los documentos antes de activar envíos

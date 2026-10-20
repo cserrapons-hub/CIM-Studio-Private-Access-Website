@@ -1,6 +1,9 @@
 # Local development template only. Never commit a filled .dev.vars.
 FORMS_ENABLED=false
 NEWSLETTER_ENABLED=false
+SAMPLES_ENABLED=false
+CAREERS_ENABLED=false
+FOUNDERS_RECORDING_VERIFIED=false
 FORMS_VERIFIED=false
 SITE_LIVE=false
 TURNSTILE_SITE_KEY=
@@ -14,3 +17,22 @@ GR_CONSENT_TEXT_FIELD_ID=
 GR_LANGUAGE_FIELD_ID=
 RESEND_API_KEY=
 MAIL_FROM=
+# Standalone HTML is pending official export review. No endpoint/token is inferred.
+NEWSLETTER_PROVIDER=getresponse-html
+# Webhook processing remains blocked pending real contract/authentication tests.
+GETRESPONSE_WEBHOOK_ENABLED=false
+GETRESPONSE_WEBHOOK_CIDRS=
+GETRESPONSE_WEBHOOK_BEARER_SECRET=
+GETRESPONSE_WEBHOOK_GRANTS_ENABLED=false
+GETRESPONSE_WEBHOOK_IPS_REVIEWED=false
+
+# Server-to-server transport: keep false until a real DOI webhook is authenticated.
+CIM_PRODUCTION_DELIVERY_ENABLED=false
+CIM_PRODUCTION_URL=
+CIM_PRODUCTION_KEY_ID=
+CIM_PRODUCTION_HMAC_SECRET=
+OUTBOX_ENCRYPTION_KEY=
+# Explicit operational retention/incident review required; no default periods.
+OUTBOX_MAX_PENDING_SECONDS=
+OUTBOX_RECEIPT_SECONDS=
+OUTBOX_RECONCILIATION_REVIEWED=false

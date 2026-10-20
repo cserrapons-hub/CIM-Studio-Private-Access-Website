@@ -1,4 +1,4 @@
-/* No credentials belong here. Same-origin Functions are the only form endpoints. */
+/* No credentials, Analytics or hosted redirect. HTML newsletter submission stays disabled pending its official export. */
 (()=>{
  const messages={
   es:{receivedCareers:'Solicitud recibida. Revisa tu correo para confirmar los avisos laborales si recibes un mensaje de verificación.',privacyRead:'Leer la política de privacidad',testing:'Demostración de conexión: utiliza solo datos de prueba. Estos envíos sí se procesan por los servicios externos.',sending:'Enviando…',receivedSubscribe:'Solicitud recibida. Revisa tu correo y confirma la suscripción si recibes un mensaje de verificación.',receivedSamples:'Solicitud enviada. Te responderemos por email.',invalid:'Revisa los campos y vuelve a intentarlo.',consent:'Acepta el consentimiento y revisa la política de privacidad actualizada.',challenge:'Completa la comprobación de seguridad e inténtalo de nuevo.',rate:'Has realizado varios intentos. Espera una hora antes de volver a intentarlo.',unavailable:'No hemos podido confirmar el envío. Tus datos siguen en el formulario; inténtalo más tarde.',pending:'Tu solicitud está pendiente de confirmación técnica. No podemos confirmar el envío todavía; no es necesario repetirla.',conflict:'La solicitud ha cambiado. Cierra y vuelve a abrir la página antes de intentarlo de nuevo.'},
@@ -23,7 +23,7 @@
  }
  async function renderChallenges(){
   if(!settings?.siteKey)return;
-  try{await loadChallenge();for(const form of forms){if(!settings.enabled[form.dataset.formKind]||!form.closest('dialog').open)continue;const size=form.querySelector('.challenge-slot').clientWidth<300?'compact':'flexible';widgetSizes.set(form,size);if(widgets.has(form))window.turnstile.remove(widgets.get(form));widgets.set(form,window.turnstile.render(form.querySelector('.challenge-slot'),{sitekey:settings.siteKey,action:form.dataset.formKind,theme:'light',language,size}));}}
+  try{await loadChallenge();for(const form of forms){if(form.hidden||!settings.enabled[form.dataset.formKind]||!form.closest('dialog').open)continue;const size=form.querySelector('.challenge-slot').clientWidth<300?'compact':'flexible';widgetSizes.set(form,size);if(widgets.has(form))window.turnstile.remove(widgets.get(form));widgets.set(form,window.turnstile.render(form.querySelector('.challenge-slot'),{sitekey:settings.siteKey,action:form.dataset.formKind,theme:'light',language,size}));}}
   catch{for(const form of forms)if(settings.enabled[form.dataset.formKind])status(form,'unavailable',true);}
  }
  window.addEventListener('cim:language',()=>{refresh();renderChallenges();});
@@ -31,6 +31,7 @@
  window.addEventListener('resize',()=>{if(forms.some(form=>form.closest('dialog').open&&widgets.has(form)&&widgetSizes.get(form)!==(form.querySelector('.challenge-slot').clientWidth<300?'compact':'flexible')))renderChallenges();});
  forms.forEach(form=>form.addEventListener('submit',async event=>{
   event.preventDefault();if(form.getAttribute('aria-busy')==='true')return;
+  if(form.dataset.formKind==='subscribe'){status(form,'status');return;}
   if(form.dataset.formKind==='careers'&&!form.reportValidity())return;
   if(!settings?.enabled[form.dataset.formKind]){status(form,'status');return;}
   if(!form.reportValidity())return;

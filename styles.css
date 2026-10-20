@@ -1,6 +1,8 @@
+@font-face{font-family:Montserrat;font-style:normal;font-weight:300;font-display:swap;src:url("assets/fonts/montserrat-latin-300.8df42ef175d6.woff2") format("woff2")}
+@font-face{font-family:Montserrat;font-style:normal;font-weight:400;font-display:swap;src:url("assets/fonts/montserrat-latin-400.021091be0b08.woff2") format("woff2")}
 :root{--paper:#f8f7f3;--page-background:#f7f6f4;--ink:#292a26;--muted:#77766f;--line:#d7d5ce;--serif:Georgia,'Times New Roman',serif}
 *{box-sizing:border-box}
-body{margin:0;background:var(--page-background);color:var(--ink);font:13px/1.7 Arial,Helvetica,sans-serif}
+body{margin:0;background:var(--page-background);color:var(--ink);font:300 13px/1.7 Montserrat,Arial,Helvetica,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}a{color:inherit}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #6c6b5e;outline-offset:5px}
 .page-shell{position:relative;isolation:isolate;container-type:inline-size;width:86%;max-width:1426px;min-height:max(100svh,min(86vw,1426px) * .75);margin:0 auto;background:var(--page-background);overflow:hidden;overflow:clip;display:flex;flex-direction:column}
@@ -77,3 +79,6 @@ footer .careers-link:hover{text-decoration:underline;text-underline-offset:3px}
  footer{flex-wrap:wrap;align-items:baseline}
  footer .careers-link{position:static;transform:none;order:3;flex-basis:100%;width:100%;text-align:center;white-space:normal}
 }
+
+/* Georgia headings; regular weight for controls and small interface text. */
+button,input,select,textarea,form label,.languages,.overline,footer,.demo,.status,.preview-notice,.privacy-inline{font-family:Montserrat,Arial,Helvetica,sans-serif;font-weight:400}
