@@ -49,3 +49,14 @@ MAIL_WORKER_ENABLED=false
 # Transactional mail: reuse only in authorised test environment.
 RESEND_API_KEY=
 MAIL_FROM=
+
+# Local newsletter evidence preparation ONLY; no public route enabled.
+NEWSLETTER_PREPARATION_ENABLED=false
+# Dedicated SECRET: AES-256 base64, do not reuse samples/career keys.
+NEWSLETTER_DATA_KEY=
+
+# Restricted /api/controlled/subscribe ONLY; keep false until authorised.
+NEWSLETTER_CONTROLLED_SEND_ENABLED=false
+# HMAC-SHA256(AUDIT_HASH_SECRET, 'newsletter-consent:' + normalised owner test email).
+# Calculate privately; do not place the actual address or audit secret in this file.
+NEWSLETTER_TEST_EMAIL_HASH=

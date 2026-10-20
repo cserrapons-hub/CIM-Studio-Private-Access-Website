@@ -2,21 +2,64 @@
 
 Work branch integration/three-forms-2026-10-20 is based on the backed-up full integration work, not the informational alternative. launch/informational-2026-10-20 remains unchanged. No public deployment, DNS change, live migration or real subscription is authorised by this document.
 
-## 1. GetResponse — one precise support request (release blocker)
+## 1. GetResponse — confirmed contract and restricted API-verified test
 
-Known: cim_studio_newsletter, token PL6jh, panel list ID 374914302; add_subscriber.html endpoint confirmed; web/API double opt-in enabled. Do not ask to reconfirm those facts. Send the following:
+### Confirmed by support — do not request these again
 
-> We have confirmed our list cim_studio_newsletter (token PL6jh, panel ID 374914302), the endpoint https://app.getresponse.com/add_subscriber.html and web double opt-in. Please provide the exact standalone HTML/export for our account, including method/enctype, email and list-token field names, all mandatory fields, and the native consent field ID/name/value. We must not invent those parameters.
->
-> May our Cloudflare server POST that documented form on behalf of the visitor while preserving web double opt-in and valid native consent evidence? Which consent content/version/origin information is actually recorded, and which fields are officially supported? Custom API fields are not a substitute for native consent. Please provide the documented success/rejection/redirect behaviour and server-side anti-abuse controls at the public GetResponse endpoint; local Turnstile does not prevent direct submissions to that endpoint.
->
-> Please provide an actual sample/schema of contact-subscribed for this standalone form, including stable event ID, list/contact/source identifiers and occurredAt UTC. Does this event also fire for API imports/manual additions without an email confirmation? What authenticated evidence distinguishes the confirmed form flow?
->
-> How can our receiver authenticate YOUR notification for OUR account? Specify the official signature/header/canonical signing algorithm/key verification, or supported secret-authentication mechanism if available. Provider-wide IP ranges or arbitrary headers alone do not prove account ownership. Also provide the retry/timeout policy and whether duplicate deliveries retain the same event ID. Please identify the actual v3 campaignId corresponding to this panel ID/token.
+- List cim_studio_newsletter, token PL6jh, panel list ID 374914302; web/API double opt-in enabled.
+- POST https://app.getresponse.com/add_subscriber.html with email and campaign_token=PL6jh.
+- Cloudflare may submit the form server-side; double opt-in is preserved.
+- For this standalone HTML form, contact-subscribed is sent after the subscriber confirms their email.
+- A custom checkbox field may be added to carry consent. This is not, by itself, proof of a native GetResponse consent record or of confirmation.
+- Support has not documented endpoint anti-spam protections or webhook authentication. Support now mentions created_on; earlier information identified event.occurredAt in UTC. Neither field is assumed to prove the original confirmation time without contrasting real payloads, authenticated API responses and the observed DOI sequence.
 
-No genuine account form export, supported server-relay consent contract or authenticated real event has yet been received. Therefore /api/subscribe remains 503 and htmlFormReady remains false. The browser retains its original modal/translations/unchecked consent; there is no guessed action, no Web Connect and no Analytics.
+These confirmations allow preparation of the restricted environment without waiting for an undocumented webhook signature. No real subscription, deployment or public activation is authorised. This document update does not enable the existing runtime gates or assert that the adapter has already been changed.
 
-Safe fallback if relay consent cannot be evidenced: a genuinely official hosted/native form or link, only after reviewing its consent, DOI and browser technologies and with owner approval. Do not embed an analytics-dependent widget. If webhook authentication cannot be established, no automatic Founders grant: require a separately reviewed, independently evidenced manual confirmation procedure before changing the current protocol. Do not treat a signed Cloudflare assertion as proof of an unauthenticated GetResponse event.
+### Confirmed custom consent field and local preparation
+
+Owner has now verified by authenticated API (HTTP 200): name consentimiento, customFieldId njH9fM, permitted value aceptado. Support confirms HTML parameter custom_consentimiento=aceptado. Do not ask to create or identify this field again. The API identifier is for contact-value checks; it is not an extra HTML parameter.
+
+server/getresponse-controlled.js prepares exactly email, campaign_token=PL6jh and custom_consentimiento=aceptado as an encoded POST. The preparation helper performs no fetch. Its new restricted handler may send only after its explicit test gates are authorised; the public route remains blocked. Actual acceptance/storage in GetResponse still requires an authorised test; fixtures do not verify the provider. The old generic export adapter remains blocked and is not used to assert native GDPR consent.
+
+The same module prepares a consent evidence record in FORMS_DB using new additive migrations/0006_newsletter_consent.sql (NOT applied remotely). It records server UTC acceptance, server-selected exact checkbox text/version, language, purpose, request ID and verified custom-field reference. Email is AES-GCM encrypted with dedicated NEWSLETTER_DATA_KEY (32 random bytes, base64); AUDIT_HASH_SECRET signs the canonical evidence. That signature detects changes while its secret remains protected; it is not an independent trusted timestamp or proof of DOI. Repeated request IDs preserve the original record and conflicting reuse is rejected. Acceptance date never becomes confirmation date.
+
+NEWSLETTER_PREPARATION_ENABLED=false is the default. The evidence function requires a restricted-test flag and expressly approved policy/version, but no combination enables the public signup route: /api/subscribe stays 503 and htmlFormReady stays false. The separate /api/controlled/subscribe route now rechecks Basic authentication, exact HTTPS origin, JSON bounds, required unchecked-by-default consent/version, honeypot, server Turnstile hostname/action and atomic D1 rate limits before saving evidence and sending. It accepts only one explicitly authorised test email represented by an HMAC allowlist. No browser, commercial copy, other forms, legal approval or production data are changed.
+
+### GetResponse configuration needed from the owner
+
+1. Keep cim_studio_newsletter, web double opt-in, existing confirmation email and default confirmation page unchanged. Do not recreate the confirmed custom field or enable Web Connect/Analytics.
+2. Use the existing secret API key only server-side to resolve the real API campaignId and read the authorised test contact; no key needs to be shared in chat.
+3. Prepare contact-subscribed notifications if supported, without an invented receiver URL. After a restricted deployment is authorised, configure its exact supplied URL. A webhook is only an untrusted trigger for independent API inspection.
+
+### Next controlled test (not authorised or performed)
+
+The restricted route is locally implemented and simulated, not deployed or enabled. Before a real test: approve test privacy/version and retention; authorise push/private deployment and one owner test email; apply 0006_newsletter_consent.sql then 0007_newsletter_html_deliveries.sql ONLY to FORMS_DB test; configure NEWSLETTER_DATA_KEY and NEWSLETTER_TEST_EMAIL_HASH, then explicitly authorise NEWSLETTER_PREPARATION_ENABLED=true and NEWSLETTER_CONTROLLED_SEND_ENABLED=true only on the protected test project. No production migration, public activation, webhook grant or CIM Production delivery is needed for the first DOI observation. Before DOI click record the observed state; after click query the same contact/list and njH9fM value through authenticated API. The current API inspector accepts only an exact value array ['aceptado'] for the identified field, fails closed for unknown shapes, and never marks confirmation or Founders verified. Contrast the actual redacted API structure before adapting it. Keep a minimal protected test record; no personal data in logs.
+
+#### Restricted relay behaviour and first request
+
+The main modal and /api/config remain unchanged and newsletter submission stays disabled there. First authorised provider observation uses POST /api/controlled/subscribe from the authenticated test browser (same origin), with email, consent=true, language, legalVersion, requestId (UUID), website empty and a fresh Turnstile token with action subscribe. Never put credentials/tokens/emails in URLs. This is a technical probe, not public activation or a claim the full modal is connected.
+
+NEWSLETTER_TEST_EMAIL_HASH is computed privately using HMAC-SHA256 with AUDIT_HASH_SECRET over UTF-8 'newsletter-consent:' followed by the trimmed/lowercase approved owner email. It is an allowlist, not a provider parameter or anonymisation claim. No plaintext email or key belongs in Git. Rate limits are five requests per IP/hour and twenty total/hour; D1 stores only keyed bucket identifiers. Turnstile guards our relay, not direct submissions to the provider.
+
+Evidence commits before a separate delivery claim. UNIQUE(subject_hash) prevents concurrent sends and retries with fresh request IDs; same-ID conflicts are rejected. No automatic resend, including after restart/timeout/rejection. An expired in-flight claim becomes unknown for manual reconciliation. Even a new UUID cannot bypass the one-email guard. Approving any later resend requires inspecting provider state first; do not delete evidence to force a retry.
+
+GetResponse is sent only the three confirmed fields and no API secret. Redirects are never followed, and response bodies, Location, Set-Cookie and provider error content are neither stored nor returned. Recognised HTTP rejection statuses are reported generically; timeout/5xx are unknown. A 2xx/3xx is unverified, NOT evidence that GetResponse accepted the form or sent a DOI email. With the provider success contract still unverified, the route responds error=pending / pending_provider_verification (HTTP 409), and never confirmation_required or ok=true. A first real test may therefore receive pending while the owner inspects their inbox and authenticated API. Learning the genuine acceptance/rejection response is required before enabling the modal's success message. No second DOI email is sent by Cloudflare.
+
+Keep NEWSLETTER_CONTROLLED_SEND_ENABLED and NEWSLETTER_PREPARATION_ENABLED false after preparation and until explicit test authorisation. All *_VERIFIED, Founders delivery/grant flags and SITE_LIVE remain false. MAIL_WORKER_ENABLED has no role in this one-shot newsletter relay.
+
+There is still no confirmed API field for the original DOI date. createdOn/changedOn, a stored custom checkbox or an untrusted occurredAt do not independently establish it. Keep Founders pending until an evidence-based automatic mechanism or a separately approved manual review workflow exists in CIM Production. Existing duplicate-resolution review is NOT that evidence-approval workflow.
+
+### Independent verification and minimal outstanding questions
+
+The webhook is an untrusted trigger, not entitlement evidence. Before delivering a Founders grant, the server must independently query GetResponse using its secret API key and establish the expected account/list, contact email and identifier, effective confirmed subscription, the relevant checkbox/consent evidence and an original confirmation instant demonstrably tied to this DOI flow. Correlate these with the restricted server's own consent record and the authorised test submission; knowing a contact identifier/email alone is insufficient. Rate-limit and bound API verification; deduplicate triggers and do not log personal data or keys.
+
+Capture minimal before-click and after-click evidence in the authorised test. Compare actual created_on, event.occurredAt and API fields, including time zones and whether they represent submission, creation, confirmation or a later change. A contact creation timestamp, observation time or untrusted webhook timestamp is not automatically the DOI confirmation timestamp. No automatic grant from a page visit, initial form acceptance or an unverified payload. If the API does not independently establish confirmation, original date and consent, keep Founders pending; use only a separately reviewed manual process with independent evidence. Do not grant from the webhook simply because its data matches an existing contact.
+
+Only ask support for what remains unresolved after inspecting the account/export and read-only API: the generated custom-checkbox submission/API mapping if unavailable, the precise semantics and availability of confirmation/consent fields (including created_on versus occurredAt), and any documented authentication or anti-abuse controls. Do not repeat the confirmed endpoint, email/campaign_token fields, relay permission, DOI or event timing questions. The relay's verified success/rejection behaviour still needs an authorised test before showing a successful request modal.
+
+Cloudflare-side Turnstile and rate limits protect our relay, not direct POSTs to GetResponse. The provider's endpoint anti-abuse remains unverified: record that risk, restrict the initial test to authorised owner emails and do not claim the public endpoint is protected. Native consent functionality, public launch security and any additional browser technologies remain subject to review. No Web Connect or Analytics.
+
+Existing /api/subscribe remains disabled and htmlFormReady remains false until the confirmed contract is implemented and the restricted test is authorised. CIM Production stays the sole definitive Founders register; D1 is temporary event transport only.
 
 ## 2. Cloudflare / Resend — private real-test configuration
 
@@ -47,7 +90,7 @@ Future bulk vacancy dispatch/admin exports can wait; any later sender must apply
 
 ## 4. Render / Founders — existing safe path retained
 
-Use PRIVATE-ACCESS.md and scripts/rehearse-private-access.py in Cim-Production. Privately download the full backup, verify and rehearse on a disposable copy; use a separate staging Render service/disk and HMAC keys. Existing customers, issued documents and prices are not rewritten. Confirm the real campaignId in both sides. Registration follows ONLY authenticated, verified original confirmation before 2026-12-31T23:00:00Z. Newsletter unsubscribe is never a revocation. No production migration is part of this preparation.
+Use PRIVATE-ACCESS.md and scripts/rehearse-private-access.py in Cim-Production. Privately download the full backup, verify and rehearse on a disposable copy; use a separate staging Render service/disk and HMAC keys. Existing customers, issued documents and prices are not rewritten. Confirm the real campaignId in both sides. Registration follows ONLY independently verified original confirmation before 2026-12-31T23:00:00Z; an untrusted webhook alone cannot provide that evidence. Newsletter unsubscribe is never a revocation. No production migration is part of this preparation.
 
 ## Local checks
 
@@ -59,7 +102,7 @@ legal/content.js ES/EN describes all three forms, separate D1 career confirmatio
 
 After explicit authorisation to deploy ONLY the private test and process the named owner test emails:
 
-1. Private Access: submit once, verify DOI receipt and no benefit before click; confirm; inspect authenticated event and UTC/list/source; deliver idempotently to staging CIM Production; verify potential customer and 15% PVP/professional/custom draft; unsubscribe and verify entitlement remains. Stop if the GetResponse contract/authentication cannot be proved.
+1. Private Access: submit once, verify DOI receipt and no benefit before click; confirm; treat the event as an untrusted trigger and independently verify confirmation/date/consent/list through the authenticated API; compare created_on and event.occurredAt rather than assuming either date; deliver idempotently to staging CIM Production; verify potential customer and 15% PVP/professional/custom draft; unsubscribe and verify entitlement remains. Keep Founders pending if independent verification cannot prove confirmation, original date and consent. Lack of a documented webhook signature alone does not prevent this restricted test preparation.
 2. Samples: submit ES and EN, check every professional/project field in admin mailbox and a separate customer receipt, D1 ciphertext and exact acceptance; repeat same request ID (no duplicate email), invalid email/consent/token, rate limit, known rejection and uncertain timeout. Check Resend status AND both inboxes; a provider ID alone does not pass delivery.
 3. Careers: submit ES and EN, verify independent consent/DB and pending state; receipt in owner mailbox; open link without action (still pending); explicit confirm (active + confirmation evidence); withdraw (email removed, no later career notice); repeat link safely; re-consent and verify old link cannot alter new state. Newsletter and Founders stay untouched.
 4. Check 1920/1440/tablet/390/320px, legal links, error and recorded-but-email-pending copy, actual network/cookies/storage with Turnstile, no Analytics/Web Connect, no PII in request URLs or logs. Record only minimum test evidence privately.
