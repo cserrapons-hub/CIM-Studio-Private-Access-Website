@@ -57,6 +57,8 @@ NEWSLETTER_DATA_KEY=
 
 # Restricted /api/controlled/subscribe ONLY; keep false until authorised.
 NEWSLETTER_CONTROLLED_SEND_ENABLED=false
-# HMAC-SHA256(AUDIT_HASH_SECRET, 'newsletter-consent:' + normalised owner test email).
-# Calculate privately; do not place the actual address or audit secret in this file.
+# Dedicated SECRET: 32 random bytes encoded as Base64; never reuse AUDIT_HASH_SECRET.
+NEWSLETTER_TEST_ALLOWLIST_SECRET=
+# HMAC-SHA256(UTF-8 Base64 secret TEXT, 'newsletter-test-allowlist:v1:' + normalised email).
+# Calculate privately; never place the email or either secret in this file.
 NEWSLETTER_TEST_EMAIL_HASH=

@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {handleControlledNewsletter} from '../server/getresponse-controlled-handler.js';
-import {verifyConsentEvidence} from '../server/getresponse-controlled.js';
+import {recordControlledConsent,verifyConsentEvidence} from '../server/getresponse-controlled.js';
 import {hash} from '../server/forms.js';
+import {newsletterTestEmailHash} from '../server/newsletter-test-allowlist.js';
 import {onRequest as controlledRoute} from '../functions/api/controlled/subscribe.js';
 import {onRequest as publicRoute} from '../functions/api/subscribe.js';
 const policy={approved:true,version:'simulation-policy-v1'};
@@ -12,9 +13,9 @@ async function setup(){
  const sqlite=new DatabaseSync(':memory:');
  for(const name of ['0001_forms.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql'])sqlite.exec(readFileSync('migrations/'+name,'utf8'));
  const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};}};
- const env={CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:'https://cim-studio-test.pages.dev',CONTROLLED_TEST_USER:'test-owner',CONTROLLED_TEST_PASSWORD:'test-only-password-at-least-32-characters',NEWSLETTER_PREPARATION_ENABLED:'true',NEWSLETTER_CONTROLLED_SEND_ENABLED:'true',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret',SITE_LIVE:'false'};
+ const env={CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:'https://cim-studio-test.pages.dev',CONTROLLED_TEST_USER:'test-owner',CONTROLLED_TEST_PASSWORD:'test-only-password-at-least-32-characters',NEWSLETTER_PREPARATION_ENABLED:'true',NEWSLETTER_CONTROLLED_SEND_ENABLED:'true',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret',SITE_LIVE:'false'};
  const data={email:'owner@example.test',consent:true,language:'es',requestId:crypto.randomUUID(),legalVersion:policy.version,token:'simulation-token',website:''};
- env.NEWSLETTER_TEST_EMAIL_HASH=await hash(env.AUDIT_HASH_SECRET,'newsletter-consent:'+data.email);
+ env.NEWSLETTER_TEST_EMAIL_HASH=await newsletterTestEmailHash(env.NEWSLETTER_TEST_ALLOWLIST_SECRET,data.email);
  const headers={Origin:env.CONTROLLED_TEST_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1',Authorization:'Basic '+btoa(env.CONTROLLED_TEST_USER+':'+env.CONTROLLED_TEST_PASSWORD)};
  const request=(change={},h={})=>new Request(env.CONTROLLED_TEST_ORIGIN+'/api/controlled/subscribe',{method:'POST',headers:{...headers,...h},body:JSON.stringify({...data,...change})});
  const calls=[],mock={status:302,challenge:{success:true,hostname:'cim-studio-test.pages.dev',action:'subscribe'},challengeStatus:200,throwProvider:false};
@@ -123,5 +124,41 @@ test('database failure cannot send data; expired sends require reconciliation, n
   const missing={prepare(){throw Error('SIMULATED database failure');}};
   assert.equal((await handleControlledNewsletter(s.request(),{...s.env,FORMS_DB:missing},{fetcher:s.fetcher,policy})).status,503);assert.equal(s.calls.length,0);
   await s.run();s.sqlite.prepare("UPDATE newsletter_html_deliveries SET state='sending',lease_until=0").run();await s.run();assert.equal(s.sqlite.prepare('SELECT state FROM newsletter_html_deliveries').get().state,'unknown');assert.equal(s.calls.filter(x=>x.url.includes('add_subscriber')).length,1);
+ }finally{s.sqlite.close();}
+});
+
+test('independent allowlist secret is mandatory; wrong key and legacy audit-derived hash cannot authorise or send',async()=>{
+ for(const mode of ['missing','malformed','wrong','legacy','reused']){
+  const s=await setup();try{
+   if(mode==='missing')delete s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET;
+   if(mode==='malformed')s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET='not-a-base64-key';
+   if(mode==='wrong')s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET=btoa('w'.repeat(32));
+   if(mode==='legacy')s.env.NEWSLETTER_TEST_EMAIL_HASH=await hash(s.env.AUDIT_HASH_SECRET,'newsletter-consent:'+s.data.email);
+   if(mode==='reused')s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET=s.env.AUDIT_HASH_SECRET;
+   assert.equal((await s.run()).status,503,mode);assert.equal(s.calls.length,0,mode);
+   assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);
+   assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_html_deliveries').get().n,0);
+  }finally{s.sqlite.close();}
+ }
+});
+test('existing signed evidence, audit-derived subjects and deduplication survive independent allowlist rotation',async()=>{
+ const s=await setup();try{
+  // Evidence helper has no dependency on the allowlist, just as before this change.
+  const legacyEnv={...s.env};delete legacyEnv.NEWSLETTER_TEST_ALLOWLIST_SECRET;
+  const original=await recordControlledConsent(legacyEnv,s.data,new Date('2026-10-19T10:00:00Z'),policy);
+  assert.ok(await verifyConsentEvidence(original.evidence,s.env.AUDIT_HASH_SECRET));
+  await s.run();
+  const subject=await hash(s.env.AUDIT_HASH_SECRET,'newsletter-consent:'+s.data.email);
+  assert.equal(s.sqlite.prepare('SELECT subject_hash FROM newsletter_html_deliveries').get().subject_hash,subject);
+  const rateId=await hash(s.env.AUDIT_HASH_SECRET,'controlled-newsletter-rate:ip:192.0.2.1:'+Math.floor(new Date('2026-10-20T12:00:00Z').getTime()/3600000));
+  assert.equal(s.sqlite.prepare('SELECT count FROM form_rate_limits WHERE id=?').get(rateId).count,1);
+  s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET=btoa('r'.repeat(32));
+  s.env.NEWSLETTER_TEST_EMAIL_HASH=await newsletterTestEmailHash(s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET,s.data.email);
+  await s.run();
+  const stored=s.sqlite.prepare('SELECT * FROM newsletter_consent_requests').get();assert.deepEqual(stored,original.evidence);
+  assert.ok(await verifyConsentEvidence(stored,s.env.AUDIT_HASH_SECRET));
+  assert.equal(await verifyConsentEvidence(stored,s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET),false);
+  assert.equal(s.sqlite.prepare('SELECT count FROM form_rate_limits WHERE id=?').get(rateId).count,2);
+  assert.equal(s.calls.filter(x=>x.url.includes('add_subscriber')).length,1);
  }finally{s.sqlite.close();}
 });

@@ -3,11 +3,12 @@ import {controlledTestBoundary} from './controlled-test.js';
 import {legal} from './settings.js';
 import {json,readJson,validate,hash,Rejection} from './forms.js';
 import {recordControlledConsent} from './getresponse-controlled.js';
+import {validNewsletterAllowlistSecret,authorisedNewsletterTestEmail} from './newsletter-test-allowlist.js';
 const utc=()=>new Date();
 function settings(env,policy){
  if(env.CONTROLLED_TEST_MODE!=='true'||env.NEWSLETTER_PREPARATION_ENABLED!=='true'||env.NEWSLETTER_CONTROLLED_SEND_ENABLED!=='true'||env.SITE_LIVE==='true'||!env.FORMS_DB||!policy.approved||typeof policy.version!=='string'||!policy.version.trim())return false;
- if(!['TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','AUDIT_HASH_SECRET','NEWSLETTER_TEST_EMAIL_HASH','NEWSLETTER_DATA_KEY'].every(key=>typeof env[key]==='string'&&env[key].trim()))return false;
- if(env.AUDIT_HASH_SECRET.length<32||!/^[a-f0-9]{64}$/.test(env.NEWSLETTER_TEST_EMAIL_HASH))return false;
+ if(!['TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','AUDIT_HASH_SECRET','NEWSLETTER_TEST_ALLOWLIST_SECRET','NEWSLETTER_TEST_EMAIL_HASH','NEWSLETTER_DATA_KEY'].every(key=>typeof env[key]==='string'&&env[key].trim()))return false;
+ if(!validNewsletterAllowlistSecret(env.NEWSLETTER_TEST_ALLOWLIST_SECRET)||env.NEWSLETTER_TEST_ALLOWLIST_SECRET===env.AUDIT_HASH_SECRET||env.AUDIT_HASH_SECRET.length<32||!/^[a-f0-9]{64}$/.test(env.NEWSLETTER_TEST_EMAIL_HASH))return false;
  try{
   const origin=new URL(env.CONTROLLED_TEST_ORIGIN);
   if(origin.protocol!=='https:'||origin.hostname==='cimstudio.es'||origin.hostname.endsWith('.cimstudio.es')||origin.pathname!=='/'||origin.search||origin.hash||origin.username||origin.password||atob(env.NEWSLETTER_DATA_KEY).length!==32)return false;
@@ -47,8 +48,9 @@ export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=
   await limited(db,env.AUDIT_HASH_SECRET,'all',20,at);
   const subject=await hash(env.AUDIT_HASH_SECRET,'newsletter-consent:'+data.email);
   // Only the explicitly approved owner's test email is eligible for this route.
-  // The stored allowlist is HMAC-based, never a clear email in configuration.
-  if(subject!==env.NEWSLETTER_TEST_EMAIL_HASH)throw new Rejection('unavailable',503);
+  // Independent HMAC key for authorisation ONLY; the audit-derived subject above
+  // remains unchanged for records, evidence and deduplication. No legacy fallback.
+  if(!await authorisedNewsletterTestEmail(env,data.email))throw new Rejection('unavailable',503);
   const challengeResponse=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'error',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:raw.token})});
   if(!challengeResponse.ok)throw new Rejection('unavailable',503);
   const challenge=await challengeResponse.json();
