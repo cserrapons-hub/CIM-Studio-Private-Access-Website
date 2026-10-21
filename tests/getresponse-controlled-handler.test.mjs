@@ -163,3 +163,9 @@ test('existing signed evidence, audit-derived subjects and deduplication survive
   assert.equal(s.calls.filter(x=>x.url.includes('add_subscriber')).length,1);
  }finally{s.sqlite.close();}
 });
+
+test('Turnstile transport is Workers-compatible and rejects redirects before consent or HTML delivery',async()=>{
+ for(const status of [301,302,303,307,308]){
+  const s=await setup();try{let calls=0;const response=await s.run(s.request(),{fetcher:async(url,options)=>{calls++;assert.equal(url,'https://challenges.cloudflare.com/turnstile/v0/siteverify');assert.equal(options.redirect,'manual');assert.equal(options.method,'POST');return new Response(null,{status,headers:{Location:'https://untrusted.example.test'}});}});assert.equal(response.status,503);assert.equal(calls,1);assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_html_deliveries').get().n,0);}finally{s.sqlite.close();}
+ }
+});

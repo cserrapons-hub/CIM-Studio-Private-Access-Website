@@ -52,7 +52,7 @@ export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=
   // Independent HMAC key for authorisation ONLY; the audit-derived subject above
   // remains unchanged for records, evidence and deduplication. No legacy fallback.
   if(!await authorisedNewsletterTestEmail(env,data.email))throw new Rejection('unavailable',503);
-  const challengeResponse=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'error',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:raw.token})});
+  const challengeResponse=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:raw.token})});
   if(!challengeResponse.ok)throw new Rejection('unavailable',503);
   const challenge=await challengeResponse.json();
   if(challenge.success!==true||challenge.hostname!==new URL(request.url).hostname||challenge.action!=='subscribe')throw new Rejection('challenge',403);
