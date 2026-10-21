@@ -1,3 +1,5 @@
+> Procedimiento vigente: [LAUNCH-RUNBOOK.md](LAUNCH-RUNBOOK.md). Consolida los tres formularios y sustituye estados e instrucciones de fases anteriores; se conservan debajo como referencia histórica. Las aprobaciones y activaciones siguen deshabilitadas.
+
 # Lanzamiento mínimo — estado y acciones pendientes
 
 **DECISIÓN POSTERIOR:** [CIM-PRODUCTION-LAUNCH.md](CIM-PRODUCTION-LAUNCH.md) establece CIM Production como único registro de Clientes/Fundadores y la activación posterior de muestras. No aplicar las propuestas antiguas de derechos definitivos en D1.

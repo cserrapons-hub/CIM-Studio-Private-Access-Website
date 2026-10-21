@@ -1,6 +1,5 @@
 import {registrationReady} from './registration-settings.js';
-import {getresponseWebhookContract} from './getresponse-webhook-contract.js';
-import {htmlFormReady,GETRESPONSE_FORM_ID} from './getresponse-form.js';
+import {htmlFormReady} from './getresponse-form.js';
 import legal from '../legal/content.js';
 export const consent = {
   es: { careers:'Acepto recibir comunicaciones sobre oportunidades profesionales de CIM Studio y he leído la Política de Privacidad.', subscribe: 'Acepto recibir novedades de la colección por email.', samples: 'Acepto que CIM Studio contacte conmigo sobre esta solicitud.' },
@@ -32,8 +31,8 @@ export function careersReady(env) {
 export function publicSettings(env, url) {
   const enabled = { subscribe: htmlFormReady(env,legalReady()), samples: registrationReady(env,'samples',legalReady()), careers: registrationReady(env,'careers',legalReady()) };
   const verified = env.FORMS_VERIFIED === 'true';
-  return { enabled, verified, newsletter:{provider:'getresponse-html',nativeWidgetId:GETRESPONSE_FORM_ID,reviewRequired:true}, siteKey: (enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
-    siteLive: env.SITE_LIVE === 'true' && verified && env.SAMPLES_VERIFIED==='true' && env.CAREERS_VERIFIED==='true' && env.MAIL_RECEIPTS_VERIFIED==='true' && legalReady() && enabled.subscribe && enabled.samples && enabled.careers && env.FOUNDERS_RECORDING_VERIFIED === 'true' && env.GETRESPONSE_WEBHOOK_GRANTS_ENABLED === 'true' && getresponseWebhookContract.confirmationSemanticsVerified && getresponseWebhookContract.authenticationVerified && getresponseWebhookContract.sourceBindingVerified && getresponseWebhookContract.customerDeliveryVerified && env.CIM_PRODUCTION_DELIVERY_ENABLED === 'true' && url.hostname === 'cimstudio.es',
+  return { enabled, verified, newsletter:{provider:'getresponse-html',reviewRequired:true}, siteKey: (enabled.subscribe||enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
+    siteLive: env.CONTROLLED_TEST_MODE!=='true' && env.SITE_LIVE === 'true' && verified && env.SAMPLES_VERIFIED==='true' && env.CAREERS_VERIFIED==='true' && env.MAIL_RECEIPTS_VERIFIED==='true' && env.NEWSLETTER_EVIDENCE_REVIEWED==='true' && legalReady() && enabled.subscribe && enabled.samples && enabled.careers && url.hostname === 'cimstudio.es',
     legalVersion: legalReady() ? legal.version : null, legal: legalReady() ? { es: legal.es, en: legal.en } : null };
 }
 export { legal };

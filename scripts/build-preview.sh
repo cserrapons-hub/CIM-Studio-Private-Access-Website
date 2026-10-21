@@ -17,5 +17,9 @@ mkdir -p public/bienvenida
 cp welcome/index.html welcome/welcome.css welcome/welcome.js public/bienvenida/
 mkdir -p public/careers/preferences
 cp careers/preferences/index.html careers/preferences/preferences.css careers/preferences/preferences.js public/careers/preferences/
+mkdir -p public/controlled/newsletter
+cp controlled/newsletter/index.html controlled/newsletter/test.css controlled/newsletter/test.js public/controlled/newsletter/
+mkdir -p public/controlled/registrations
+cp controlled/registrations/index.html controlled/registrations/test.css controlled/registrations/test.js public/controlled/registrations/
 node scripts/prepare-legal.mjs
 node scripts/prepare-launch.mjs

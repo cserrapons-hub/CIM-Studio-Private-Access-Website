@@ -1,3 +1,5 @@
+> Procedimiento vigente: [LAUNCH-RUNBOOK.md](LAUNCH-RUNBOOK.md). Consolida los tres formularios y sustituye estados e instrucciones de fases anteriores; se conservan debajo como referencia histórica. Las aprobaciones y activaciones siguen deshabilitadas.
+
 # Una prueba real controlada — todavía NO autorizada
 
 ## Entrada necesaria ahora

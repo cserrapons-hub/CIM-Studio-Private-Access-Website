@@ -1,3 +1,5 @@
+> Procedimiento vigente: [LAUNCH-RUNBOOK.md](LAUNCH-RUNBOOK.md). Consolida los tres formularios y sustituye estados e instrucciones de fases anteriores; se conservan debajo como referencia histórica. Las aprobaciones y activaciones siguen deshabilitadas.
+
 # Primera prueba controlada — configuración preparada, nada activado
 
 Rama de trabajo: controlled-getresponse-test-2026-10-20, derivada de los respaldos. Ningún despliegue, alta real, cambio de dominio o migración de producción está autorizado por este documento. Usar un proyecto Pages independiente y un CIM Production de ensayo con disco/base separados.

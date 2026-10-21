@@ -31,7 +31,6 @@
  window.addEventListener('resize',()=>{if(forms.some(form=>form.closest('dialog').open&&widgets.has(form)&&widgetSizes.get(form)!==(form.querySelector('.challenge-slot').clientWidth<300?'compact':'flexible')))renderChallenges();});
  forms.forEach(form=>form.addEventListener('submit',async event=>{
   event.preventDefault();if(form.getAttribute('aria-busy')==='true')return;
-  if(form.dataset.formKind==='subscribe'){status(form,'status');return;}
   if(form.dataset.formKind==='careers'&&!form.reportValidity())return;
   if(!settings?.enabled[form.dataset.formKind]){status(form,'status');return;}
   if(!form.reportValidity())return;
@@ -52,7 +51,7 @@
    if(kind==='subscribe'&&response.status===202&&result.subscription==='confirmation_required'){
     form.closest('dialog').close();confirmationDialog.showModal();
    }
-  }catch{status(form,'unavailable',true);}
+  }catch{status(form,kind==='subscribe'?'pending':'unavailable',true);}
   finally{button.disabled=false;form.removeAttribute('aria-busy');if(widget!==undefined)window.turnstile?.reset(widget);}
  }));
  refresh();

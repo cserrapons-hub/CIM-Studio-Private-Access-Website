@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {newsletterTestPolicy} from '../server/newsletter-test-policy.js';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
@@ -6,8 +7,8 @@ import {prepareControlledHtml,recordControlledConsent,verifyConsentEvidence,insp
 import {htmlFormReady} from '../server/getresponse-form.js';
 import {onRequest} from '../functions/api/subscribe.js';
 const input={email:' Person@example.test ',consent:true,language:'es',requestId:'12345678-1234-1234-1234-123456789abc',legalVersion:'simulation-policy-v1'};
-const policy={approved:true,version:input.legalVersion};
-function setup(){const sqlite=new DatabaseSync(':memory:');sqlite.exec(readFileSync('migrations/0006_newsletter_consent.sql','utf8'));const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};}};return {sqlite,env:{CONTROLLED_TEST_MODE:'true',NEWSLETTER_PREPARATION_ENABLED:'true',FORMS_DB:db,AUDIT_HASH_SECRET:'test-only-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32))}};}
+const policy={...newsletterTestPolicy,approved:true,version:input.legalVersion};
+function setup(){const sqlite=new DatabaseSync(':memory:');sqlite.exec(readFileSync('migrations/0006_newsletter_consent.sql','utf8'));const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};}};return {sqlite,env:{NEWSLETTER_TEST_LEGAL_APPROVED:'true',CONTROLLED_TEST_MODE:'true',NEWSLETTER_PREPARATION_ENABLED:'true',FORMS_DB:db,AUDIT_HASH_SECRET:'test-only-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32))}};}
 test('confirmed HTML mapping sends only the supported fields, without API key or customFieldId parameter',()=>{
  const request=prepareControlledHtml(input);assert.equal(request.url,'https://app.getresponse.com/add_subscriber.html');assert.equal(request.options.redirect,'manual');
  assert.deepEqual([...new URLSearchParams(request.options.body)],[['email','person@example.test'],['campaign_token','PL6jh'],['custom_consentimiento','aceptado']]);

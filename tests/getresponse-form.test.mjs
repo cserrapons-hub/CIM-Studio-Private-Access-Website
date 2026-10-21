@@ -4,10 +4,10 @@ import {htmlFormReady,htmlFormReview,GETRESPONSE_FORM_ID,GETRESPONSE_LIST} from 
 import {publicSettings} from '../server/settings.js';
 import {onRequest} from '../functions/api/subscribe.js';
 import {readFileSync} from 'node:fs';
-test('standalone HTML integration remains blocked until the real provider export is reviewed',()=>{
+test('standalone HTML release remains blocked until the real response and consent flow are reviewed',()=>{
  assert.equal(GETRESPONSE_FORM_ID,'9748c724-790b-4c48-bbde-29366c400934');
  assert.equal(htmlFormReview.complete,false);
- assert.equal(htmlFormReview.reason,'official_html_export_required');
+ assert.equal(htmlFormReview.reason,'real_response_and_consent_flow_required');
  assert.equal(htmlFormReady({FORMS_ENABLED:'true',NEWSLETTER_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-html'},true),false);
  assert.equal(htmlFormReady({FORMS_ENABLED:'true',NEWSLETTER_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-hosted',GETRESPONSE_HOSTED_FORM_REVIEWED:'true',GETRESPONSE_HOSTED_FORM_URL:'https://cim.getresponse.com/example'},true),false);
  const config=publicSettings({},new URL('https://cim.test'));

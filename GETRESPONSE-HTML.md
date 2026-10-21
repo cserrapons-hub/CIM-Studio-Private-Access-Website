@@ -1,3 +1,5 @@
+> Procedimiento vigente: [LAUNCH-RUNBOOK.md](LAUNCH-RUNBOOK.md). Consolida los tres formularios y sustituye estados e instrucciones de fases anteriores; se conservan debajo como referencia histórica. Las aprobaciones y activaciones siguen deshabilitadas.
+
 > Decisión vigente: lanzamiento solo con los tres formularios probados. Acciones y prueba integral: THREE-FORMS-LAUNCH.md. La rama informativa se conserva intacta como alternativa, no se publica.
 
 # Lanzamiento: HTML independiente de GetResponse, pendiente de contrato oficial

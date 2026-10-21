@@ -1,3 +1,5 @@
+> Procedimiento vigente: [LAUNCH-RUNBOOK.md](LAUNCH-RUNBOOK.md). Consolida los tres formularios y sustituye estados e instrucciones de fases anteriores; se conservan debajo como referencia histórica. Las aprobaciones y activaciones siguen deshabilitadas.
+
 # Activación de CIM Studio en Cloudflare Pages
 
 **ACTUALIZACIÓN:** el flujo de alta por API ha sido retirado del acceso público. Seguir únicamente [GETRESPONSE-LAUNCH.md](GETRESPONSE-LAUNCH.md) para el formulario alojado y el webhook. Las instrucciones de activación siguientes son históricas y no deben ejecutarse para este lanzamiento.

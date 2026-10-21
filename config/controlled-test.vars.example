@@ -62,3 +62,20 @@ NEWSLETTER_TEST_ALLOWLIST_SECRET=
 # HMAC-SHA256(UTF-8 Base64 secret TEXT, 'newsletter-test-allowlist:v1:' + normalised email).
 # Calculate privately; never place the email or either secret in this file.
 NEWSLETTER_TEST_EMAIL_HASH=
+
+# Independent private-test policy approval AND reviewed code version required.
+# This never approves legal/content.js or enables public newsletter acquisition.
+NEWSLETTER_TEST_LEGAL_APPROVED=false
+
+# Read-only private controls. Remain false until separately authorised.
+NEWSLETTER_OBSERVATIONS_ENABLED=false
+CONTROLLED_REVIEW_ENABLED=false
+# Future public newsletter: source contract + public legal approval also required.
+NEWSLETTER_PUBLIC_ENABLED=false
+NEWSLETTER_VERIFIED=false
+NEWSLETTER_EVIDENCE_REVIEWED=false
+NEWSLETTER_ORIGIN=
+
+# Independent private sample/career policy gates; never public legal approval.
+SAMPLES_TEST_LEGAL_APPROVED=false
+CAREERS_TEST_LEGAL_APPROVED=false

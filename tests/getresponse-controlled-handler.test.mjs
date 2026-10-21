@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {newsletterTestPolicy} from '../server/newsletter-test-policy.js';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
@@ -8,12 +9,12 @@ import {hash} from '../server/forms.js';
 import {newsletterTestEmailHash} from '../server/newsletter-test-allowlist.js';
 import {onRequest as controlledRoute} from '../functions/api/controlled/subscribe.js';
 import {onRequest as publicRoute} from '../functions/api/subscribe.js';
-const policy={approved:true,version:'simulation-policy-v1'};
+const policy={...newsletterTestPolicy,approved:true,version:'simulation-policy-v1'};
 async function setup(){
  const sqlite=new DatabaseSync(':memory:');
  for(const name of ['0001_forms.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql'])sqlite.exec(readFileSync('migrations/'+name,'utf8'));
  const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};}};
- const env={CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:'https://cim-studio-test.pages.dev',CONTROLLED_TEST_USER:'test-owner',CONTROLLED_TEST_PASSWORD:'test-only-password-at-least-32-characters',NEWSLETTER_PREPARATION_ENABLED:'true',NEWSLETTER_CONTROLLED_SEND_ENABLED:'true',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret',SITE_LIVE:'false'};
+ const env={NEWSLETTER_TEST_LEGAL_APPROVED:'true',CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:'https://cim-studio-test.pages.dev',CONTROLLED_TEST_USER:'test-owner',CONTROLLED_TEST_PASSWORD:'test-only-password-at-least-32-characters',NEWSLETTER_PREPARATION_ENABLED:'true',NEWSLETTER_CONTROLLED_SEND_ENABLED:'true',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret',SITE_LIVE:'false'};
  const data={email:'owner@example.test',consent:true,language:'es',requestId:crypto.randomUUID(),legalVersion:policy.version,token:'simulation-token',website:''};
  env.NEWSLETTER_TEST_EMAIL_HASH=await newsletterTestEmailHash(env.NEWSLETTER_TEST_ALLOWLIST_SECRET,data.email);
  const headers={Origin:env.CONTROLLED_TEST_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1',Authorization:'Basic '+btoa(env.CONTROLLED_TEST_USER+':'+env.CONTROLLED_TEST_PASSWORD)};

@@ -1,17 +1,18 @@
 // Restricted test only. No browser configuration enables public acquisition.
-import {controlledTestBoundary} from './controlled-test.js';
-import {legal} from './settings.js';
+import {newsletterTestBoundary} from './newsletter-test-boundary.js';
+import {resolveNewsletterTestPolicy} from './newsletter-test-policy.js';
 import {json,readJson,validate,hash,Rejection} from './forms.js';
 import {recordControlledConsent} from './getresponse-controlled.js';
 import {validNewsletterAllowlistSecret,authorisedNewsletterTestEmail} from './newsletter-test-allowlist.js';
 const utc=()=>new Date();
-function settings(env,policy){
- if(env.CONTROLLED_TEST_MODE!=='true'||env.NEWSLETTER_PREPARATION_ENABLED!=='true'||env.NEWSLETTER_CONTROLLED_SEND_ENABLED!=='true'||env.SITE_LIVE==='true'||!env.FORMS_DB||!policy.approved||typeof policy.version!=='string'||!policy.version.trim())return false;
+export function controlledNewsletterReady(env,policy=resolveNewsletterTestPolicy(env)){
+ if(env.NEWSLETTER_TEST_LEGAL_APPROVED!=='true'||env.CONTROLLED_TEST_MODE!=='true'||env.NEWSLETTER_PREPARATION_ENABLED!=='true'||env.NEWSLETTER_CONTROLLED_SEND_ENABLED!=='true'||env.SITE_LIVE==='true'||!env.FORMS_DB||!policy.approved||typeof policy.version!=='string'||!policy.version.trim())return false;
+ if(!['es','en'].every(lang=>['consent','privacy'].every(key=>typeof policy[lang]?.[key]==='string'&&Boolean(policy[lang][key].trim()))))return false;
  if(!['TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','AUDIT_HASH_SECRET','NEWSLETTER_TEST_ALLOWLIST_SECRET','NEWSLETTER_TEST_EMAIL_HASH','NEWSLETTER_DATA_KEY'].every(key=>typeof env[key]==='string'&&env[key].trim()))return false;
  if(!validNewsletterAllowlistSecret(env.NEWSLETTER_TEST_ALLOWLIST_SECRET)||env.NEWSLETTER_TEST_ALLOWLIST_SECRET===env.AUDIT_HASH_SECRET||env.AUDIT_HASH_SECRET.length<32||!/^[a-f0-9]{64}$/.test(env.NEWSLETTER_TEST_EMAIL_HASH))return false;
  try{
   const origin=new URL(env.CONTROLLED_TEST_ORIGIN);
-  if(origin.protocol!=='https:'||origin.hostname==='cimstudio.es'||origin.hostname.endsWith('.cimstudio.es')||origin.pathname!=='/'||origin.search||origin.hash||origin.username||origin.password||atob(env.NEWSLETTER_DATA_KEY).length!==32)return false;
+  if(origin.origin!=='https://cim-studio-test.pages.dev'||origin.pathname!=='/'||origin.search||origin.hash||origin.username||origin.password||atob(env.NEWSLETTER_DATA_KEY).length!==32)return false;
  }catch{return false;}
  return true;
 }
@@ -31,13 +32,13 @@ async function previous(db,requestId,subject,policy,language){
  }
  return byId||await db.prepare('SELECT * FROM newsletter_html_deliveries WHERE subject_hash=?').bind(subject).first();
 }
-export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=utc,policy=legal}={}){
+export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=utc,policy=resolveNewsletterTestPolicy(env)}={}){
  let owned=null;
  try{
   if(request.method!=='POST')return json({error:'method'},405,{Allow:'POST'});
-  if(!settings(env,policy))return json({error:'unavailable'},503);
+  if(!controlledNewsletterReady(env,policy))return json({error:'unavailable'},503);
   // Authenticate here too: do not rely only on the Pages middleware being invoked.
-  const blocked=await controlledTestBoundary(request,env);if(blocked)return blocked;
+  const blocked=await newsletterTestBoundary(request,env);if(blocked)return blocked;
   const origin=new URL(request.url).origin;
   if(origin!==new URL(env.CONTROLLED_TEST_ORIGIN).origin||request.headers.get('Origin')!==origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403);
   const raw=await readJson(request),data=validate(raw,'subscribe');

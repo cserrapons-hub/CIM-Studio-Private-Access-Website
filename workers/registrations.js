@@ -5,6 +5,8 @@ export default {async scheduled(controller,env,ctx){
   for(const kind of ['samples','careers']){try{
    const result=await drainRegistrationMail(env,kind);
    const db=kind==='careers'?env.CAREERS_DB:env.FORMS_DB;
+   if(db)await db.prepare('DELETE FROM form_rate_limits WHERE expires_at<?').bind(Date.now()).run();
+   if(kind==='samples'&&db)await db.prepare('DELETE FROM registration_submission_claims WHERE expires_at<?').bind(Date.now()).run();
    const due=db?await db.prepare("SELECT COUNT(*) n FROM registrations WHERE state IN ('active','pending') AND review_due<?").bind(new Date().toISOString()).first():null;
    if(result.review||due?.n)console.warn('CIM registration review required',kind,{mail:result.review,retention:due?.n||0});
   }catch{console.warn('CIM registration worker unavailable',kind);}}

@@ -17,7 +17,7 @@ GR_CONSENT_TEXT_FIELD_ID=
 GR_LANGUAGE_FIELD_ID=
 RESEND_API_KEY=
 MAIL_FROM=
-# Standalone HTML is pending official export review. No endpoint/token is inferred.
+# Support-confirmed HTML mapping; real acknowledgement/DOI evidence still need verification.
 NEWSLETTER_PROVIDER=getresponse-html
 # Webhook processing remains blocked pending real contract/authentication tests.
 GETRESPONSE_WEBHOOK_ENABLED=false
@@ -62,3 +62,20 @@ NEWSLETTER_TEST_ALLOWLIST_SECRET=
 # HMAC-SHA256(UTF-8 Base64 secret TEXT, 'newsletter-test-allowlist:v1:' + normalised email).
 # Calculate privately; never place the email or either secret in this file.
 NEWSLETTER_TEST_EMAIL_HASH=
+
+# Independent private-test policy approval AND reviewed code version required.
+# This never approves legal/content.js or enables public newsletter acquisition.
+NEWSLETTER_TEST_LEGAL_APPROVED=false
+
+# Read-only private controls. Remain false until separately authorised.
+NEWSLETTER_OBSERVATIONS_ENABLED=false
+CONTROLLED_REVIEW_ENABLED=false
+# Future public newsletter: source contract + public legal approval also required.
+NEWSLETTER_PUBLIC_ENABLED=false
+NEWSLETTER_VERIFIED=false
+NEWSLETTER_EVIDENCE_REVIEWED=false
+NEWSLETTER_ORIGIN=
+
+# Independent private sample/career policy gates.
+SAMPLES_TEST_LEGAL_APPROVED=false
+CAREERS_TEST_LEGAL_APPROVED=false

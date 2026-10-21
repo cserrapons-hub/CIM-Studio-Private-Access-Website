@@ -1,4 +1,6 @@
-// Endpoint expressly confirmed by support; field mapping/server proxy semantics are still unverified.
+import {newsletterPublicReady} from './newsletter-release.js';
+// Endpoint/three-field HTML mapping and Cloudflare relay are support-confirmed.
+// Historical generic adapter below is kept for regression; current concrete relay is in getresponse-controlled.js.
 export const GETRESPONSE_HTML_ENDPOINT='https://app.getresponse.com/add_subscriber.html';
 // This UUID identifies the native Web Connect widget, not a standalone HTML export.
 // Never derive an action URL, campaign token or consent field ID from it.
@@ -17,7 +19,7 @@ export const GETRESPONSE_LIST=Object.freeze({
 });
 export const htmlFormReview=Object.freeze({
  complete:false,
- reason:'official_html_export_required'
+ reason:'real_response_and_consent_flow_required'
 });
 
 // Preparation only: this produces a submission description, never a network request.
@@ -49,11 +51,9 @@ export function prepareOfficialHtmlSubmission(review,input){
  }
  return {method:'POST',action:action.href,fields};
 }
-export function htmlFormReady(){
- // Intentionally blocked: the official generated HTML, list binding, consent fields,
- // DOI behaviour and provider-side abuse protection have not been reviewed yet.
- // Environment flags cannot turn an unknown submission contract into a verified one.
- return false;
+export function htmlFormReady(env={},approved=false){
+ // Still false with the current code-owned release contract. No env-only bypass.
+ return newsletterPublicReady(env,approved);
 }
 
 // Pure request preparation only; no fetch and no connection to /api/subscribe.
