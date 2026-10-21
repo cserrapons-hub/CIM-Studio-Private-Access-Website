@@ -3,9 +3,8 @@ import {json,readJson,hash,Rejection} from './forms.js';
 import {newsletterTestBoundary} from './newsletter-test-boundary.js';
 import {resolveNewsletterTestPolicy} from './newsletter-test-policy.js';
 import {authorisedNewsletterTestEmail,validNewsletterAllowlistSecret} from './newsletter-test-allowlist.js';
-import {verifyNewsletter,NewsletterVerificationError} from './getresponse-newsletter.js';
+import {verifyNewsletter,NewsletterVerificationError,readGetResponse} from './getresponse-newsletter.js';
 import {inspectNewsletterContact} from './getresponse-controlled.js';
-const api='https://api.getresponse.com/v3';
 // Same preflight in config and handler. Does not access D1/provider or check an email.
 export function observationConfigurationIssue(env,policy=resolveNewsletterTestPolicy(env)){
  if(env.NEWSLETTER_OBSERVATIONS_ENABLED!=='true')return 'observation_disabled';
@@ -39,9 +38,8 @@ export async function observeNewsletter(request,env,{fetcher=fetch,now=new Date(
   stage='getresponse_campaign';code='campaign_network';
   await verifyNewsletter(env.GETRESPONSE_API_KEY,env.GETRESPONSE_CAMPAIGN_ID,fetcher);
   stage='getresponse_contacts';code='contacts_network';
-  const response=await fetcher(api+'/contacts?'+query,{method:'GET',headers:{'X-Auth-Token':'api-key '+env.GETRESPONSE_API_KEY,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(12000)});
-  if(!response.ok){code='contacts_http';providerStatus=response.status;try{await response.body?.cancel();}catch{}throw new Rejection('unavailable',503);}
-  code='contacts_response';const contacts=await response.json();
+  const contacts=await readGetResponse(fetcher,env.GETRESPONSE_API_KEY,'/contacts?'+query,'contacts');
+  code='contacts_response';
   if(!Array.isArray(contacts)||contacts.some(c=>!c||typeof c!=='object'||Array.isArray(c)))throw new Rejection('unavailable',503);
   if(contacts.length>=100){code='contacts_incomplete';throw new Rejection('unavailable',503);}
   const matches=contacts.filter(c=>typeof c.email==='string'&&c.email.trim().toLowerCase()===email&&c.campaign?.campaignId===env.GETRESPONSE_CAMPAIGN_ID);

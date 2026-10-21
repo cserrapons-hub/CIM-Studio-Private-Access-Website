@@ -7,7 +7,7 @@ const path='/api/controlled/newsletter-observation';
 function scenario(s,{campaign='valid',contacts='valid'}={}){
  const calls=[];
  const fetcher=async(target,options)=>{
-  const url=new URL(target);assert.equal(url.origin,'https://api.getresponse.com');assert.ok(!options.method||options.method==='GET');assert.equal(options.redirect,'error');calls.push({path:url.pathname});
+  const url=new URL(target);assert.equal(url.origin,'https://api.getresponse.com');assert.ok(!options.method||options.method==='GET');assert.equal(options.redirect,'manual');calls.push({path:url.pathname});
   if(url.pathname==='/v3/campaigns/PL6jh'){
    if(campaign==='network')throw Error('PRIVATE CAMPAIGN URL AND KEY');
    if(Number.isInteger(campaign))return Response.json({private:s.env.GETRESPONSE_API_KEY},{status:campaign});

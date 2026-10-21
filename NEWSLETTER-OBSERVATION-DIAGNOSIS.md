@@ -62,3 +62,15 @@ No requiere pedir al usuario que investigue código ni que revele secretos. Con 
 32 casos Chromium locales: 16 nuevos de error/recuperación en modo solo observación (ES/EN, 1440/390), más 16 de regresión privada a 1920/1440/768/390. Todas las llamadas externas interceptadas y SQLite desechable; ninguna suscripción ni correo real. Sin desbordamiento horizontal ni errores JS observados. No Safari físico.
 
 Compilación estática y Pages Functions correctas. Ningún cambio de flags/Secrets, migración remota, política aprobada, diseño público, otro formulario ni CIM Production. No hay commit ni push de esta corrección.
+
+## Diagnóstico posterior: `campaign_network` en 2521ece (21/10/2026)
+
+La observación real comunicada devuelve `getresponse_campaign / campaign_network`, sin estado HTTP. Se ha reproducido una causa concreta en workerd local: `fetch` no admite `redirect: "error"` y lanza TypeError antes de enviar la petición. El código de 2521ece captura esa excepción como fallo de red. No demuestra un fallo de DNS, TLS, timeout ni rechazo de GetResponse. Node admite ese valor y las simulaciones anteriores no detectaban esta incompatibilidad del runtime.
+
+Petición prevista: GET `https://api.getresponse.com/v3/campaigns/PL6jh`, sin cuerpo, `Accept: application/json`, `X-Auth-Token: api-key [secreto de servidor]`, timeout de 12 segundos. La lectura de campaña no contiene el correo. Después se consulta contactos por email y campaña; esa URL nunca debe registrarse ni mostrarse.
+
+Corrección local mínima: `redirect: "manual"` y rechazo explícito de cualquier respuesta 3xx sin seguir Location ni reenviar credenciales. Se comparte el transporte de solo lectura entre campaña y contactos, ya que ambos usaban la opción incompatible. Se distinguen construcción (`*_request`), timeout (`*_timeout`), transporte (`*_network`), redirección (`*_redirect`), HTTP y JSON; solo códigos estáticos y estado HTTP. No se revelan mensajes originales, URLs de contactos, payloads ni secretos. No hay reintentos ni cambios en los mecanismos de envío, consentimiento o concesión de Fundadores.
+
+Validación local: 156/156 pruebas Node; 6 casos workerd con salida completamente interceptada (el original falla antes de salir con dos fechas de compatibilidad; el corregido completa la observación; campaña/contactos rechazan redirecciones; cabecera inválida se rechaza antes de salir); 16 casos Chromium ES/EN a 1440 y 390 px con proveedores simulados. Build estático y Pages Functions correctos. El script workerd necesita Miniflare con convertV4MiniflareOptions y esbuild, mediante MINIFLARE_MODULE/ESBUILD_MODULE si no están instalados localmente; no añade dependencias de producción.
+
+Es la causa reproducida y más probable del diagnóstico real; no se ha inspeccionado el runtime remoto ni consultado GetResponse. La confirmación definitiva en Cloudflare requerirá autorización para publicar y efectuar una única observación, manteniendo los envíos desactivados. No se han realizado commit, push, despliegues, consultas reales, cambios de variables o escrituras remotas.

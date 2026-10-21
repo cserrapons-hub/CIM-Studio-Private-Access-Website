@@ -9,22 +9,33 @@ export class NewsletterVerificationError extends Error {
     this.providerStatus=Number.isInteger(providerStatus)&&providerStatus>=100&&providerStatus<=599?providerStatus:null;
   }
 }
-async function read(fetcher, key, path) {
+export async function readGetResponse(fetcher, key, path, operation='campaign') {
+  const label=operation==='contacts'?'contacts':'campaign';
+  let options;
+  const url=API+path;
+  try{
+    options={method:'GET',headers:{'X-Auth-Token':'api-key '+key,Accept:'application/json'},redirect:'manual',signal:AbortSignal.timeout(12000)};
+    // Validate URL/headers/options separately from transport. No network is performed.
+    // Workers supports manual/follow, not redirect:error. Never follow API redirects.
+    new Request(url,options);
+  }catch{throw new NewsletterVerificationError(label+'_request');}
   let response;
-  try{response=await fetcher(API + path, {
-    headers: {'X-Auth-Token':'api-key ' + key, Accept:'application/json'},
-    redirect:'error', signal:AbortSignal.timeout(12000)
-  });}catch{throw new NewsletterVerificationError('campaign_network');}
+  try{response=await fetcher(url,options);}
+  catch(error){throw new NewsletterVerificationError(label+(options.signal.aborted||error?.name==='TimeoutError'||error?.name==='AbortError'?'_timeout':'_network'));}
+  if(response.status>=300&&response.status<400){
+    try{await response.body?.cancel();}catch{}
+    throw new NewsletterVerificationError(label+'_redirect',response.status);
+  }
   if (!response.ok) {
     try{await response.body?.cancel();}catch{}
-    throw new NewsletterVerificationError('campaign_http',response.status);
+    throw new NewsletterVerificationError(label+'_http',response.status);
   }
-  try{return await response.json();}catch{throw new NewsletterVerificationError('campaign_response');}
+  try{return await response.json();}catch{throw new NewsletterVerificationError(label+'_response');}
 }
 export async function verifyNewsletter(key, campaignId, fetcher=fetch) {
   if (typeof key !== 'string' || !key.trim() || typeof campaignId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(campaignId))
     throw new NewsletterVerificationError('campaign_configuration');
-  const campaign = await read(fetcher,key,'/campaigns/' + encodeURIComponent(campaignId));
+  const campaign = await readGetResponse(fetcher,key,'/campaigns/' + encodeURIComponent(campaignId));
   // Official GetResponse SDK: CampaignOptinTypes and GetCampaignFields (optinTypes.api).
   // Keep exact identity and double-opt-in checks; never guess or relax them.
   if (!campaign||Array.isArray(campaign)||typeof campaign!=='object')throw new NewsletterVerificationError('campaign_response');
@@ -38,7 +49,7 @@ export async function discoverNewsletter(key, fetcher=fetch) {
   const matches = new Map();
   for (let page=1;page<=10;page++) {
     const query = new URLSearchParams({'query[name]':NEWSLETTER_NAME,perPage:'100',page:String(page)});
-    const campaigns = await read(fetcher,key,'/campaigns?' + query);
+    const campaigns = await readGetResponse(fetcher,key,'/campaigns?' + query);
     if (!Array.isArray(campaigns)) throw new Error('Unexpected campaign response');
     for (const campaign of campaigns) if (campaign.name === NEWSLETTER_NAME) matches.set(campaign.campaignId,campaign);
     if (campaigns.length < 100) {

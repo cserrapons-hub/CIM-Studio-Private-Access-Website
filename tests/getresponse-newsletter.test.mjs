@@ -12,7 +12,7 @@ test('read-only discovery selects exact newsletter name and verifies its actual 
  assert.equal(calls.length,2);
  assert.equal(new URL(calls[0].url).searchParams.get('query[name]'),NEWSLETTER_NAME);
  assert.equal(calls[1].url,'https://api.getresponse.com/v3/campaigns/real-from-api');
- for(const c of calls){assert.equal(c.options.method,undefined);assert.equal(c.options.body,undefined);assert.equal(c.options.redirect,'error');assert.equal(c.options.headers['X-Auth-Token'],'api-key simulation-only');}
+ for(const c of calls){assert.equal(c.options.method,'GET');assert.equal(c.options.body,undefined);assert.equal(c.options.redirect,'manual');assert.equal(c.options.headers['X-Auth-Token'],'api-key simulation-only');}
 });
 test('discovery refuses absent, ambiguous or malformed lists and handles pagination without silently choosing',async()=>{
  for(const response of [[],[detail,{...detail,campaignId:'second'}],{}])
