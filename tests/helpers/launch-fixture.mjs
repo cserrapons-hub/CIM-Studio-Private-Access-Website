@@ -4,7 +4,7 @@ import {newsletterTestPolicy} from '../../server/newsletter-test-policy.js';
 import {newsletterTestEmailHash} from '../../server/newsletter-test-allowlist.js';
 export function store(careers=false){
  const sqlite=new DatabaseSync(':memory:');
- const files=careers?['careers/0001_careers.sql','careers/0002_registrations.sql','careers/0003_audit_seals.sql']:['0001_forms.sql','0003_getresponse_webhook.sql','0004_production_outbox.sql','0005_registrations.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql','0008_launch_operations.sql','0009_newsletter_api_deliveries.sql'];
+ const files=careers?['careers/0001_careers.sql','careers/0002_registrations.sql','careers/0003_audit_seals.sql']:['0001_forms.sql','0003_getresponse_webhook.sql','0004_production_outbox.sql','0005_registrations.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql','0008_launch_operations.sql','0009_newsletter_api_deliveries.sql','0010_newsletter_html404_retry.sql'];
  for(const name of files)sqlite.exec(readFileSync('migrations/'+name,'utf8'));
  const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async all(){return {results:sqlite.prepare(sql).all(...args)};},async run(){return {meta:{changes:sqlite.prepare(sql).run(...args).changes}};},sql,args:()=>args};},async batch(statements){sqlite.exec('BEGIN IMMEDIATE');try{const result=statements.map(s=>({results:sqlite.prepare(s.sql).all(...s.args())}));sqlite.exec('COMMIT');return result;}catch(error){sqlite.exec('ROLLBACK');throw error;}}};
  return {db,sqlite};

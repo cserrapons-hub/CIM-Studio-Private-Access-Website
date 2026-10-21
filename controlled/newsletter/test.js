@@ -37,7 +37,7 @@
   event.preventDefault();if(!config?.enabled||busy||settled||!form.reportValidity())return;
   const values=new FormData(form);if(values.get('consent')!=='on'){message='consent';render();return;}
   const token=widget!==null?window.turnstile?.getResponse(widget):null;if(!token){message='challenge';render();return;}
-  if(!requestId)requestId=crypto.randomUUID();
+  if(!requestId)requestId=config.retryRequestId||crypto.randomUUID();
   const data={email:values.get('email'),consent:true,language:lang,legalVersion:config.policy.version,requestId,token,website:values.get('website')||''};
   busy=true;message='sending';render();
   try{

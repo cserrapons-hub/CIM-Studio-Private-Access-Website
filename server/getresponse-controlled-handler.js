@@ -6,6 +6,7 @@ import {recordControlledConsent,verifyConsentEvidence} from './getresponse-contr
 import {validNewsletterAllowlistSecret,authorisedNewsletterTestEmail} from './newsletter-test-allowlist.js';
 import {prepareNewsletterApi,NEWSLETTER_API_CONTRACT} from './getresponse-api-submission.js';
 import {verifyNewsletter,readGetResponse} from './getresponse-newsletter.js';
+import {retryConfigured,useHtml404Retry} from './newsletter-html404-retry.js';
 const utc=()=>new Date();
 export function controlledNewsletterReady(env,policy=resolveNewsletterTestPolicy(env)){
  if(env.NEWSLETTER_API_REVIEWED!=='true'||env.GETRESPONSE_CAMPAIGN_ID!=='PL6jh'||typeof env.GETRESPONSE_API_KEY!=='string'||!env.GETRESPONSE_API_KEY.trim())return false;
@@ -71,7 +72,12 @@ export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=
   // No retries on uncertain requests, including new request IDs for the same email.
   await db.prepare("UPDATE newsletter_html_deliveries SET state='unknown',updated_at=? WHERE state='sending' AND lease_until<?").bind(at.toISOString(),Math.floor(at.getTime()/1000)).run();
   const prior=await previous(db,raw.requestId,subject,policy,data.language);
-  if(prior)return await priorDelivery(db,prior,env.AUDIT_HASH_SECRET);
+  if(prior){
+   if(retryConfigured(env))return useHtml404Retry(request,env,{parent:prior,subject,raw,data,policy,fetcher,now});
+   return await priorDelivery(db,prior,env.AUDIT_HASH_SECRET);
+  }
+  // Exception mode must never fall through to an ordinary new-email subscription.
+  if(env.NEWSLETTER_HTML404_RETRY_ENABLED==='true')return pending();
   // Fail before consent/claims/provider reads if the local API migration is missing.
   await db.prepare('SELECT request_id FROM newsletter_api_deliveries LIMIT 1').first();
   // Validate the destination and double opt-in on every NEW attempt. Never bypass an existing claim.

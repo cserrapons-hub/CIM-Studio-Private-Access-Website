@@ -82,3 +82,7 @@ CAREERS_TEST_LEGAL_APPROVED=false
 
 # Keep false until GetResponse API double opt-in behaviour is reviewed.
 NEWSLETTER_API_REVIEWED=false
+
+# One-shot private HTML 404 retry. Never enable without a reviewed expiring D1 permit.
+NEWSLETTER_HTML404_RETRY_ENABLED=false
+NEWSLETTER_HTML404_RETRY_PARENT_ID=

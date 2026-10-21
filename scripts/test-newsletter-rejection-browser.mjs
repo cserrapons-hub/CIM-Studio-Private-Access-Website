@@ -3,12 +3,15 @@ import {createRequire} from 'node:module';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {fixture,policy} from '../tests/helpers/launch-fixture.mjs';
+import {recordControlledConsent} from '../server/getresponse-controlled.js';
 import {handleControlledNewsletter} from '../server/getresponse-controlled-handler.js';
 import {newsletterTestConfiguration} from '../functions/api/controlled/newsletter-config.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
-try{for(const mode of ['rejected','accepted'])for(const lang of ['es','en'])for(const width of [1440,390]){
+try{for(const retry of [false,true])for(const mode of ['rejected','accepted'])for(const lang of ['es','en'])for(const width of [1440,390]){
  const s=await fixture();Object.assign(s.env,{NEWSLETTER_API_REVIEWED:'true',GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_PREPARATION_ENABLED:'true',NEWSLETTER_CONTROLLED_SEND_ENABLED:'true'});
+ let parentId=null,retryId=null;
+ if(retry){parentId=s.data.requestId;retryId=crypto.randomUUID();const {evidence}=await recordControlledConsent(s.env,s.data,new Date(),policy);s.forms.sqlite.prepare("INSERT INTO newsletter_html_deliveries VALUES(?,?,'rejected',404,?,?,?)").run(parentId,evidence.subject_hash,new Date().toISOString(),new Date().toISOString(),0);const t=Math.floor(Date.now()/1000);s.forms.sqlite.prepare('INSERT INTO newsletter_retry_permits(parent_request_id,api_request_id,subject_hash,issued_at,expires_at,approved_by,active) VALUES(?,?,?,?,?,?,1)').run(parentId,retryId,evidence.subject_hash,t-1,t+600,'CIM Studio simulation');Object.assign(s.env,{NEWSLETTER_HTML404_RETRY_ENABLED:'true',NEWSLETTER_HTML404_RETRY_PARENT_ID:parentId});}
  const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage();let posts=0;
  try{
  await context.route('**/*',async route=>{
@@ -32,6 +35,7 @@ try{for(const mode of ['rejected','accepted'])for(const lang of ['es','en'])for(
  if(lang==='en')await page.click('[data-lang=en]');
  await page.fill('[name=email]',s.data.email);await page.check('[name=consent]');await page.click('[type=submit]');
  await page.waitForFunction(()=>document.getElementById('result').textContent.includes('GetResponse'));
- assert.match(await page.locator('#result').textContent(),mode==='accepted'?(lang==='es'?/ha aceptado/:/accepted/):(lang==='es'?/ha rechazado/:/rejected/));assert.equal(posts,1);assert.equal(await page.locator('[type=submit]').isDisabled(),true);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);count++;
+ assert.match(await page.locator('#result').textContent(),mode==='accepted'?(lang==='es'?/ha aceptado/:/accepted/):(lang==='es'?/ha rechazado/:/rejected/));assert.equal(posts,1);if(retry){assert.equal(s.forms.sqlite.prepare('SELECT request_id FROM newsletter_retry_attempts').get().request_id,retryId);assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_html_deliveries WHERE request_id=?').get(parentId).state,'rejected');}
+ assert.equal(await page.locator('[type=submit]').isDisabled(),true);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);count++;
  }finally{await context.close();s.close();}
 }console.log('PASS',count,'ES/EN desktop/mobile acceptance/rejection cases, no real provider calls.');}finally{await browser.close();}
