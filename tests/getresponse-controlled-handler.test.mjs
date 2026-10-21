@@ -38,7 +38,7 @@ test('controlled route and public route cannot send with default configuration o
    const response=await handleControlledNewsletter(s.request(),{...s.env,...changes},{fetcher:s.fetcher,policy});assert.equal(response.status,503);
   }
   assert.equal((await s.run(s.request(),{policy:{...policy,approved:false}})).status,503);
-  assert.equal((await controlledRoute({request:s.request(),env:s.env})).status,503);
+  assert.equal((await controlledRoute({request:s.request(),env:{...s.env,NEWSLETTER_CONTROLLED_SEND_ENABLED:'false'}})).status,503);
   assert.equal((await publicRoute({request:s.request(),env:s.env})).status,503);
   assert.equal(s.calls.length,0);
  }finally{s.sqlite.close();}

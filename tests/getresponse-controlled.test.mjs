@@ -28,7 +28,7 @@ test('consent records server time, server text/version and encrypted email; retr
 test('preparation is disabled by default, requires legal review/version, supports EN and never activates public signup',async()=>{
  const s=setup();try{
   await assert.rejects(recordControlledConsent({...s.env,NEWSLETTER_PREPARATION_ENABLED:'false'},input,new Date(),policy),/disabled/);
-  await assert.rejects(recordControlledConsent(s.env,input),/disabled/);
+  await assert.rejects(recordControlledConsent({...s.env,NEWSLETTER_TEST_LEGAL_APPROVED:'false'},input),/disabled/);
   await assert.rejects(recordControlledConsent(s.env,{...input,legalVersion:'wrong'},new Date(),policy),/version/);
   const record=await recordControlledConsent(s.env,{...input,language:'en'},new Date(),policy);assert.equal(record.evidence.consent_text,'I agree to receive collection news by email.');
   assert.equal(htmlFormReady(s.env,true),false);assert.equal((await onRequest({env:s.env})).status,503);

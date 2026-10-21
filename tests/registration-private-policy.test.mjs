@@ -15,12 +15,13 @@ const reviewed=kind=>({...registrationTestPolicies[kind],approved:true});
 function configure(s){Object.assign(s.env,{SAMPLES_TEST_LEGAL_APPROVED:'true',CAREERS_TEST_LEGAL_APPROVED:'true',REGISTRATIONS_TEST_ENABLED:'true',SAMPLES_VERIFIED:'false',CAREERS_VERIFIED:'false',MAIL_RECEIPTS_VERIFIED:'false'});}
 function data(s,kind,extra={}){return {...s.data,...(kind==='samples'?fictionalSample:{}),testData:true,legalVersion:registrationTestPolicies[kind].version,token:kind==='samples'?'sample-token':'career-token',...extra};}
 function submit(s,kind,body=data(s,kind),env=s.env,policy=resolveRegistrationTestPolicy(env,kind,reviewed(kind)),headers={}){return handleRegistration(s.request('/api/controlled/'+kind,body,headers),env,kind,s.fetcher,new Date('2026-10-21T09:00:00Z'),policy);}
-test('sample and career test approvals start false with distinct fixed versions and cannot approve each other or public documents',async()=>{
+test('express sample and career approvals are separate, runtime-gated and cannot approve public documents',async()=>{
  const s=await fixture();configure(s);try{
   assert.equal(legal.approved,false);
   for(const kind of ['samples','careers']){
-   const p=registrationTestPolicies[kind];assert.equal(p.approved,false);assert.match(p.version,/-private-test-v1$/);
-   assert.equal(resolveRegistrationTestPolicy(s.env,kind).approved,false);
+   const p=registrationTestPolicies[kind];assert.equal(p.approved,true);assert.match(p.version,/-private-test-v1$/);
+   assert.equal(resolveRegistrationTestPolicy({},kind).approved,false);
+   assert.equal(resolveRegistrationTestPolicy(s.env,kind,{...reviewed(kind),approved:false}).approved,false);
    assert.equal(resolveRegistrationTestPolicy(s.env,kind,reviewed(kind)).approved,true);
    assert.equal(resolveRegistrationTestPolicy(s.env,kind,{...reviewed(kind),version:'changed'}).approved,false);
    assert.equal(resolveRegistrationTestPolicy(s.env,kind,{...reviewed(kind),en:{consent:'',privacy:''}}).approved,false);
@@ -28,7 +29,7 @@ test('sample and career test approvals start false with distinct fixed versions 
    assert.equal(resolveRegistrationTestPolicy({...s.env,[flag]:'false'},kind,reviewed(kind)).approved,false);
    assert.equal(resolveRegistrationTestPolicy(s.env,kind,reviewed(kind==='samples'?'careers':'samples')).approved,false);
   }
-  for(const route of [samplesRoute,careersRoute])assert.equal((await route({request:s.request('/api/controlled/samples',s.data),env:s.env})).status,503);
+  for(const route of [samplesRoute,careersRoute])assert.equal((await route({request:s.request('/api/controlled/samples',s.data),env:{...s.env,REGISTRATIONS_TEST_ENABLED:'false'}})).status,503);
   const publicConfig=publicSettings(s.env,new URL(s.env.REGISTRATION_ORIGIN));assert.equal(publicConfig.enabled.samples,false);assert.equal(publicConfig.enabled.careers,false);
   assert.equal((await handleRegistration(s.request('/api/samples',data(s,'samples')),s.env,'samples',s.fetcher)).status,503);
   assert.equal((await handleRegistration(s.request('/api/careers',data(s,'careers')),s.env,'careers',s.fetcher)).status,503);
@@ -39,7 +40,7 @@ test('private registration config and assets require exact test host and Basic; 
  const s=await fixture();configure(s);try{
   const request=(auth=true)=>new Request(s.env.REGISTRATION_ORIGIN+'/api/controlled/registration-config',{headers:auth?{Authorization:'Basic '+btoa(s.env.CONTROLLED_TEST_USER+':'+s.env.CONTROLLED_TEST_PASSWORD)}:{}});
   assert.equal((await registrationTestConfiguration(request(false),s.env)).status,401);
-  const r=await registrationTestConfiguration(request(),s.env),c=await r.json();assert.equal(c.enabled.samples,false);assert.equal(c.enabled.careers,false);assert.equal(c.siteKey,null);
+  const r=await registrationTestConfiguration(request(),{...s.env,REGISTRATIONS_TEST_ENABLED:'false'}),c=await r.json();assert.equal(c.enabled.samples,false);assert.equal(c.enabled.careers,false);assert.equal(c.siteKey,null);
   for(const v of [s.data.email,s.env.AUDIT_HASH_SECRET,s.env.NEWSLETTER_TEST_ALLOWLIST_SECRET,s.env.NEWSLETTER_TEST_EMAIL_HASH,s.env.RESEND_API_KEY])assert.ok(!JSON.stringify(c).includes(v));
   for(const path of ['/controlled/registrations/','/controlled/registrations/test.js','/controlled%2Fregistrations/test.css','//controlled/registrations/test.js']){
    let calls=0;const next=async()=>{calls++;return new Response('never');};
@@ -109,10 +110,10 @@ test('private challenge failures cannot create records and prior approval eviden
   assert.equal(s.careers.sqlite.prepare('SELECT consent_version FROM registrations').get().consent_version,'previous-other-scope');
  }finally{s.close();}
 });
-test('consolidated review document reproduces the exact fixed draft texts and versions, without approving them',async()=>{
+test('consolidated document reproduces exact approved private texts without approving public documents',async()=>{
  const {newsletterTestPolicy}=await import('../server/newsletter-test-policy.js');
  const text=readFileSync('PRIVATE-TEST-NOTICES.md','utf8');
- for(const p of [newsletterTestPolicy,...Object.values(registrationTestPolicies)]){assert.equal(p.approved,false);assert.ok(text.includes('`'+p.version+'`'));for(const lang of ['es','en'])for(const field of ['consent','privacy'])assert.ok(text.includes(p[lang][field]));
+ for(const p of [newsletterTestPolicy,...Object.values(registrationTestPolicies)]){assert.equal(p.approved,true);assert.ok(text.includes('`'+p.version+'`'));for(const lang of ['es','en'])for(const field of ['consent','privacy'])assert.ok(text.includes(p[lang][field]));
   for(const lang of ['es','en']){assert.match(p[lang].privacy,lang==='es'?/confirmados por CIM Studio/:/confirmed by CIM Studio/);assert.match(p[lang].privacy,/Carrer Joan Sindic, 7/);assert.ok(!p[lang].privacy.includes('Juan Sindic'));assert.match(p[lang].privacy,lang==='es'?/bajo la supervisión de su responsable/:/under the supervision of its responsible representative/);}}
  assert.equal(legal.approved,false);
 });

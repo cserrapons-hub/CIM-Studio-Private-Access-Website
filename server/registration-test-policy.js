@@ -1,5 +1,5 @@
-// Independent, fixed-version DRAFTS. Neither environment flags nor another form's
-// approval can approve these texts. Public legal/content.js remains untouched.
+// Separate private policies expressly approved by CIM Studio on 2026-10-21.
+// Exact ES/EN content from 372193d is unchanged; public documents and runtime gates remain closed.
 const controller={es:'Responsable: CIM STUDIO ESPJ, NIF E88749155, Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears. Contacto: admin@cimstudio.es. Datos facilitados y confirmados por CIM Studio para estos ensayos privados.',en:'Controller: CIM STUDIO ESPJ, tax ID E88749155, Carrer Joan Sindic, 7, ground floor, 07420 Sa Pobla, Illes Balears. Contact: admin@cimstudio.es. These details have been supplied and confirmed by CIM Studio for these private tests.'};
 const common={
  es:`Cloudflare aloja el entorno privado; Turnstile comprueba la solicitud. D1 conserva por separado los registros de muestras y de oportunidades laborales. Resend tramita los correos; el buzón administrativo admin@cimstudio.es utiliza Google Workspace. Este flujo no utiliza GetResponse, Web Connect ni Analytics y no concede la Tarifa Fundadores.
@@ -29,16 +29,16 @@ CIM Studio reports that it has initially reviewed Cloudflare’s DPA, which addr
 
 PENDING APPROVAL: this notice and version, consent and lawful bases for technical processing and evidence, technical checks of providers and transfers applicable to the accounts, technologies used, retention, and the review and erasure procedure. This draft does not authorise sending or approve the public documents.`
 };
-function draft(kind,version,es,en){return Object.freeze({kind,approved:false,version,es:Object.freeze(es),en:Object.freeze(en)});}
+function approvedPrivatePolicy(kind,version,es,en){return Object.freeze({kind,approved:true,approval:Object.freeze({date:'2026-10-21',scope:'private-controlled-test-only',contentCommit:'372193daa923c55ce731bd3f7d0dd7003834b48f'}),version,es:Object.freeze(es),en:Object.freeze(en)});}
 export const registrationTestPolicies=Object.freeze({
- samples:draft('samples','samples-private-test-v1',{
+ samples:approvedPrivatePolicy('samples','samples-private-test-v1',{
  consent:'Acepto el tratamiento de mi correo para esta prueba privada de solicitud de muestras y he leído su aviso de privacidad.',
  privacy:`AVISO DE PRIVACIDAD — BORRADOR DEL ENSAYO PRIVADO DE MUESTRAS\n\n${controller.es}\n\nPrueba limitada a la persona con acceso privado autorizado y al correo propio permitido. Solo se utilizarán un nombre, estudio y proyecto ficticios prefijados. La finalidad es comprobar el registro de una solicitud, su recepción administrativa y el acuse al solicitante, sobre la base del consentimiento para este ensayo. No se tramitarán muestras reales ni se incorporarán datos de terceros. No implica newsletter ni verificación profesional.\n\n${common.es}`
  },{
  consent:'I consent to the processing of my email for this private sample-request test and have read its privacy notice.',
  privacy:`PRIVACY NOTICE — DRAFT FOR THE PRIVATE SAMPLE TEST\n\n${controller.en}\n\nThis test is limited to the person with authorised private access and the permitted owner email. Only preset fictional name, studio and project details will be used. Its purpose is to check request registration, administrative receipt and acknowledgement to the applicant, based on consent for this test. No real samples will be arranged and no third-party details will be included. It does not entail newsletter subscription or professional verification.\n\n${common.en}`
  }),
- careers:draft('careers','careers-private-test-v1',{
+ careers:approvedPrivatePolicy('careers','careers-private-test-v1',{
  consent:'Acepto recibir los correos de prueba de oportunidades profesionales de CIM Studio y he leído el aviso de privacidad de este ensayo.',
  privacy:`AVISO DE PRIVACIDAD — BORRADOR DEL ENSAYO PRIVADO DE OPORTUNIDADES LABORALES\n\n${controller.es}\n\nPrueba limitada a la persona con acceso privado autorizado y al correo propio permitido. Solo se solicita el email, sin CV, teléfono ni datos de terceros. Su finalidad, basada en el consentimiento para este ensayo, es comprobar el registro independiente, el correo de recepción, la confirmación y la baja. No constituye una candidatura ni autoriza campañas laborales posteriores al ensayo; tampoco suscribe a la newsletter comercial. La baja se prueba mediante el enlace recibido y una acción expresa en el entorno privado, o escribiendo al contacto indicado.\n\n${common.es}`
  },{

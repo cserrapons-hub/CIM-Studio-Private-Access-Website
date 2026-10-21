@@ -1,7 +1,8 @@
-// Draft ONLY for the private, single-owner-email newsletter test. Independent of legal/content.js.
-// Express review must approve the text, providers and retention before changing approval/version.
+// Approved expressly by CIM Studio on 2026-10-21 for the private owner-email test only.
+// Exact ES/EN content from 372193d is unchanged; runtime acknowledgements/sending remain off.
 export const newsletterTestPolicy=Object.freeze({
- approved:false,
+ approved:true,
+ approval:Object.freeze({date:'2026-10-21',scope:'private-controlled-test-only',contentCommit:'372193daa923c55ce731bd3f7d0dd7003834b48f'}),
  version:'newsletter-private-test-v1',
  revision:'newsletter-private-test-draft-2',
  es:Object.freeze({
