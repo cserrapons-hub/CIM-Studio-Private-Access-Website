@@ -79,3 +79,6 @@ NEWSLETTER_ORIGIN=
 # Independent private sample/career policy gates; never public legal approval.
 SAMPLES_TEST_LEGAL_APPROVED=false
 CAREERS_TEST_LEGAL_APPROVED=false
+
+# Keep false until GetResponse API double opt-in behaviour is reviewed.
+NEWSLETTER_API_REVIEWED=false
