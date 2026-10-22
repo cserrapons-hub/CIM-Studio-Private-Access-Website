@@ -104,3 +104,33 @@ test('registration Turnstile and transactional mail use manual redirects and fai
  });assert.equal(response.status,stage==='challenge'?503:202);if(stage==='challenge')assert.equal(mails,0);
  }finally{s.forms.sqlite.close();s.careers.sqlite.close();}}
 });
+
+test('mail worker disabled does not prevent immediate samples and careers delivery; acceptance is not delivery',async()=>{
+ for(const kind of ['samples','careers']){
+  const s=setup(kind);s.env.MAIL_WORKER_ENABLED='false';
+  const response=await handleRegistration(s.request(),s.env,kind,s.fetcher),body=await response.json();
+  assert.equal(body.recorded,true);assert.equal(body.mailState,'accepted');assert.equal(body.deliveryVerified,false);
+  assert.equal(s.calls.filter(call=>call.url==='https://api.resend.com/emails').length,kind==='samples'?2:1);
+ }
+});
+test('mail outcome distinguishes rejected, uncertain, rate-limited and missing jobs without resubmitting',async()=>{
+ for(const [status,state] of [[403,'rejected'],[422,'rejected'],[500,'uncertain'],[429,'pending']]){
+  const s=setup();let sends=0;
+  const fetcher=(url,options)=>{if(url.includes('resend')){sends++;return Promise.resolve(new Response(null,{status}));}return s.fetcher(url,options);};
+  const body=await(await handleRegistration(s.request(),s.env,'careers',fetcher)).json();
+  assert.equal(body.recorded,true);assert.equal(body.mailState,state);assert.equal(body.mail,'pending');assert.equal(body.deliveryVerified,false);
+  const replay=await(await handleRegistration(s.request(),s.env,'careers',fetcher)).json();
+  assert.equal(replay.mailState,state);assert.equal(sends,1);
+  // No mail job is not proof of a successful mail operation.
+  s.careers.sqlite.exec('DELETE FROM registration_mail');
+  const missing=await(await handleRegistration(s.request(),s.env,'careers',fetcher)).json();
+  assert.equal(missing.mailState,'pending');assert.equal(sends,1);
+ }
+});
+test('partial samples acceptance is not reported as complete provider acceptance',async()=>{
+ const s=setup('samples');let sends=0;
+ const fetcher=(url,options)=>url.includes('resend')?Promise.resolve(++sends===1?Response.json({id:'simulation-admin'}):new Response(null,{status:403})):s.fetcher(url,options);
+ const body=await(await handleRegistration(s.request(),s.env,'samples',fetcher)).json();
+ assert.equal(body.mailState,'rejected');assert.equal(body.mail,'pending');assert.equal(body.recorded,true);assert.equal(body.deliveryVerified,false);
+ assert.deepEqual(s.forms.sqlite.prepare('SELECT state FROM registration_mail ORDER BY state').all().map(row=>row.state),['accepted','rejected']);
+});

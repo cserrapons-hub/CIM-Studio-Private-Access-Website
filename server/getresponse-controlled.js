@@ -22,14 +22,14 @@ export async function verifyConsentEvidence(row,secret){
  let mismatch=0;for(let i=0;i<expected.length;i++)mismatch|=expected.charCodeAt(i)^row.evidence_mac.charCodeAt(i);
  return mismatch===0;
 }
-export async function recordControlledConsent(env,input,now=new Date(),policy=resolveNewsletterTestPolicy(env)){
+export async function recordControlledConsent(env,input,now=new Date(),policy=resolveNewsletterTestPolicy(env),deferWrite=false){
  // Evidence helper called only after the restricted handler guards.
  // Public signup remains disabled; this helper performs no network request.
  if(env.NEWSLETTER_TEST_LEGAL_APPROVED!=='true'||env.CONTROLLED_TEST_MODE!=='true'||env.NEWSLETTER_PREPARATION_ENABLED!=='true'||!env.FORMS_DB||!policy.approved||typeof policy.version!=='string'||!policy.version.trim())throw Error('preparation_disabled');
- return recordNewsletterConsent(env,input,now,policy);
+ return recordNewsletterConsent(env,input,now,policy,deferWrite);
 }
 // Internal evidence primitive. Only guarded handlers call it; it does not send anything.
-export async function recordNewsletterConsent(env,input,now,policy){
+export async function recordNewsletterConsent(env,input,now,policy,deferWrite=false){
  if(!env.FORMS_DB||!policy?.approved||typeof policy.version!=='string'||!policy.version.trim())throw Error('preparation_disabled');
  const prepared=prepareControlledHtml(input);
  if(!['es','en'].includes(input.language)||typeof policy[input.language]?.consent!=='string'||!policy[input.language].consent.trim()||input.legalVersion!==policy.version)throw Error('invalid_consent_version');
@@ -41,7 +41,7 @@ export async function recordNewsletterConsent(env,input,now,policy){
  const prior=await env.FORMS_DB.prepare('SELECT * FROM newsletter_consent_requests WHERE request_id=?').bind(input.requestId).first();
  if(prior){
   if(!await verifyConsentEvidence(prior,env.AUDIT_HASH_SECRET)||prior.subject_hash!==subject||prior.language!==input.language||prior.policy_version!==policy.version)throw Error('request_conflict');
-  return {prepared,evidence:prior,founders:'pending'};
+  return {prepared,evidence:prior,founders:'pending',...(deferWrite?{statement:consentInsert(env.FORMS_DB,prior,true)}:{})};
  }
  const key=await crypto.subtle.importKey('raw',keyBytes,'AES-GCM',false,['encrypt']);
  const iv=crypto.getRandomValues(new Uint8Array(12));
@@ -49,11 +49,16 @@ export async function recordNewsletterConsent(env,input,now,policy){
  const b64=value=>btoa(String.fromCharCode(...new Uint8Array(value)));
  const row={request_id:input.requestId,subject_hash:subject,accepted_at:now.toISOString(),purpose:'newsletter-private-access',language:input.language,consent_text:policy[input.language].consent,policy_version:policy.version,custom_field_id:NEWSLETTER_CONSENT.customFieldId,custom_value:NEWSLETTER_CONSENT.value,encrypted_email:b64(iv)+'.'+b64(encrypted)};
  row.evidence_mac=await hash(env.AUDIT_HASH_SECRET,canonical(row));
- await env.FORMS_DB.prepare('INSERT OR IGNORE INTO newsletter_consent_requests(request_id,subject_hash,accepted_at,purpose,language,consent_text,policy_version,custom_field_id,custom_value,encrypted_email,evidence_mac) VALUES(?,?,?,?,?,?,?,?,?,?,?)').bind(row.request_id,row.subject_hash,row.accepted_at,row.purpose,row.language,row.consent_text,row.policy_version,row.custom_field_id,row.custom_value,row.encrypted_email,row.evidence_mac).run();
+ if(deferWrite)return {prepared,evidence:row,statement:consentInsert(env.FORMS_DB,row,true),founders:'pending'};
+ await consentInsert(env.FORMS_DB,row).run();
  // Re-read to detect concurrent request-ID reuse, never return an unsaved record.
  const saved=await env.FORMS_DB.prepare('SELECT * FROM newsletter_consent_requests WHERE request_id=?').bind(input.requestId).first();
  if(!saved||!await verifyConsentEvidence(saved,env.AUDIT_HASH_SECRET)||saved.subject_hash!==subject||saved.language!==input.language||saved.policy_version!==policy.version)throw Error('request_conflict');
  return {prepared,evidence:saved,founders:'pending'};
+}
+function consentInsert(db,row,requireClaim=false){
+ const sql='INSERT OR IGNORE INTO newsletter_consent_requests(request_id,subject_hash,accepted_at,purpose,language,consent_text,policy_version,custom_field_id,custom_value,encrypted_email,evidence_mac) '+(requireClaim?"SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE EXISTS (SELECT 1 FROM newsletter_html_deliveries WHERE request_id=? AND subject_hash=?)":'VALUES(?,?,?,?,?,?,?,?,?,?,?)');
+ return db.prepare(sql).bind(row.request_id,row.subject_hash,row.accepted_at,row.purpose,row.language,row.consent_text,row.policy_version,row.custom_field_id,row.custom_value,row.encrypted_email,row.evidence_mac,...(requireClaim?[row.request_id,row.subject_hash]:[]));
 }
 export function inspectNewsletterContact(contact,expected){
  // Inspect an AUTHENTICATED API response only. This does not prove DOI/date.

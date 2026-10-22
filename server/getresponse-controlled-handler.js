@@ -46,29 +46,34 @@ async function previous(db,requestId,subject,policy,language){
  return byId||await db.prepare('SELECT * FROM newsletter_html_deliveries WHERE subject_hash=?').bind(subject).first();
 }
 export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=utc,policy=resolveNewsletterTestPolicy(env)}={}){
- let owned=null;
+ let owned=null,stage='configuration';
  try{
   if(request.method!=='POST')return json({error:'method'},405,{Allow:'POST'});
-  if(!controlledNewsletterReady(env,policy))return json({error:'unavailable'},503);
+  if(!controlledNewsletterReady(env,policy))return json({error:'unavailable',submission:'not_submitted',stage},503);
   // Authenticate here too: do not rely only on the Pages middleware being invoked.
   const blocked=await newsletterTestBoundary(request,env);if(blocked)return blocked;
+  stage='request';
   const origin=new URL(request.url).origin;
   if(origin!==new URL(env.CONTROLLED_TEST_ORIGIN).origin||request.headers.get('Origin')!==origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403);
   const raw=await readJson(request),data=validate(raw,'subscribe');
   if(raw.legalVersion!==policy.version)throw new Rejection('consent');
   const at=now(),db=env.FORMS_DB,ip=request.headers.get('CF-Connecting-IP');
   if(!ip)throw new Rejection('unavailable',503);
+  stage='storage_rate';
   await limited(db,env.AUDIT_HASH_SECRET,'ip:'+ip,5,at);
   await limited(db,env.AUDIT_HASH_SECRET,'all',20,at);
   const subject=await hash(env.AUDIT_HASH_SECRET,'newsletter-consent:'+data.email);
   // Only the explicitly approved owner's test email is eligible for this route.
   // Independent HMAC key for authorisation ONLY; the audit-derived subject above
   // remains unchanged for records, evidence and deduplication. No legacy fallback.
+  stage='allowlist';
   if(!await authorisedNewsletterTestEmail(env,data.email))throw new Rejection('unavailable',503);
+  stage='turnstile';
   const challengeResponse=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:raw.token})});
   if(!challengeResponse.ok)throw new Rejection('unavailable',503);
   const challenge=await challengeResponse.json();
   if(challenge.success!==true||challenge.hostname!==new URL(request.url).hostname||challenge.action!=='subscribe')throw new Rejection('challenge',403);
+  stage='storage_read';
   // No retries on uncertain requests, including new request IDs for the same email.
   await db.prepare("UPDATE newsletter_html_deliveries SET state='unknown',updated_at=? WHERE state='sending' AND lease_until<?").bind(at.toISOString(),Math.floor(at.getTime()/1000)).run();
   const prior=await previous(db,raw.requestId,subject,policy,data.language);
@@ -82,22 +87,30 @@ export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=
   await db.prepare('SELECT request_id FROM newsletter_api_deliveries LIMIT 1').first();
   // Validate the destination and double opt-in on every NEW attempt. Never bypass an existing claim.
   const prepared=prepareNewsletterApi(env,data.email);
+  stage='getresponse_campaign';
   await verifyNewsletter(env.GETRESPONSE_API_KEY,env.GETRESPONSE_CAMPAIGN_ID,fetcher);
   const query=new URLSearchParams({'query[email]':data.email,'query[campaignId]':'PL6jh',perPage:'100'});
+  stage='getresponse_contacts';
   const contacts=await readGetResponse(fetcher,env.GETRESPONSE_API_KEY,'/contacts?'+query,'contacts');
   if(!Array.isArray(contacts)||contacts.length>=100||contacts.some(c=>!c||typeof c!=='object'||typeof c.email!=='string'||!c.campaign?.campaignId))throw new Rejection('unavailable',503);
   if(contacts.some(c=>c.email.trim().toLowerCase()===data.email&&c.campaign.campaignId==='PL6jh'))return pending();
-  await recordControlledConsent(env,{...data,requestId:raw.requestId,legalVersion:raw.legalVersion},at,policy);
-  // Durable, atomic UNIQUE(subject_hash) claim BEFORE the external send. No lease reclaim.
-  const claimed=await db.prepare("INSERT OR IGNORE INTO newsletter_html_deliveries(request_id,subject_hash,state,started_at,updated_at,lease_until) VALUES(?,?,'sending',?,?,?) RETURNING request_id").bind(raw.requestId,subject,at.toISOString(),at.toISOString(),Math.floor(now().getTime()/1000)+30).first();
-  if(!claimed){
+  // Commit evidence, the cross-transport claim and the API trace together.
+  // A failed batch rolls back all three; no provider POST may precede it.
+  stage='persistence';
+  const evidence=await recordControlledConsent(env,{...data,requestId:raw.requestId,legalVersion:raw.legalVersion},at,policy,true);
+  const committed=await db.batch([
+   db.prepare("INSERT OR IGNORE INTO newsletter_html_deliveries(request_id,subject_hash,state,started_at,updated_at,lease_until) VALUES(?,?,'sending',?,?,?) RETURNING request_id").bind(raw.requestId,subject,at.toISOString(),at.toISOString(),Math.floor(now().getTime()/1000)+30),
+   evidence.statement,
+   db.prepare("INSERT OR IGNORE INTO newsletter_api_deliveries(request_id,contract_version,state,updated_at) SELECT request_id,?,'sending',? FROM newsletter_html_deliveries WHERE request_id=? AND subject_hash=?").bind(NEWSLETTER_API_CONTRACT,at.toISOString(),raw.requestId,subject)
+  ]);
+  if(!committed[0]?.results?.length){
    const prior=await previous(db,raw.requestId,subject,policy,data.language);
    if(!prior)throw new Rejection('unavailable',503);
    return await priorDelivery(db,prior,env.AUDIT_HASH_SECRET);
   }
   owned=raw.requestId;
-  // Legacy table remains the cross-transport deduplication ledger; never remove HTML history.
-  await db.prepare("INSERT INTO newsletter_api_deliveries(request_id,contract_version,state,updated_at) VALUES(?,?,'sending',?)").bind(owned,NEWSLETTER_API_CONTRACT,at.toISOString()).run();
+  const saved=await db.prepare('SELECT * FROM newsletter_consent_requests WHERE request_id=?').bind(owned).first();
+  if(!saved||saved.subject_hash!==subject||saved.language!==data.language||saved.policy_version!==policy.version||!await verifyConsentEvidence(saved,env.AUDIT_HASH_SECRET))throw new Rejection('unavailable',503);
   let response;
   try{response=await fetcher(prepared.url,{...prepared.options,signal:AbortSignal.timeout(12000)});}
   catch{
@@ -120,6 +133,6 @@ export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=
   // A persisted sending claim also prevents retries if the DB becomes unavailable.
   if(owned){try{await env.FORMS_DB.prepare("UPDATE newsletter_html_deliveries SET state='unknown',updated_at=? WHERE request_id=?").bind(now().toISOString(),owned).run();await env.FORMS_DB.prepare("UPDATE newsletter_api_deliveries SET state='unknown',updated_at=? WHERE request_id=?").bind(now().toISOString(),owned).run();}catch{}}
   if(owned)return pending();
-  return json({error:error instanceof Rejection?error.code:'unavailable',founders:'pending'},error instanceof Rejection?error.status:503);
+  return json({error:error instanceof Rejection?error.code:'unavailable',submission:'not_submitted',stage,founders:'pending'},error instanceof Rejection?error.status:503);
  }
 }

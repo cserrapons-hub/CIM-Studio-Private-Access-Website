@@ -18,10 +18,11 @@ const root=fileURLToPath(new URL('../',import.meta.url)),origin='https://cim-stu
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});
 let cases=0;
 try{
- for(const enabled of [false,true])for(const width of [1920,1440,768,390])for(const lang of ['es','en']){
-  const sqlite=new DatabaseSync(':memory:');for(const name of ['0001_forms.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql','0008_launch_operations.sql'])sqlite.exec(readFileSync(root+'migrations/'+name,'utf8'));
-  const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};}};
-  const env={CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:origin,CONTROLLED_TEST_USER:'simulated-owner',CONTROLLED_TEST_PASSWORD:'simulation-password-at-least-32-characters',SITE_LIVE:'false',NEWSLETTER_OBSERVATIONS_ENABLED:enabled?'true':'false',GETRESPONSE_API_KEY:'simulation-no-real-key',GETRESPONSE_CAMPAIGN_ID:'simulation-campaign',FORMS_ENABLED:'false',NEWSLETTER_ENABLED:'false',SAMPLES_ENABLED:'false',CAREERS_ENABLED:'false',NEWSLETTER_TEST_LEGAL_APPROVED:enabled?'true':'false',NEWSLETTER_PREPARATION_ENABLED:enabled?'true':'false',NEWSLETTER_CONTROLLED_SEND_ENABLED:enabled?'true':'false',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-only-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret'};
+ for(const scenario of ['disabled','accepted','allowlist','turnstile','campaign','contacts','persistence','browser_network'])for(const width of (['disabled','accepted'].includes(scenario)?[1920,1440,768,390]:[1440,390]))for(const lang of ['es','en']){
+  const enabled=scenario!=='disabled';
+  const sqlite=new DatabaseSync(':memory:');for(const name of ['0001_forms.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql','0008_launch_operations.sql','0009_newsletter_api_deliveries.sql'])sqlite.exec(readFileSync(root+'migrations/'+name,'utf8'));
+  const db={prepare(sql){let args=[];return {sql,args:()=>args,bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};},async batch(statements){sqlite.exec('BEGIN IMMEDIATE');try{const result=statements.map(s=>({results:sqlite.prepare(s.sql).all(...s.args())}));sqlite.exec('COMMIT');return result;}catch(error){sqlite.exec('ROLLBACK');throw error;}}};
+  const env={CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:origin,CONTROLLED_TEST_USER:'simulated-owner',CONTROLLED_TEST_PASSWORD:'simulation-password-at-least-32-characters',SITE_LIVE:'false',NEWSLETTER_OBSERVATIONS_ENABLED:enabled?'true':'false',GETRESPONSE_API_KEY:'simulation-no-real-key',GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_API_REVIEWED:enabled?'true':'false',FORMS_ENABLED:'false',NEWSLETTER_ENABLED:'false',SAMPLES_ENABLED:'false',CAREERS_ENABLED:'false',NEWSLETTER_TEST_LEGAL_APPROVED:enabled?'true':'false',NEWSLETTER_PREPARATION_ENABLED:enabled?'true':'false',NEWSLETTER_CONTROLLED_SEND_ENABLED:enabled?'true':'false',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-only-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret'};
   env.NEWSLETTER_TEST_EMAIL_HASH=await newsletterTestEmailHash(env.NEWSLETTER_TEST_ALLOWLIST_SECRET,'owner@example.test');
   const policy=resolveNewsletterTestPolicy(env,enabled?{...newsletterTestPolicy,approved:true,version:'simulation-private-policy-v1'}:newsletterTestPolicy);
   const context=await browser.newContext({viewport:{width,height:900},isMobile:width<500,hasTouch:width<500}),errors=[],external=[],posts=[];
@@ -29,6 +30,7 @@ try{
   try{
    await context.route('**/*',async route=>{
     const r=route.request(),url=new URL(r.url());
+    if(scenario==='browser_network'&&url.pathname==='/api/controlled/subscribe'){posts.push(JSON.parse(r.postData()));return route.abort('failed');}
     if(url.hostname==='challenges.cloudflare.com'){
      external.push(url.href);assert.equal(enabled,true,'Blocked draft must not load Turnstile');
      return route.fulfill({contentType:'application/javascript',body:"window.turnstile={render:()=>1,getResponse:()=> 'simulation-token',remove:()=>{},reset:()=>{}};window.cimPrivateNewsletterTurnstileReady();"});
@@ -47,11 +49,17 @@ try{
      }
      if(url.pathname==='/api/controlled/subscribe'){
       posts.push(JSON.parse(r.postData()));
+      if(scenario==='allowlist')env.NEWSLETTER_TEST_EMAIL_HASH='0'.repeat(64);
+      if(scenario==='persistence')sqlite.exec("CREATE TRIGGER fail_before_commit BEFORE INSERT ON newsletter_api_deliveries BEGIN SELECT RAISE(ABORT,'private failure'); END");
       return handleControlledNewsletter(request,env,{policy,fetcher:async(target,options)=>{
-       if(target.includes('siteverify')){turnstileCalls++;return Response.json({success:true,hostname:url.hostname,action:'subscribe'});}
-       assert.equal(target,'https://app.getresponse.com/add_subscriber.html');providerCalls++;
+       if(target.includes('siteverify')){turnstileCalls++;return Response.json({success:scenario!=='turnstile',hostname:url.hostname,action:'subscribe'});}
+       if(target==='https://api.getresponse.com/v3/campaigns/PL6jh'&&scenario==='campaign')return new Response(null,{status:401});
+       if(target.includes('/contacts?')&&scenario==='contacts')return new Response(null,{status:503});
+       if(target==='https://api.getresponse.com/v3/campaigns/PL6jh')return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});
+       if(target.startsWith('https://api.getresponse.com/v3/contacts?'))return Response.json([]);
+       assert.equal(target,'https://api.getresponse.com/v3/contacts');assert.equal(options.method,'POST');providerCalls++;
        assert.equal(options.redirect,'manual');
-       return new Response('SIMULATED HTML ONLY',{status:302,headers:{Location:'https://untrusted.example.test/'}});
+       return new Response(null,{status:202});
       }});
      }
      const name=url.pathname.endsWith('/')?url.pathname+'index.html':url.pathname;
@@ -82,7 +90,14 @@ try{
     assert.equal(sqlite.prepare('SELECT COUNT(*) n FROM newsletter_observations').get().n,1);
     await page.locator('button[type=submit]').click();assert.equal(posts.length,0,'Unchecked consent blocks submission');
     await page.locator('[name=consent]').check();await page.locator('button[type=submit]').click();
-    try{await page.waitForFunction(()=>document.getElementById('result').textContent.includes(document.documentElement.lang==='es'?'Verificación técnica pendiente':'Technical verification pending'),{},{timeout:8000});}catch(error){console.log({enabled,width,lang,providerCalls,turnstileCalls,posts:posts.length,result:await page.locator('#result').textContent(),errors});throw error;}
+    if(scenario!=='accepted'){
+     await page.waitForFunction(()=>/no se ha enviado a GetResponse|not submitted to GetResponse|No se ha recibido una respuesta válida|No valid response was received/.test(document.getElementById('result').textContent));
+     assert.equal(providerCalls,0);assert.equal(posts.length,1);
+     assert.equal(sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);
+     assert.equal(await page.locator('button[type=submit]').isDisabled(),true);
+     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);cases++;continue;
+    }
+    try{await page.waitForFunction(()=>document.getElementById('result').textContent.includes(document.documentElement.lang==='es'?'GetResponse ha aceptado':'GetResponse accepted'),{},{timeout:8000});}catch(error){console.log({enabled,width,lang,providerCalls,turnstileCalls,posts:posts.length,result:await page.locator('#result').textContent(),errors});throw error;}
     assert.equal(providerCalls,1);assert.equal(turnstileCalls,1);assert.equal(posts.length,1);assert.equal(posts[0].language,lang);assert.equal(posts[0].legalVersion,'simulation-private-policy-v1');
     assert.equal(await page.locator('button[type=submit]').isDisabled(),true);
     await page.locator('[data-observe=after]').click();await page.waitForFunction(()=>document.getElementById('observation-result').textContent.includes('\"phase\": \"after\"'));
@@ -94,5 +109,5 @@ try{
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);assert.equal(legal.approved,false);cases++;
   }finally{await context.close();sqlite.close();}
  }
- console.log('PASS '+cases+' private newsletter browser cases: ES/EN at 1920/1440/768/390px; blocked drafts make no external requests; simulated approved flow has mandatory unchecked consent, private notice, Turnstile and one signed pending request. Public legal approval remains false. Before/after API observations remain pending evidence. All providers mocked.');
+ console.log('PASS '+cases+' private newsletter browser cases: ES/EN, responsive acceptance and pre-persistence/network failure cases; blocked drafts make no external requests; simulated approved flow has mandatory unchecked consent, private notice, Turnstile and one signed API-accepted request (not DOI confirmation). Public legal approval remains false. Before/after API observations remain pending evidence. All providers mocked.');
 }finally{await browser.close();}

@@ -10,7 +10,13 @@ const base64=value=>btoa(String.fromCharCode(...new Uint8Array(value)));
 const keyFor=(env,kind)=>crypto.subtle.importKey('raw',bytes(env[kind==='careers'?'CAREERS_DATA_KEY':'SAMPLES_DATA_KEY']),'AES-GCM',false,['encrypt','decrypt']);
 export async function encryptRegistration(env,kind,id,value){const iv=crypto.getRandomValues(new Uint8Array(12));const encrypted=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:encoder.encode(id)},await keyFor(env,kind),encoder.encode(JSON.stringify(value)));return base64(iv)+'.'+base64(encrypted);}
 export async function decryptRegistration(env,kind,id,value){const [iv,ciphertext]=value.split('.');return JSON.parse(decoder.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(iv),additionalData:encoder.encode(id)},await keyFor(env,kind),bytes(ciphertext))));}
-async function receiptStatus(db,id){const result=await db.prepare("SELECT COUNT(*) n FROM registration_mail WHERE registration_id=? AND state NOT IN ('accepted','cancelled')").bind(id).first();return result.n?'pending':'accepted';}
+async function receiptStatus(db,id){
+ // Storage success is not mail acceptance; neither establishes delivery.
+ const rows=(await db.prepare('SELECT state FROM registration_mail WHERE registration_id=?').bind(id).all()).results;
+ const states=rows.map(row=>row.state);
+ const mailState=states.includes('unknown')?'uncertain':states.includes('rejected')?'rejected':states.length&&states.every(state=>state==='accepted')?'accepted':'pending';
+ return {mail:mailState==='accepted'?'accepted':'pending',mailState,deliveryVerified:false};
+}
 const database=(env,kind)=>kind==='careers'?env.CAREERS_DB:env.FORMS_DB;
 async function checkStore(db,kind){await db.prepare('INSERT OR IGNORE INTO registration_store(id,purpose) VALUES(1,?)').bind(kind).run();if((await db.prepare('SELECT purpose FROM registration_store WHERE id=1').first())?.purpose!==kind)throw new Rejection('unavailable',503);}
 async function rate(request,env,db,now,limit=8){const ip=request.headers.get('CF-Connecting-IP');if(!ip)throw new Rejection('unavailable',503);const bucket=Math.floor(now.getTime()/3600000),id=await hash(env.AUDIT_HASH_SECRET,'registration-rate:'+ip+':'+bucket);const row=await db.prepare('INSERT INTO form_rate_limits(id,count,expires_at) VALUES(?,1,?) ON CONFLICT(id) DO UPDATE SET count=count+1 RETURNING count').bind(id,(bucket+1)*3600000).first();if(row.count>limit)throw new Rejection('rate',429);await db.prepare('DELETE FROM form_rate_limits WHERE expires_at<?').bind(now.getTime()).run();}
@@ -38,7 +44,7 @@ export async function handleRegistration(request,env,kind,fetcher=fetch,now=new 
   if(['pending','active'].includes(prior?.state)){
    if(testPolicy&&prior.consent_version!==policyVersion)throw new Rejection('conflict',409);
    if(kind==='samples'&&prior.fingerprint!==fingerprint)throw new Rejection('conflict',409);
-   return json({ok:true,recorded:true,confirmationRequired:kind==='careers',mail:await receiptStatus(db,id)},202);
+   return json({ok:true,recorded:true,confirmationRequired:kind==='careers',...await receiptStatus(db,id)},202);
   }
   if(kind==='samples'){
    await db.prepare('DELETE FROM registration_submission_claims WHERE expires_at<?').bind(now.getTime()).run();
@@ -50,7 +56,7 @@ export async function handleRegistration(request,env,kind,fetcher=fetch,now=new 
    if(claim.request_id!==raw.requestId){
     const original=await db.prepare('SELECT state FROM registrations WHERE id=?').bind(claim.registration_id).first();
     if(original?.state!=='active')throw new Rejection('pending',409);
-    return json({ok:true,recorded:true,confirmationRequired:false,mail:await receiptStatus(db,claim.registration_id)},202);
+    return json({ok:true,recorded:true,confirmationRequired:false,...await receiptStatus(db,claim.registration_id)},202);
    }
   }
   const at=now.toISOString(),review=new Date(now.getTime()+Number(env.REGISTRATION_REVIEW_DAYS)*86400000).toISOString();
@@ -67,7 +73,7 @@ export async function handleRegistration(request,env,kind,fetcher=fetch,now=new 
   await db.batch(statements); // Contact, exact consent and encrypted mail jobs commit together.
   const saved=await db.prepare('SELECT state FROM registrations WHERE id=?').bind(id).first();if(!['pending','active'].includes(saved?.state))throw new Rejection('unavailable',503);
   try{await drainRegistrationMail(env,kind,fetcher,now,id,testPolicy);}catch{/* Durable registration remains valid; never log its data. */}
-  return json({ok:true,recorded:true,confirmationRequired:kind==='careers',mail:await receiptStatus(db,id)},202);
+  return json({ok:true,recorded:true,confirmationRequired:kind==='careers',...await receiptStatus(db,id)},202);
  }catch(error){return json({error:error instanceof Rejection?error.code:'unavailable'},error instanceof Rejection?error.status:503);}
 }
 export async function drainRegistrationMail(env,kind,fetcher=fetch,now=new Date(),onlyId=null,testPolicy=null){

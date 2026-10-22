@@ -10,7 +10,8 @@ import {onRequest as middleware} from '../functions/_middleware.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
 try{
- for(const enabled of [false,true])for(const kind of ['samples','careers'])for(const lang of ['es','en'])for(const width of [1440,390]){
+ for(const outcome of ['disabled','accepted','rejected','uncertain','pending'])for(const kind of ['samples','careers'])for(const lang of ['es','en'])for(const width of [1440,390]){
+  const enabled=outcome!=='disabled';
   const s=await fixture();Object.assign(s.env,{REGISTRATIONS_TEST_ENABLED:enabled?'true':'false',SAMPLES_TEST_LEGAL_APPROVED:enabled?'true':'false',CAREERS_TEST_LEGAL_APPROVED:enabled?'true':'false',SAMPLES_VERIFIED:'false',CAREERS_VERIFIED:'false',MAIL_RECEIPTS_VERIFIED:'false'});
   const defs=Object.fromEntries(Object.entries(registrationTestPolicies).map(([k,v])=>[k,{...v,approved:enabled}]));
   const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
@@ -23,7 +24,7 @@ try{
     const request=new Request(r.url(),{method:r.method(),headers,...(r.method()==='POST'?{body:r.postData()}:{})});
     const response=await middleware({request,env:s.env,next:async()=>{
      if(url.pathname==='/api/controlled/registration-config')return registrationTestConfiguration(request,s.env,defs);
-     if(url.pathname==='/api/controlled/'+kind)return handleRegistration(request,s.env,kind,s.fetcher,new Date(),defs[kind]);
+     if(url.pathname==='/api/controlled/'+kind)return handleRegistration(request,s.env,kind,(url,options)=>{if(url==='https://api.resend.com/emails'&&outcome!=='accepted')return Promise.resolve(new Response(null,{status:outcome==='rejected'?403:outcome==='uncertain'?500:429}));return s.fetcher(url,options);},new Date(),defs[kind]);
      const name=url.pathname.endsWith('/')?url.pathname+'index.html':url.pathname;
      return new Response(readFileSync('public'+name),{headers:{'Content-Type':name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html'}});
     }});
@@ -35,7 +36,7 @@ try{
    await page.click('#privacy-link');assert.equal(await page.locator('#privacy-text').textContent(),defs[kind][lang].privacy);await page.click('#privacy-close');
    assert.equal(await page.locator('[name=consent]').isChecked(),false);assert.equal(await page.locator('[name=testData]').isChecked(),false);
    assert.equal(await page.locator('fieldset').evaluate(e=>e.disabled),!enabled);
-   if(enabled){await page.waitForFunction(()=>Boolean(window.testAction));await page.fill('#email','owner@example.test');await page.check('[name=testData]');await page.check('[name=consent]');await page.click('[type=submit]');await page.waitForFunction(()=>/Prueba registrada|Test recorded/.test(document.getElementById('result').textContent));assert.equal((kind==='samples'?s.forms:s.careers).sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);}else{assert.equal(external.length,0);assert.equal(s.calls.length,0);}
+   if(enabled){await page.waitForFunction(()=>Boolean(window.testAction));await page.fill('#email','owner@example.test');await page.check('[name=testData]');await page.check('[name=consent]');await page.click('[type=submit]');await page.waitForFunction(()=>/Solicitud guardada|Request saved|Prueba registrada|Test recorded/.test(document.getElementById('result').textContent));assert.match(await page.locator('#result').textContent(),outcome==='accepted'?/aceptados por Resend|accepted by Resend/:outcome==='rejected'?/rechazado|rejected/:outcome==='uncertain'?/no se puede acreditar|cannot be established/:/pendiente|needs checking/);assert.equal((kind==='samples'?s.forms:s.careers).sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);}else{assert.equal(external.length,0);assert.equal(s.calls.length,0);}
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);cases++;
   }finally{await context.close();s.close();}
  }

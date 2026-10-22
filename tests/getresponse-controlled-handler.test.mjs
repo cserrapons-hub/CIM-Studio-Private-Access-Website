@@ -13,7 +13,7 @@ const policy={...newsletterTestPolicy,approved:true,version:'simulation-policy-v
 async function setup(){
  const sqlite=new DatabaseSync(':memory:');
  for(const name of ['0001_forms.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql','0009_newsletter_api_deliveries.sql'])sqlite.exec(readFileSync('migrations/'+name,'utf8'));
- const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};}};
+ const db={prepare(sql){let args=[];return {sql,args:()=>args,bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};},async batch(statements){sqlite.exec('BEGIN IMMEDIATE');try{const result=statements.map(s=>({results:sqlite.prepare(s.sql).all(...s.args())}));sqlite.exec('COMMIT');return result;}catch(error){sqlite.exec('ROLLBACK');throw error;}}};
  const env={NEWSLETTER_API_REVIEWED:'true',GETRESPONSE_API_KEY:'simulation-api-key',GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_TEST_LEGAL_APPROVED:'true',CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:'https://cim-studio-test.pages.dev',CONTROLLED_TEST_USER:'test-owner',CONTROLLED_TEST_PASSWORD:'test-only-password-at-least-32-characters',NEWSLETTER_PREPARATION_ENABLED:'true',NEWSLETTER_CONTROLLED_SEND_ENABLED:'true',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret',SITE_LIVE:'false'};
  const data={email:'owner@example.test',consent:true,language:'es',requestId:crypto.randomUUID(),legalVersion:policy.version,token:'simulation-token',website:''};
  env.NEWSLETTER_TEST_EMAIL_HASH=await newsletterTestEmailHash(env.NEWSLETTER_TEST_ALLOWLIST_SECRET,data.email);
@@ -178,4 +178,72 @@ test('a persisted API 404 is an explicit rejection and remains blocked across re
  for(const change of [{},{requestId:crypto.randomUUID()}]){const r=await s.run(s.request(change));assert.equal(r.status,502);assert.deepEqual(await r.json(),body);}
  assert.equal(s.calls.filter(x=>x.url==='https://api.getresponse.com/v3/contacts').length,1);assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,1);assert.equal(s.sqlite.prepare('SELECT state FROM newsletter_html_deliveries').get().state,'rejected');
  }finally{s.sqlite.close();}
+});
+
+test('all three private API persistence writes roll back on each statement failure, before any provider POST',async()=>{
+ for(const table of ['newsletter_html_deliveries','newsletter_consent_requests','newsletter_api_deliveries']){
+  const s=await setup();try{
+   s.sqlite.exec(`CREATE TRIGGER fail_write BEFORE INSERT ON ${table} BEGIN SELECT RAISE(ABORT,'simulated persistence failure'); END`);
+   const response=await s.run();assert.equal(response.status,503);
+   for(const name of ['newsletter_html_deliveries','newsletter_consent_requests','newsletter_api_deliveries'])assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM '+name).get().n,0);
+   assert.equal(s.calls.filter(call=>call.options.method==='POST'&&call.url==='https://api.getresponse.com/v3/contacts').length,0);
+  }finally{s.sqlite.close();}
+ }
+});
+test('a consent with the same policy version can be historical; a normal new subject gets its own complete API trace',async()=>{
+ const s=await setup();try{
+  const oldId=crypto.randomUUID();const old=await recordControlledConsent(s.env,{...s.data,email:'earlier-owner@example.test',requestId:oldId},new Date('2026-10-19T10:00:00Z'),policy);
+  s.sqlite.prepare("INSERT INTO newsletter_html_deliveries VALUES(?,?,'rejected',404,?,?,0)").run(oldId,old.evidence.subject_hash,'2026-10-19T10:00:00Z','2026-10-19T10:00:00Z');
+  let posts=0;
+  const response=await s.run(s.request(),{fetcher:(url,options)=>{if(url==='https://api.getresponse.com/v3/contacts'&&options.method==='POST'){posts++;assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,2);assert.equal(s.sqlite.prepare('SELECT state FROM newsletter_api_deliveries WHERE request_id=?').get(s.data.requestId).state,'sending');return Promise.resolve(new Response(null,{status:202}));}return s.fetcher(url,options);}});
+  assert.equal(response.status,202);assert.equal(posts,1);
+  assert.equal(s.sqlite.prepare('SELECT * FROM newsletter_api_deliveries WHERE request_id=?').get(oldId),undefined);
+  assert.deepEqual(s.sqlite.prepare('SELECT * FROM newsletter_consent_requests WHERE request_id=?').get(oldId),old.evidence);
+  assert.equal(s.sqlite.prepare('SELECT state FROM newsletter_api_deliveries WHERE request_id=?').get(s.data.requestId).state,'accepted');
+ }finally{s.sqlite.close();}
+});
+
+test('the deployed separate-write sequence can leave consent and a claim without an API trace',async()=>{
+ const s=await setup();try{
+  // Reproduce the old sequence locally, not a claim about the remote incident.
+  const {evidence}=await recordControlledConsent(s.env,s.data,new Date('2026-10-20T12:00:00Z'),policy);
+  s.sqlite.prepare("INSERT INTO newsletter_html_deliveries VALUES(?,?,'sending',NULL,?,?,0)").run(s.data.requestId,evidence.subject_hash,evidence.accepted_at,evidence.accepted_at);
+  s.sqlite.exec("CREATE TRIGGER fail_api BEFORE INSERT ON newsletter_api_deliveries BEGIN SELECT RAISE(ABORT,'simulated API trace failure'); END");
+  assert.throws(()=>s.sqlite.prepare("INSERT INTO newsletter_api_deliveries VALUES(?,'simulation-contract','sending',NULL,?)").run(s.data.requestId,evidence.accepted_at));
+  assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,1);
+  assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_html_deliveries').get().n,1);
+  assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_api_deliveries').get().n,0);
+  assert.equal(s.calls.length,0);
+ }finally{s.sqlite.close();}
+});
+
+test('concurrent normal requests with different IDs leave one complete evidence/claim/API set and one POST',async()=>{
+ const s=await setup();try{
+  let posts=0;
+  const fetcher=(url,options)=>{if(url==='https://api.getresponse.com/v3/contacts'&&options.method==='POST'){posts++;return Promise.resolve(new Response(null,{status:202}));}return s.fetcher(url,options);};
+  const results=await Promise.all([s.run(s.request(),{fetcher}),s.run(s.request({requestId:crypto.randomUUID()}),{fetcher})]);
+  assert.ok(results.some(response=>response.status===202));assert.equal(posts,1);
+  for(const table of ['newsletter_consent_requests','newsletter_html_deliveries','newsletter_api_deliveries'])assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM '+table).get().n,1);
+ }finally{s.sqlite.close();}
+});
+
+test('pre-persistence failures identify their safe stage and never claim a provider submission',async()=>{
+ for(const kind of ['configuration','request','allowlist','turnstile','storage_read','getresponse_campaign','getresponse_contacts','persistence']){
+  const s=await setup();try{
+   let request=s.request(),fetcher=s.fetcher;
+   if(kind==='configuration')s.env.NEWSLETTER_API_REVIEWED='false';
+   if(kind==='request')request=s.request({consent:false});
+   if(kind==='allowlist')request=s.request({email:'not-authorised@example.test'});
+   if(kind==='turnstile')s.mock.challenge.success=false;
+   if(kind==='storage_read')s.sqlite.exec('DROP TABLE newsletter_api_deliveries');
+   if(kind==='getresponse_campaign')fetcher=(url,options)=>url.includes('/campaigns/')?Promise.resolve(new Response(null,{status:401})):s.fetcher(url,options);
+   if(kind==='getresponse_contacts')fetcher=(url,options)=>url.includes('/contacts?')?Promise.resolve(new Response(null,{status:503})):s.fetcher(url,options);
+   if(kind==='persistence')s.sqlite.exec("CREATE TRIGGER fail_before_commit BEFORE INSERT ON newsletter_api_deliveries BEGIN SELECT RAISE(ABORT,'private internal detail'); END");
+   const r=await s.run(request,{fetcher}),body=await r.json();
+   assert.equal(body.submission,'not_submitted');assert.equal(body.stage,kind);assert.ok(r.status>=400);
+   assert.equal(s.calls.filter(c=>c.url==='https://api.getresponse.com/v3/contacts'&&c.options.method==='POST').length,0);
+   assert.equal(s.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);
+   for(const sensitive of [s.data.email,s.env.GETRESPONSE_API_KEY,s.env.AUDIT_HASH_SECRET,'private internal detail'])assert.ok(!JSON.stringify(body).includes(sensitive));
+  }finally{s.sqlite.close();}
+ }
 });
