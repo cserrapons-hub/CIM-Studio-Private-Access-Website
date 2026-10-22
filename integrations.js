@@ -1,4 +1,4 @@
-/* No credentials, Analytics or hosted redirect. HTML newsletter submission stays disabled pending its official export. */
+/* Server configuration controls availability; no credentials or tracking scripts. */
 (()=>{
  const messages={
   es:{subscriber_type:'Selecciona Particular o Profesional.',recordedPendingMail:'Solicitud registrada. No podemos confirmar el envío del correo de recepción. No es necesario repetirla; si no llega, escribe a admin@cimstudio.es.',receivedCareers:'Hemos registrado tu solicitud. Los avisos se activarán solo cuando confirmes tu correo.',privacyRead:'Leer la política de privacidad',testing:'Demostración de conexión: utiliza solo datos de prueba. Estos envíos sí se procesan por los servicios externos.',sending:'Enviando…',receivedSubscribe:'Solicitud recibida. Revisa tu correo y confirma la suscripción si recibes un mensaje de verificación.',receivedSamples:'Hemos registrado tu solicitud de muestras. Nuestro equipo se pondrá en contacto contigo.',invalid:'Revisa los campos y vuelve a intentarlo.',consent:'Acepta el consentimiento y revisa la política de privacidad actualizada.',challenge:'Completa la comprobación de seguridad e inténtalo de nuevo.',rate:'Has realizado varios intentos. Espera una hora antes de volver a intentarlo.',unavailable:'No hemos podido confirmar el envío. Tus datos siguen en el formulario; inténtalo más tarde.',pending:'Tu solicitud está pendiente de confirmación técnica. No podemos confirmar el envío todavía; no es necesario repetirla.',conflict:'La solicitud ha cambiado. Cierra y vuelve a abrir la página antes de intentarlo de nuevo.'},
@@ -13,7 +13,7 @@
  function status(form,key,error=false){const el=form.querySelector('.status');el.dataset.message=key;el.dataset.error=String(error);el.textContent=copy[language][key];}
  function refresh(){
   document.querySelectorAll('[data-privacy-read]').forEach(e=>e.textContent=copy[language].privacyRead);
-  for(const form of forms){const note=form.querySelector('.demo');note.hidden=Boolean(settings?.enabled[form.dataset.formKind]&&settings.verified);note.textContent=settings?.enabled[form.dataset.formKind]?copy[language].testing:copy[language].demo;}
+  for(const form of forms){const enabled=settings?.enabled[form.dataset.formKind]===true;form.querySelector('button[type=submit]').disabled=!enabled||form.getAttribute('aria-busy')==='true';const note=form.querySelector('.demo');note.hidden=Boolean(settings?.enabled[form.dataset.formKind]&&settings.verified);note.textContent=settings?.enabled[form.dataset.formKind]?copy[language].testing:copy[language].demo;}
   if(settings?.siteLive){document.querySelector('.preview-notice').hidden=true;document.title='CIM Studio — Private Access';}
  }
  function loadChallenge(){

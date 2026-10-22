@@ -16,7 +16,7 @@ test('legal drafts never enable forms or expose unapproved documents through con
 test('both languages include all documents, business identity and accessible commercial terms', () => {
   assert.deepEqual(legal.business, {
     name:'CIM STUDIO ESPJ',taxId:'E88749155',
-    postalAddress:'C/ Juan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.',
+    postalAddress:'Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears.',
     privacyEmail:'admin@cimstudio.es',domain:'cimstudio.es'
   });
   for (const lang of ['es','en']) {
@@ -65,4 +65,24 @@ test('final launch decisions name CIM Production as authoritative and specify pr
  assert.ok(legal.es.privacy.includes('Facturas:'));assert.ok(legal.en.privacy.includes('Invoices:'));
  assert.ok(legal.es.terms.includes('aunque nunca haya comprado'));assert.ok(legal.en.terms.includes('even if they have never purchased'));
  assert.equal(legal.approved,false);
+});
+
+test('approved launch decisions remain drafts and remove automatic discount promises',()=>{
+ assert.equal(legal.approved,false);
+ assert.equal(legal.version,'');
+ assert.match(legal.es.terms,/15 % adicional sobre el Precio Profesional vigente/);
+ assert.match(legal.en.terms,/additional 15% off the current Professional Price/);
+ assert.match(legal.es.terms,/CIM Studio aplicará el descuento al preparar el presupuesto/);
+ assert.match(legal.en.terms,/CIM Studio will apply the discount when preparing the quotation/);
+ assert.match(legal.es.privacy,/12 meses desde la recepción/);
+ assert.match(legal.en.privacy,/12 months from receipt/);
+ assert.match(legal.es.privacy,/cada 12 meses/);
+ assert.match(legal.en.privacy,/every 12 months/);
+ for(const lang of ['es','en']){
+  const content=JSON.stringify(legal[lang]);
+  assert.doesNotMatch(content,/se aplicará automáticamente|will be applied automatically|intended to be applied automatically/);
+  assert.doesNotMatch(content,/estos son demostraciones|they are demonstrations|project descriptions/i);
+ }
+ assert.match(legal.es.privacy,/Solo si estos medios no son suficientes/);
+ assert.match(legal.en.privacy,/Only where these sources are insufficient/);
 });
