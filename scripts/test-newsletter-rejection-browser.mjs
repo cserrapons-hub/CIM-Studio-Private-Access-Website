@@ -33,7 +33,7 @@ try{for(const retry of [false,true])for(const mode of ['rejected','accepted'])fo
  });
  await page.goto(s.env.CONTROLLED_TEST_ORIGIN+'/controlled/newsletter/');await page.waitForFunction(()=>!document.querySelector('[type=submit]').disabled);
  if(lang==='en')await page.click('[data-lang=en]');
- await page.fill('[name=email]',s.data.email);await page.check('[name=consent]');await page.click('[type=submit]');
+ await page.selectOption('[name=subscriberType]','particular');await page.fill('[name=email]',s.data.email);await page.check('[name=consent]');await page.click('[type=submit]');
  await page.waitForFunction(()=>document.getElementById('result').textContent.includes('GetResponse'));
  assert.match(await page.locator('#result').textContent(),mode==='accepted'?(lang==='es'?/ha aceptado/:/accepted/):(lang==='es'?/ha rechazado/:/rejected/));assert.equal(posts,1);if(retry){assert.equal(s.forms.sqlite.prepare('SELECT request_id FROM newsletter_retry_attempts').get().request_id,retryId);assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_html_deliveries WHERE request_id=?').get(parentId).state,'rejected');}
  assert.equal(await page.locator('[type=submit]').isDisabled(),true);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);count++;

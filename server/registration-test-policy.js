@@ -46,7 +46,7 @@ export const registrationTestPolicies=Object.freeze({
  privacy:`PRIVACY NOTICE — DRAFT FOR THE PRIVATE CAREER-OPPORTUNITY TEST\n\n${controller.en}\n\nThis test is limited to the person with authorised private access and the permitted owner email. Only the email address is requested, with no CV, phone number or third-party details. Based on consent for this test, its purpose is to check independent registration, the acknowledgement email, confirmation and withdrawal. It is not a job application and does not authorise career campaigns after the test or subscribe you to the commercial newsletter. Withdrawal is tested through the received link and an explicit action in the private environment, or by contacting us.\n\n${common.en}`
  })
 });
-export const fictionalSample=Object.freeze({name:'Ensayo CIM Studio',company:'Estudio ficticio',discipline:'other',project:'Proyecto ficticio de ensayo privado; no tramitar muestras reales.'});
+export const fictionalSample=Object.freeze({name:'Ensayo CIM Studio',company:'Estudio ficticio',discipline:'other',shippingAddress:'Calle de ensayo 1 (ficticia)',postalCode:'00000',city:'Población de ensayo',province:'Provincia de ensayo',country:'País de ensayo'});
 export function resolveRegistrationTestPolicy(env,kind,definition=registrationTestPolicies[kind]){
  const complete=definition?.kind===kind&&['es','en'].every(lang=>['consent','privacy'].every(key=>typeof definition[lang]?.[key]==='string'&&Boolean(definition[lang][key].trim())));
  return {...definition,approved:Boolean(complete&&definition.approved===true&&definition.version===registrationTestPolicies[kind]?.version&&env[(kind==='samples'?'SAMPLES':'CAREERS')+'_TEST_LEGAL_APPROVED']==='true')};

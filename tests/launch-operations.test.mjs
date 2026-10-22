@@ -36,7 +36,7 @@ test('samples with new request UUIDs but identical content do not repeat notific
   assert.equal((await handleRegistration(s.request('/api/samples',sample),s.env,'samples',s.fetcher)).status,202);
   assert.equal((await handleRegistration(s.request('/api/samples',{...sample,requestId:crypto.randomUUID()}),s.env,'samples',s.fetcher)).status,202);
   assert.equal(s.calls.filter(c=>c.url.includes('resend')).length,2);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);
-  assert.equal((await handleRegistration(s.request('/api/samples',{...sample,project:'changed'}),s.env,'samples',s.fetcher)).status,409);
+  assert.equal((await handleRegistration(s.request('/api/samples',{...sample,shippingAddress:'changed'}),s.env,'samples',s.fetcher)).status,409);
  }finally{s.close();}
 });
 test('simultaneous identical samples preserve a single claim and one pair of emails',async()=>{
@@ -59,7 +59,7 @@ test('career confirmation and withdrawal produce sealed independent events witho
  const s=await fixture();approve();try{
   await handleRegistration(s.request('/api/careers',{...s.data,token:'career-token'}),s.env,'careers',s.fetcher);
   const mail=JSON.parse(s.calls.find(c=>c.url.includes('resend')).options.body),token=mail.text.match(/preferences\/#([a-f0-9]{64})/)[1];
-  await withdrawCareerConsent(s.request('/api/careers/unsubscribe',{token,action:'confirm'}),s.env);
+  await withdrawCareerConsent(s.request('/api/careers/unsubscribe',{token,action:'confirm'}),s.env,new Date(),null,s.fetcher);
   await withdrawCareerConsent(s.request('/api/careers/unsubscribe',{token,action:'unsubscribe'}),{...s.env,FORMS_ENABLED:'false',CAREERS_ENABLED:'false'});
   const row=s.careers.sqlite.prepare('SELECT * FROM registrations').get();assert.equal(row.encrypted_data,null);assert.equal((await inspectRegistrationAudit(s.careers.db,s.env,row)).events,3);
   assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);
@@ -80,7 +80,7 @@ test('owner review is read-only, defaults blocked and requires private authentic
   assert.equal((await controlledReview(s.request('/api/controlled/review',body),{...s.env,CONTROLLED_REVIEW_ENABLED:'false'})).status,503);
   assert.equal((await controlledReview(s.request('/api/controlled/review',body,{Authorization:'wrong'}),s.env)).status,401);
   assert.equal((await controlledReview(s.request('/api/controlled/review',body,{Origin:'https://attacker.test'}),s.env)).status,403);
-  const response=await controlledReview(s.request('/api/controlled/review',body),s.env),result=await response.json();assert.equal(response.status,200);assert.equal(result.record.data.project,'A test project');assert.equal(result.audit.verified,true);assert.equal(response.headers.get('Cache-Control'),'no-store');assert.ok(!JSON.stringify(result).includes(s.env.SAMPLES_DATA_KEY));assert.ok(!JSON.stringify(result).includes('unsubscribe_hash'));
+  const response=await controlledReview(s.request('/api/controlled/review',body),s.env),result=await response.json();assert.equal(response.status,200);assert.equal(result.record.data.shippingAddress,'Test street 1');assert.equal(result.audit.verified,true);assert.equal(response.headers.get('Cache-Control'),'no-store');assert.ok(!JSON.stringify(result).includes(s.env.SAMPLES_DATA_KEY));assert.ok(!JSON.stringify(result).includes('unsubscribe_hash'));
   assert.equal((await controlledReview(s.request('/api/controlled/review',{kind:'samples',action:'delete',id}),s.env)).status,400);
   assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);
  }finally{s.close();}

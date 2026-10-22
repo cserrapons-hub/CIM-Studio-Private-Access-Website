@@ -86,3 +86,7 @@ NEWSLETTER_API_REVIEWED=false
 # One-shot private HTML 404 retry. Never enable without a reviewed expiring D1 permit.
 NEWSLETTER_HTML404_RETRY_ENABLED=false
 NEWSLETTER_HTML404_RETRY_PARENT_ID=
+
+# Real GetResponse customFieldId for tipo_suscriptor (particular/profesional). Not a secret.
+# Leave empty until obtained from the account; newsletter sends fail closed.
+GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID=

@@ -6,6 +6,8 @@
  Object.assign(copy.en,{observationEmail:'Enter a valid email to check its status. This action does not request a subscription.',observing:'Checking the current state. This action does not request a subscription.',observationSuccess:'Observation saved. No subscription was requested and double opt-in has not been established.',observationError:'The observation could not be completed. This action does not request a subscription. Keep the diagnostic and do not repeat the check until it has been reviewed.',observationUnknown:'The observation result could not be received. It may have been saved; check its state before repeating. This action does not request a subscription.'});
  Object.assign(copy.es,{accepted:'GetResponse ha aceptado la solicitud para procesarla. Revisa tu correo para confirmar. Esto no acredita el doble opt-in ni la Tarifa Fundadores. No repitas el envío.',rejected:'GetResponse ha rechazado la solicitud. No se ha confirmado ninguna suscripción. No repitas el envío; la persona responsable debe revisar el rechazo registrado.'});
  Object.assign(copy.en,{accepted:'GetResponse accepted the request for processing. Check your inbox to confirm. This does not establish double opt-in or Founders eligibility. Do not resubmit.',rejected:'GetResponse rejected the request. No subscription has been confirmed. Do not resubmit; the responsible person must review the recorded rejection.'});
+ Object.assign(copy.es,{subscriberType:'Me suscribo como',chooseType:'Selecciona una opción',privateType:'Particular',professionalType:'Profesional'});
+ Object.assign(copy.en,{subscriberType:'I am subscribing as',chooseType:'Select an option',privateType:'Private individual',professionalType:'Professional'});
  const submissionStages=new Set(['configuration','request','storage_rate','allowlist','turnstile','storage_read','getresponse_campaign','getresponse_contacts','persistence']);
  Object.assign(copy.es,{notSubmitted:'La solicitud no se ha enviado a GetResponse. Bloqueo previo en: ',submissionUnknown:'No se ha recibido una respuesta válida. No se puede saber si la solicitud llegó al servidor. No repitas el formulario.'});
  Object.assign(copy.en,{notSubmitted:'The request was not submitted to GetResponse. Blocked before submission at: ',submissionUnknown:'No valid response was received. It is not known whether the server received the request. Do not resubmit.'});
@@ -43,7 +45,7 @@
   const values=new FormData(form);if(values.get('consent')!=='on'){message='consent';render();return;}
   const token=widget!==null?window.turnstile?.getResponse(widget):null;if(!token){message='challenge';render();return;}
   if(!requestId)requestId=config.retryRequestId||crypto.randomUUID();
-  const data={email:values.get('email'),consent:true,language:lang,legalVersion:config.policy.version,requestId,token,website:values.get('website')||''};
+  const data={subscriberType:values.get('subscriberType'),email:values.get('email'),consent:true,language:lang,legalVersion:config.policy.version,requestId,token,website:values.get('website')||''};
   busy=true;message='sending';render();
   try{
    const response=await fetch('/api/controlled/subscribe',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(60000)});

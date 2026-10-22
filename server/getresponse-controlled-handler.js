@@ -1,3 +1,4 @@
+import {subscriberType,segmentationReady} from './newsletter-segmentation.js';
 // Restricted test only. No browser configuration enables public acquisition.
 import {newsletterTestBoundary} from './newsletter-test-boundary.js';
 import {resolveNewsletterTestPolicy} from './newsletter-test-policy.js';
@@ -9,6 +10,7 @@ import {verifyNewsletter,readGetResponse} from './getresponse-newsletter.js';
 import {retryConfigured,useHtml404Retry} from './newsletter-html404-retry.js';
 const utc=()=>new Date();
 export function controlledNewsletterReady(env,policy=resolveNewsletterTestPolicy(env)){
+ if(!segmentationReady(env))return false;
  if(env.NEWSLETTER_API_REVIEWED!=='true'||env.GETRESPONSE_CAMPAIGN_ID!=='PL6jh'||typeof env.GETRESPONSE_API_KEY!=='string'||!env.GETRESPONSE_API_KEY.trim())return false;
  if(env.NEWSLETTER_TEST_LEGAL_APPROVED!=='true'||env.CONTROLLED_TEST_MODE!=='true'||env.NEWSLETTER_PREPARATION_ENABLED!=='true'||env.NEWSLETTER_CONTROLLED_SEND_ENABLED!=='true'||env.SITE_LIVE==='true'||!env.FORMS_DB||!policy.approved||typeof policy.version!=='string'||!policy.version.trim())return false;
  if(!['es','en'].every(lang=>['consent','privacy'].every(key=>typeof policy[lang]?.[key]==='string'&&Boolean(policy[lang][key].trim()))))return false;
@@ -55,7 +57,7 @@ export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=
   stage='request';
   const origin=new URL(request.url).origin;
   if(origin!==new URL(env.CONTROLLED_TEST_ORIGIN).origin||request.headers.get('Origin')!==origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403);
-  const raw=await readJson(request),data=validate(raw,'subscribe');
+  const raw=await readJson(request),data=validate(raw,'subscribe');data.subscriberType=subscriberType(raw.subscriberType);
   if(raw.legalVersion!==policy.version)throw new Rejection('consent');
   const at=now(),db=env.FORMS_DB,ip=request.headers.get('CF-Connecting-IP');
   if(!ip)throw new Rejection('unavailable',503);
@@ -86,7 +88,7 @@ export async function handleControlledNewsletter(request,env,{fetcher=fetch,now=
   // Fail before consent/claims/provider reads if the local API migration is missing.
   await db.prepare('SELECT request_id FROM newsletter_api_deliveries LIMIT 1').first();
   // Validate the destination and double opt-in on every NEW attempt. Never bypass an existing claim.
-  const prepared=prepareNewsletterApi(env,data.email);
+  const prepared=prepareNewsletterApi(env,data.email,data.subscriberType);
   stage='getresponse_campaign';
   await verifyNewsletter(env.GETRESPONSE_API_KEY,env.GETRESPONSE_CAMPAIGN_ID,fetcher);
   const query=new URLSearchParams({'query[email]':data.email,'query[campaignId]':'PL6jh',perPage:'100'});

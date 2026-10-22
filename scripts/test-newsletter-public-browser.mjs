@@ -23,9 +23,9 @@ try{
     if(url.pathname==='/api/config')return route.fulfill({contentType:'application/json',body:JSON.stringify({enabled:{subscribe:true,samples:false,careers:false},siteKey:'simulation-site',verified:false,siteLive:false,legalVersion:policy.version,legal:null})});
     if(url.pathname==='/api/subscribe'){
      posts++;const request=new Request(r.url(),{method:'POST',headers:{...r.headers(),'CF-Connecting-IP':'192.0.2.1'},body:r.postData()});
-     const response=await handlePublicNewsletter(request,s.env,{policy,profile,fetcher:async(target)=>{
+     const response=await handlePublicNewsletter(request,s.env,{policy,profile,fetcher:async(target,options)=>{
       if(target.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});
-      if(target.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(target.includes('/contacts?'))return Response.json([]);assert.equal(target,'https://api.getresponse.com/v3/contacts');sends++;
+      if(target.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(target.includes('/contacts?'))return Response.json([]);assert.equal(target,'https://api.getresponse.com/v3/contacts');sends++;assert.equal(JSON.parse(options.body).customFieldValues.find(field=>field.customFieldId===s.env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID).value[0],lang==='en'?'profesional':'particular');
       return new Response('SIMULATED ONLY',{status:scenario==='rejected'?422:scenario==='unknown'?302:202,headers:{Location:scenario==='unknown'?'https://provider.example.test/unknown':'https://never-follow.example.test'}});
      }});
      return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:await response.text()});
@@ -35,7 +35,8 @@ try{
    });
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/');await page.waitForFunction(()=>window.cimFormSettings);
    await page.locator('[data-lang='+lang+']').click();await page.locator('[data-open=subscribe-dialog]').click();await page.waitForFunction(()=>window.turnstile);
-   await page.locator('#email').fill('owner@example.test');assert.equal(await page.locator('[name=marketing_consent]').isChecked(),false);
+   assert.equal(await page.locator('#subscriber-type').inputValue(),'');await page.locator('#email').fill('owner@example.test');await page.locator('[name=marketing_consent]').check();await page.locator('#subscribe-dialog [type=submit]').click();assert.equal(posts,0,'An audience is required');await page.locator('[name=marketing_consent]').uncheck();
+   await page.selectOption('#subscriber-type',lang==='en'?'profesional':'particular');await page.locator('#email').fill('owner@example.test');assert.equal(await page.locator('[name=marketing_consent]').isChecked(),false);
    await page.locator('#subscribe-dialog [type=submit]').click();assert.equal(posts,0);
    await page.locator('[name=marketing_consent]').check();await page.locator('#subscribe-dialog [type=submit]').click();
    if(scenario==='accepted'){

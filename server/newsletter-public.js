@@ -1,3 +1,4 @@
+import {subscriberType} from './newsletter-segmentation.js';
 // Future public relay: defaults fail closed until real response semantics and legal/evidence review.
 import {json,readJson,validate,hash,Rejection} from './forms.js';
 import {legal,legalReady,consent} from './settings.js';
@@ -13,7 +14,7 @@ export async function handlePublicNewsletter(request,env,{fetcher=fetch,policy=p
   if(!newsletterPublicReady(env,policy.approved,profile))return json({error:'unavailable'},503);
   const url=new URL(request.url);
   if(url.origin!==env.NEWSLETTER_ORIGIN||request.headers.get('Origin')!==url.origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403);
-  const raw=await readJson(request),data=validate(raw,'subscribe');if(raw.legalVersion!==policy.version)throw new Rejection('consent');
+  const raw=await readJson(request),data=validate(raw,'subscribe');data.subscriberType=subscriberType(raw.subscriberType);if(raw.legalVersion!==policy.version)throw new Rejection('consent');
   const db=env.FORMS_DB,ip=request.headers.get('CF-Connecting-IP');if(!ip)throw new Rejection('unavailable',503);
   const subject=await hash(env.AUDIT_HASH_SECRET,'newsletter-consent:'+data.email),bucket=Math.floor(now.getTime()/3600000);
   for(const [label,limit] of [['ip:'+ip,8],['all',100],['email:'+subject,4]]){
@@ -35,7 +36,7 @@ export async function handlePublicNewsletter(request,env,{fetcher=fetch,policy=p
    if(receipt&&await hash(env.AUDIT_HASH_SECRET,'newsletter-http-v1:'+JSON.stringify([prior.request_id,receipt.accepted_at,receipt.contract_version]))===receipt.evidence_mac)return json({ok:true,subscription:'request_recorded'},202);
    throw new Rejection('pending',409);
   }
-  const prepared=prepareNewsletterApi(env,data.email);
+  const prepared=prepareNewsletterApi(env,data.email,data.subscriberType);
   await verifyNewsletter(env.GETRESPONSE_API_KEY,env.GETRESPONSE_CAMPAIGN_ID,fetcher);
   const contacts=await readGetResponse(fetcher,env.GETRESPONSE_API_KEY,'/contacts?'+new URLSearchParams({'query[email]':data.email,'query[campaignId]':'PL6jh',perPage:'100'}),'contacts');
   if(!Array.isArray(contacts)||contacts.length>=100||contacts.some(c=>!c||typeof c.email!=='string'||!c.campaign?.campaignId))throw new Rejection('unavailable',503);

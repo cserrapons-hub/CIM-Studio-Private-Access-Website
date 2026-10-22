@@ -1,3 +1,4 @@
+import {segmentationReady} from './newsletter-segmentation.js';
 // Code-owned release gate. Populate only from an authorised real test/provider contract.
 // No success URL/status is guessed; environment flags cannot approve this object.
 export const newsletterRelease=Object.freeze({approved:false,version:'',provider:'getresponse-api-v3',acceptedResponse:null});
@@ -10,7 +11,7 @@ export function newsletterBuildReady(env,approved,profile=newsletterRelease){
  return env.GETRESPONSE_CAMPAIGN_ID==='PL6jh'&&env.NEWSLETTER_ORIGIN==='https://cimstudio.es';
 }
 export function newsletterPublicReady(env,approved,profile=newsletterRelease){
- if(!newsletterBuildReady(env,approved,profile)||!env.FORMS_DB)return false;
+ if(!newsletterBuildReady(env,approved,profile)||!segmentationReady(env)||!env.FORMS_DB)return false;
  if(!['TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','AUDIT_HASH_SECRET','NEWSLETTER_DATA_KEY','GETRESPONSE_API_KEY'].every(k=>typeof env[k]==='string'&&env[k].trim())||env.AUDIT_HASH_SECRET.length<32)return false;
  try{return atob(env.NEWSLETTER_DATA_KEY).length===32;}catch{return false;}
 }

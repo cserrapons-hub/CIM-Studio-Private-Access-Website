@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import {fixture} from '../tests/helpers/launch-fixture.mjs';
 import {registrationTestPolicies} from '../server/registration-test-policy.js';
 import {registrationTestConfiguration} from '../functions/api/controlled/registration-config.js';
-import {handleRegistration} from '../server/registrations.js';
+import {handleRegistration,withdrawCareerConsent} from '../server/registrations.js';
 import {onRequest as middleware} from '../functions/_middleware.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
@@ -23,6 +23,7 @@ try{
     const headers={...r.headers(),Authorization:'Basic '+btoa(s.env.CONTROLLED_TEST_USER+':'+s.env.CONTROLLED_TEST_PASSWORD),'CF-Connecting-IP':'192.0.2.1'};
     const request=new Request(r.url(),{method:r.method(),headers,...(r.method()==='POST'?{body:r.postData()}:{})});
     const response=await middleware({request,env:s.env,next:async()=>{
+     if(url.pathname==='/api/controlled/career-preferences')return withdrawCareerConsent(request,s.env,new Date(),defs.careers,s.fetcher);
      if(url.pathname==='/api/controlled/registration-config')return registrationTestConfiguration(request,s.env,defs);
      if(url.pathname==='/api/controlled/'+kind)return handleRegistration(request,s.env,kind,(url,options)=>{if(url==='https://api.resend.com/emails'&&outcome!=='accepted')return Promise.resolve(new Response(null,{status:outcome==='rejected'?403:outcome==='uncertain'?500:429}));return s.fetcher(url,options);},new Date(),defs[kind]);
      const name=url.pathname.endsWith('/')?url.pathname+'index.html':url.pathname;
@@ -37,6 +38,21 @@ try{
    assert.equal(await page.locator('[name=consent]').isChecked(),false);assert.equal(await page.locator('[name=testData]').isChecked(),false);
    assert.equal(await page.locator('fieldset').evaluate(e=>e.disabled),!enabled);
    if(enabled){await page.waitForFunction(()=>Boolean(window.testAction));await page.fill('#email','owner@example.test');await page.check('[name=testData]');await page.check('[name=consent]');await page.click('[type=submit]');await page.waitForFunction(()=>/Solicitud guardada|Request saved|Prueba registrada|Test recorded/.test(document.getElementById('result').textContent));assert.match(await page.locator('#result').textContent(),outcome==='accepted'?/aceptados por Resend|accepted by Resend/:outcome==='rejected'?/rechazado|rejected/:outcome==='uncertain'?/no se puede acreditar|cannot be established/:/pendiente|needs checking/);assert.equal((kind==='samples'?s.forms:s.careers).sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);}else{assert.equal(external.length,0);assert.equal(s.calls.length,0);}
+   if(outcome==='accepted'&&kind==='careers'){
+    const receipt=JSON.parse(s.calls.find(call=>call.url==='https://api.resend.com/emails').options.body);
+    const capability=receipt.text.match(/controlled\/registrations\/#([a-f0-9]{64})/)[1];
+    await page.goto(s.env.REGISTRATION_ORIGIN+'/controlled/registrations/#'+capability);
+    await page.waitForFunction(()=>!document.querySelector('[data-action=confirm]').disabled);
+    if(lang==='en')await page.click('[data-lang=en]');
+    assert.equal(s.careers.sqlite.prepare('SELECT state FROM registrations').get().state,'pending','GET must not confirm');
+    await page.fill('#email','owner@example.test');await page.click('[data-action=confirm]');
+    await page.waitForFunction(()=>/Acción procesada|Action processed/.test(document.getElementById('result').textContent));
+    assert.equal(s.careers.sqlite.prepare('SELECT state FROM registrations').get().state,'active');
+    await page.click('[data-action=confirm]');
+    await page.waitForFunction(()=>!document.querySelector('[data-action=confirm]').disabled);
+    const admin=s.calls.filter(call=>call.url==='https://api.resend.com/emails').map(call=>JSON.parse(call.options.body)).filter(mail=>mail.to.includes('admin@cimstudio.es'));
+    assert.equal(admin.length,1);assert.ok(!admin[0].text.includes(capability));
+   }
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);cases++;
   }finally{await context.close();s.close();}
  }

@@ -35,12 +35,12 @@ dialog{border:0;background:var(--paper);color:var(--ink);padding:50px;width:min(
  .page-shell{width:94%;min-height:100svh;display:block}
  .preview-notice{font-size:7px;padding:7px 5%}
  .header{padding:18px 6% 0}.brand{width:80px;height:68px}
- .composition{padding:0 6%;margin:30px 0 42px}
- .photographic-composition{display:grid;width:100%;max-width:600px;margin-inline:auto;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(14px,3vw,22px);align-items:start}
+ .composition{padding:0;margin:30px 0 42px}
+ .photographic-composition{display:grid;width:100%;max-width:none;margin-inline:auto;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(14px,3vw,22px);align-items:start}
  .photograph-pair,.photograph-right{gap:8px}
  .photograph-pair{padding-top:clamp(28px,8vw,56px)}
  .photograph-pool{width:75%;margin-left:0;align-self:flex-end}
- .invitation{width:100%;max-width:620px;margin:40px auto 0}
+ .invitation{width:88%;max-width:620px;margin:40px auto 0}
  h1{font-size:43px;line-height:1.08;margin-bottom:28px}.intro{font-size:12px;line-height:1.9;margin-bottom:25px}.intro:has(+ .intro){margin-bottom:20px}
  .primary{font-size:10px;padding:15px 23px}.professional{font-size:10px;margin-top:23px}
  footer{margin:0 6%;font-size:8px;padding-bottom:22px;align-items:baseline}.legal-links{gap:14px}.legal-links button{font-size:8px}
@@ -52,10 +52,10 @@ dialog{border:0;background:var(--paper);color:var(--ink);padding:50px;width:min(
 
 /* Two independent photo stacks frame the existing central text column. */
 @media(min-width:1101px){
- .composition{display:grid;grid-template-columns:40.5% 37% 22.5%;align-items:start;margin-top:clamp(100px,10vw,155px);margin-bottom:72px}
+ .composition{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,min(37cqw,528px)) minmax(0,1fr);align-items:start;margin-top:clamp(100px,10vw,155px);margin-bottom:72px}
  .photograph-pair{grid-column:1;grid-row:1;width:24cqw;padding-top:clamp(72px,6cqw,96px)}
  .photograph-right{grid-column:3;grid-row:1;width:14.41872cqw;justify-self:end;margin-top:calc(-1 * clamp(32px,4cqw,60px))}
- .invitation{grid-column:2;grid-row:1;width:100%;margin:0}
+ .invitation{grid-column:2;grid-row:1;width:100%;max-width:528px;justify-self:center;margin:0}
 }
 
 /* Shared actions; the settled homepage geometry is unchanged. */
@@ -82,3 +82,6 @@ footer .careers-link:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* Georgia headings; regular weight for controls and small interface text. */
 button,input,select,textarea,form label,.languages,.overline,footer,.demo,.status,.preview-notice,.privacy-inline{font-family:Montserrat,Arial,Helvetica,sans-serif;font-weight:400}
+
+.shipping-fields{border:0;padding:0;margin:24px 0 0;min-width:0}.shipping-fields legend{font-size:10px;padding:0;margin-bottom:12px}.shipping-fields input{min-width:0}
+@media(max-width:480px){.shipping-fields .fields{grid-template-columns:1fr}.shipping-fields .wide{grid-column:auto}}

@@ -22,7 +22,7 @@ try{
   const enabled=scenario!=='disabled';
   const sqlite=new DatabaseSync(':memory:');for(const name of ['0001_forms.sql','0006_newsletter_consent.sql','0007_newsletter_html_deliveries.sql','0008_launch_operations.sql','0009_newsletter_api_deliveries.sql'])sqlite.exec(readFileSync(root+'migrations/'+name,'utf8'));
   const db={prepare(sql){let args=[];return {sql,args:()=>args,bind(...values){args=values;return this;},async first(){return sqlite.prepare(sql).get(...args)||null;},async run(){return sqlite.prepare(sql).run(...args);}};},async batch(statements){sqlite.exec('BEGIN IMMEDIATE');try{const result=statements.map(s=>({results:sqlite.prepare(s.sql).all(...s.args())}));sqlite.exec('COMMIT');return result;}catch(error){sqlite.exec('ROLLBACK');throw error;}}};
-  const env={CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:origin,CONTROLLED_TEST_USER:'simulated-owner',CONTROLLED_TEST_PASSWORD:'simulation-password-at-least-32-characters',SITE_LIVE:'false',NEWSLETTER_OBSERVATIONS_ENABLED:enabled?'true':'false',GETRESPONSE_API_KEY:'simulation-no-real-key',GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_API_REVIEWED:enabled?'true':'false',FORMS_ENABLED:'false',NEWSLETTER_ENABLED:'false',SAMPLES_ENABLED:'false',CAREERS_ENABLED:'false',NEWSLETTER_TEST_LEGAL_APPROVED:enabled?'true':'false',NEWSLETTER_PREPARATION_ENABLED:enabled?'true':'false',NEWSLETTER_CONTROLLED_SEND_ENABLED:enabled?'true':'false',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-only-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret'};
+  const env={CONTROLLED_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:origin,CONTROLLED_TEST_USER:'simulated-owner',CONTROLLED_TEST_PASSWORD:'simulation-password-at-least-32-characters',SITE_LIVE:'false',NEWSLETTER_OBSERVATIONS_ENABLED:enabled?'true':'false',GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID:'simulation-subscriber-type',GETRESPONSE_API_KEY:'simulation-no-real-key',GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_API_REVIEWED:enabled?'true':'false',FORMS_ENABLED:'false',NEWSLETTER_ENABLED:'false',SAMPLES_ENABLED:'false',CAREERS_ENABLED:'false',NEWSLETTER_TEST_LEGAL_APPROVED:enabled?'true':'false',NEWSLETTER_PREPARATION_ENABLED:enabled?'true':'false',NEWSLETTER_CONTROLLED_SEND_ENABLED:enabled?'true':'false',FORMS_DB:db,AUDIT_HASH_SECRET:'simulation-only-audit-secret-at-least-32-characters',NEWSLETTER_DATA_KEY:btoa('n'.repeat(32)),NEWSLETTER_TEST_ALLOWLIST_SECRET:btoa('l'.repeat(32)),TURNSTILE_SITE_KEY:'simulation-site',TURNSTILE_SECRET_KEY:'simulation-secret'};
   env.NEWSLETTER_TEST_EMAIL_HASH=await newsletterTestEmailHash(env.NEWSLETTER_TEST_ALLOWLIST_SECRET,'owner@example.test');
   const policy=resolveNewsletterTestPolicy(env,enabled?{...newsletterTestPolicy,approved:true,version:'simulation-private-policy-v1'}:newsletterTestPolicy);
   const context=await browser.newContext({viewport:{width,height:900},isMobile:width<500,hasTouch:width<500}),errors=[],external=[],posts=[];
@@ -57,7 +57,7 @@ try{
        if(target.includes('/contacts?')&&scenario==='contacts')return new Response(null,{status:503});
        if(target==='https://api.getresponse.com/v3/campaigns/PL6jh')return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});
        if(target.startsWith('https://api.getresponse.com/v3/contacts?'))return Response.json([]);
-       assert.equal(target,'https://api.getresponse.com/v3/contacts');assert.equal(options.method,'POST');providerCalls++;
+       assert.equal(target,'https://api.getresponse.com/v3/contacts');assert.equal(options.method,'POST');assert.equal(JSON.parse(options.body).customFieldValues.find(field=>field.customFieldId===env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID).value[0],lang==='en'?'profesional':'particular');providerCalls++;
        assert.equal(options.redirect,'manual');
        return new Response(null,{status:202});
       }});
@@ -85,6 +85,9 @@ try{
     assert.equal(sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);
    }else{
     await page.waitForFunction(()=>window.turnstile);
+    assert.equal(await page.locator('[name=subscriberType]').inputValue(),'');
+    await page.locator('[name=email]').fill('owner@example.test');await page.locator('[name=consent]').check();await page.locator('button[type=submit]').click();assert.equal(posts.length,0,'An audience is required');await page.locator('[name=consent]').uncheck();
+    await page.selectOption('[name=subscriberType]',lang==='en'?'profesional':'particular');
     await page.locator('[name=email]').fill('owner@example.test');
     await page.locator('[data-observe=before]').click();await page.waitForFunction(()=>document.getElementById('observation-result').textContent.includes('\"phase\": \"before\"'));
     assert.equal(sqlite.prepare('SELECT COUNT(*) n FROM newsletter_observations').get().n,1);

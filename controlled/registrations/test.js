@@ -6,8 +6,17 @@
  let lang='es' ,kind='samples',config=null,widget=null,loading=null,busy=false,message='',requestId=null;
  const form=document.getElementById('registration-test'),fieldset=form.querySelector('fieldset'),dialog=document.getElementById('test-privacy');
  // Remove capability from the URL immediately; never submit it automatically.
- const token=location.hash.slice(1);if(token)history.replaceState(null,'',location.pathname+location.search);
- if(/^[a-f0-9]{64}$/.test(token)){kind='careers';document.getElementById('kind').value=kind;document.getElementById('preferences').hidden=false;}
+ let token='';
+ function readCapability(){
+  const value=location.hash.slice(1);if(!value)return;
+  history.replaceState(null,'',location.pathname+location.search);
+  token=/^[a-f0-9]{64}$/.test(value)?value:'';
+  document.getElementById('preferences').hidden=!token;
+  if(token){kind='careers';document.getElementById('kind').value=kind;}
+  render();challenge();
+ }
+ window.addEventListener('hashchange',readCapability);
+ readCapability();
  function render(){document.documentElement.lang=lang;document.querySelectorAll('[data-copy]').forEach(e=>e.textContent=copy[lang][e.dataset.copy]);document.querySelectorAll('[data-lang]').forEach(e=>e.setAttribute('aria-pressed',String(e.dataset.lang===lang)));const p=config?.policies[kind];document.getElementById('readiness').textContent=copy[lang][config?.enabled[kind]?'ready':'blocked'];document.getElementById('consent-text').textContent=p?.[lang].consent||'';document.getElementById('privacy-text').textContent=p?.[lang].privacy||'';document.getElementById('policy-version').textContent=copy[lang].version+': '+(p?.version||'—');document.getElementById('result').textContent=copy[lang][message]||'';fieldset.disabled=!config?.enabled[kind]||busy;document.querySelectorAll('[data-action]').forEach(e=>e.disabled=!config?.enabled.careers||busy);const fields=document.getElementById('fictional-fields');fields.replaceChildren();if(kind==='samples'&&config)for(const value of Object.values(config.fictionalSample)){const p=document.createElement('p');p.textContent=value;fields.append(p);}}
  async function challenge(){if(!config?.enabled[kind])return;try{if(!loading)loading=new Promise((resolve,reject)=>{window.cimRegistrationTestReady=resolve;const s=document.createElement('script');s.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=cimRegistrationTestReady';s.async=true;s.onerror=reject;document.head.append(s);});await loading;if(widget!==null)window.turnstile.remove(widget);widget=window.turnstile.render(document.getElementById('challenge'),{sitekey:config.siteKey,action:kind,language:lang,theme:'light',size:'compact'});}catch{config.enabled[kind]=false;message='error';render();}}
  document.querySelectorAll('[data-lang]').forEach(e=>e.addEventListener('click',()=>{lang=e.dataset.lang;render();challenge();}));

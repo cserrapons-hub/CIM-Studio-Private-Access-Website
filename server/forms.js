@@ -21,6 +21,18 @@ export function validate(data, kind) {
   }
   return result;
 }
+// Current routed sample form. Legacy non-routed adapters retain their historical validation.
+export function validateSampleRequest(data){
+ const result=validate(data,'subscribe');
+ result.name=text(data.name,120);result.company=text(data.company,160);
+ if(!['interior-design','architecture','hospitality','gastronomy','other'].includes(data.discipline))throw new Rejection('invalid');
+ result.discipline=data.discipline;
+ for(const [field,max] of [['shippingAddress',250],['postalCode',20],['city',120],['province',120],['country',100]]){
+  result[field]=text(data[field],max);
+  if(/[\r\n]/.test(result[field]))throw new Rejection('invalid');
+ }
+ return result;
+}
 export async function readJson(request) {
   if(!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) throw new Rejection('invalid',415);
   if(Number(request.headers.get('Content-Length'))>16384) throw new Rejection('invalid',413);

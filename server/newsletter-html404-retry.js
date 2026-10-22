@@ -51,7 +51,7 @@ export async function useHtml404Retry(request,env,{parent,subject,raw,data,polic
   }
   if(!validPermit(permit,parent,now()))return pending();
   // Construction and new consent evidence precede the claim; no external API call yet.
-  const prepared=prepareNewsletterApi(env,data.email);
+  const prepared=prepareNewsletterApi(env,data.email,data.subscriberType);
   await recordControlledConsent(env,{...data,requestId:raw.requestId,legalVersion:raw.legalVersion},now(),policy);
   const t=Math.floor(now().getTime()/1000);
   const consumed=await db.prepare("UPDATE newsletter_retry_permits SET consumed_at=?,active=0 WHERE parent_request_id=? AND api_request_id=? AND subject_hash=? AND active=1 AND consumed_at IS NULL AND issued_at<=? AND expires_at>? AND expires_at<=issued_at+900 AND NOT EXISTS (SELECT 1 FROM newsletter_retry_attempts WHERE parent_request_id=?) RETURNING api_request_id").bind(t,parent.request_id,raw.requestId,subject,t,t,parent.request_id).first();

@@ -1,3 +1,4 @@
+import {segmentationReady} from './newsletter-segmentation.js';
 // Temporary private diagnostic: SELECT-only, no fetch, no logging, no activation.
 import {newsletterTestBoundary} from './newsletter-test-boundary.js';
 import {resolveNewsletterTestPolicy} from './newsletter-test-policy.js';
@@ -24,6 +25,7 @@ export async function newsletterDiagnostic(request,env,{policy=resolveNewsletter
  const check=(name,valid)=>{if(!valid)failedChecks.push(name);};
  for(const name of ['NEWSLETTER_API_REVIEWED','NEWSLETTER_TEST_LEGAL_APPROVED','NEWSLETTER_PREPARATION_ENABLED','NEWSLETTER_CONTROLLED_SEND_ENABLED','CONTROLLED_TEST_MODE','NEWSLETTER_HTML404_RETRY_ENABLED'])check(name,env[name]==='true');
  check('SITE_LIVE',env.SITE_LIVE!=='true');check('GETRESPONSE_CAMPAIGN_ID',env.GETRESPONSE_CAMPAIGN_ID==='PL6jh');
+ check('GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID',segmentationReady(env));
  for(const name of ['GETRESPONSE_API_KEY','TURNSTILE_SITE_KEY','TURNSTILE_SECRET_KEY','NEWSLETTER_DATA_KEY','NEWSLETTER_TEST_EMAIL_HASH'])check(name,present(env[name]));
  check('FORMS_DB',typeof env.FORMS_DB?.prepare==='function');
  check('AUDIT_HASH_SECRET',typeof env.AUDIT_HASH_SECRET==='string'&&env.AUDIT_HASH_SECRET.length>=32);

@@ -72,7 +72,7 @@ test('private samples retain exactly the accepted test notice evidence and ficti
  const s=await fixture();configure(s);try{
   const body=data(s,'samples');assert.equal((await submit(s,'samples',body)).status,202);
   const row=s.forms.sqlite.prepare('SELECT * FROM registrations').get();assert.equal(row.consent_version,registrationTestPolicies.samples.version);assert.equal(row.consent_text,registrationTestPolicies.samples.es.consent);assert.equal(row.consent_at,'2026-10-21T09:00:00.000Z');assert.equal((await inspectRegistrationAudit(s.forms.db,s.env,row)).verified,true);
-  const clear=await decryptRegistration(s.env,'samples',row.id,row.encrypted_data);assert.deepEqual(clear,{email:s.data.email,...fictionalSample});
+  const clear=await decryptRegistration(s.env,'samples',row.id,row.encrypted_data);assert.deepEqual(clear,{version:2,email:s.data.email,...fictionalSample});
   assert.equal(s.careers.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,0);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);
   assert.equal(s.calls.filter(c=>c.url.includes('resend')).length,2);assert.ok(!JSON.stringify(row).includes(s.data.email));
   assert.equal((await submit(s,'samples',{...body,requestId:crypto.randomUUID()})).status,202);assert.equal(s.calls.filter(c=>c.url.includes('resend')).length,2);
@@ -89,7 +89,8 @@ test('private careers confirm and withdraw with exact owner email, private capab
   assert.equal((await withdrawCareerConsent(action({}, {Authorization:''}),s.env,new Date(),policy)).status,401);
   const id=s.careers.sqlite.prepare('SELECT id FROM registrations').get().id;
   assert.equal(s.careers.sqlite.prepare('SELECT state FROM registrations').get().state,'pending');
-  assert.equal((await withdrawCareerConsent(action(),s.env,new Date(),policy)).status,200);
+  assert.equal((await withdrawCareerConsent(action(),s.env,new Date(),policy,s.fetcher)).status,200);
+  const admin=s.calls.filter(c=>c.url.includes('resend')).map(c=>JSON.parse(c.options.body)).filter(m=>m.to.includes('admin@cimstudio.es'));assert.equal(admin.length,1);assert.ok(!admin[0].text.includes(token));
   assert.equal((await withdrawCareerConsent(action({action:'unsubscribe'}),s.env,new Date(),policy)).status,200);
   const row=s.careers.sqlite.prepare('SELECT * FROM registrations').get();assert.equal(row.id,id);assert.equal(row.state,'withdrawn');assert.equal(row.encrypted_data,null);assert.equal(row.consent_text,registrationTestPolicies.careers.en.consent);assert.equal((await inspectRegistrationAudit(s.careers.db,s.env,row)).events,3);
   assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,0);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);
@@ -116,4 +117,18 @@ test('consolidated document reproduces exact approved private texts without appr
  for(const p of [newsletterTestPolicy,...Object.values(registrationTestPolicies)]){assert.equal(p.approved,true);assert.ok(text.includes('`'+p.version+'`'));for(const lang of ['es','en'])for(const field of ['consent','privacy'])assert.ok(text.includes(p[lang][field]));
   for(const lang of ['es','en']){assert.match(p[lang].privacy,lang==='es'?/confirmados por CIM Studio/:/confirmed by CIM Studio/);assert.match(p[lang].privacy,/Carrer Joan Sindic, 7/);assert.ok(!p[lang].privacy.includes('Juan Sindic'));assert.match(p[lang].privacy,lang==='es'?/bajo la supervisión de su responsable/:/under the supervision of its responsible representative/);}}
  assert.equal(legal.approved,false);
+});
+
+test('career capability page requires Basic only in controlled mode; public page has no login challenge',async()=>{
+ const s=await fixture();configure(s);try{
+  let reached=0;const next=async()=>{reached++;return new Response('simulation capability page');};
+  const privatePage=new Request(s.env.REGISTRATION_ORIGIN+'/controlled/registrations/');
+  const denied=await middleware({request:privatePage,env:s.env,next});assert.equal(denied.status,401);assert.match(denied.headers.get('WWW-Authenticate'),/^Basic/);assert.equal(reached,0);
+  const authorised=new Request(privatePage,{headers:{Authorization:'Basic '+btoa(s.env.CONTROLLED_TEST_USER+':'+s.env.CONTROLLED_TEST_PASSWORD)}});
+  assert.equal((await middleware({request:authorised,env:s.env,next})).status,200);
+  const publicPage=new Request('https://cimstudio.es/careers/preferences/');
+  const allowed=await middleware({request:publicPage,env:{...s.env,CONTROLLED_TEST_MODE:'false',REGISTRATION_ORIGIN:'https://cimstudio.es'},next});
+  assert.equal(allowed.status,200);assert.equal(allowed.headers.get('WWW-Authenticate'),null);
+  const privateOnPublic=await middleware({request:new Request('https://cimstudio.es/controlled/registrations/'),env:{...s.env,CONTROLLED_TEST_MODE:'false'},next});assert.equal(privateOnPublic.status,503);
+ }finally{s.close();}
 });
