@@ -1,88 +1,87 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import legal from '../legal/content.js';
-import {legalReady, publicSettings} from '../server/settings.js';
-
-test('legal drafts never enable forms or expose unapproved documents through configuration', () => {
-  assert.equal(legal.approved, false);
-  assert.equal(legal.version, '');
-  assert.equal(legalReady(), false);
-  const config = publicSettings({FORMS_ENABLED:'true', FORMS_VERIFIED:'true', SITE_LIVE:'true'}, new URL('https://cimstudio.es'));
-  assert.deepEqual(config.enabled, {subscribe:false,samples:false,careers:false});
-  assert.equal(config.legal, null);
-  assert.equal(config.siteLive, false);
-});
-
-test('both languages include all documents, business identity and accessible commercial terms', () => {
-  assert.deepEqual(legal.business, {
-    name:'CIM STUDIO ESPJ',taxId:'E88749155',
-    postalAddress:'Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears.',
-    privacyEmail:'admin@cimstudio.es',domain:'cimstudio.es'
-  });
-  for (const lang of ['es','en']) {
-    for (const key of ['notice','privacy','cookies','terms']) assert.ok(legal[lang][key].length > 1000, `${lang}.${key}`);
-    for (const key of ['notice','privacy','cookies']) {
-      assert.ok(legal[lang][key].includes(legal.business.name));
-      assert.ok(legal[lang][key].includes(legal.business.taxId));
-      assert.ok(legal[lang][key].includes(legal.business.privacyEmail));
-    }
-    assert.ok(!legal[lang].notice.includes(legal[lang].terms), 'terms remain a single document');
-    assert.ok(legal[lang].terms.includes('Europe/Madrid'));
-    assert.ok(!JSON.stringify(legal[lang]).includes('info@cimstudio.es'));
-    assert.ok(!/Microsoft|pedidos@cimstudio\.es/i.test(JSON.stringify(legal[lang])));
-    for (const provider of ['Cloudflare','GetResponse','Resend','Google Workspace (Gmail)','Turnstile','D1']) assert.ok(legal[lang].privacy.includes(provider));
-    assert.ok(legal[lang].privacy.includes('036'));
-    assert.ok(legal[lang].privacy.includes('https://www.aepd.es'));
-  }
-  assert.match(legal.es.terms,/No existe límite de plazas/);
-  assert.match(legal.es.terms,/15 % de descuento de por vida/);
-  assert.match(legal.es.terms,/no acumulable con otras promociones/);
-  assert.match(legal.en.terms,/lifetime 15% discount/);
-  assert.match(legal.en.terms,/not with other promotions/);
-  assert.ok(legal.pendingReview.length >= 6);
-});
-
+import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
-test('static legal preview reuses the source without exposing internal metadata or approving it',()=>{
- const context={window:{}};runInNewContext(readFileSync('public/legal-content.js','utf8'),context);
- const documents=JSON.parse(JSON.stringify(context.window.cimLegalDocuments));
- assert.deepEqual(documents,{approved:false,es:legal.es,en:legal.en});
- assert.equal(documents.pendingReview,undefined);
- const html=readFileSync('public/index.html','utf8');
- assert.ok(html.indexOf('src="legal-content.js"')<html.indexOf('src="script.js"'));
- assert.match(legal.es.terms,/La baja de la newsletter no supone perder el descuento/);
- assert.match(legal.es.terms,/sin permanencia mínima/);
- assert.match(legal.en.terms,/Unsubscribing from the newsletter does not remove the discount/);
-});
-test('final launch decisions name CIM Production as authoritative and specify proportionate retention',()=>{
- for(const lang of ['es','en']){
-  assert.ok(legal[lang].privacy.includes('CIM Production'));
-  assert.ok(legal[lang].terms.includes('CIM Production'));
-  for(const technology of ['Google Analytics','Meta Pixel','GetResponse Analytics'])assert.ok(legal[lang].cookies.includes(technology));
- }
- assert.ok(legal.es.privacy.includes('12 meses'));assert.ok(legal.en.privacy.includes('12 months'));
- assert.ok(legal.es.privacy.includes('Facturas:'));assert.ok(legal.en.privacy.includes('Invoices:'));
- assert.ok(legal.es.terms.includes('aunque nunca haya comprado'));assert.ok(legal.en.terms.includes('even if they have never purchased'));
- assert.equal(legal.approved,false);
+import legal from '../legal/content.js';
+import {legalReady,publicSettings,consent} from '../server/settings.js';
+import {newsletterRelease} from '../server/newsletter-release.js';
+import {handlePublicNewsletter} from '../server/newsletter-public.js';
+import {handleRegistration} from '../server/registrations.js';
+
+test('express public legal approval is versioned, scoped and integrity-linked to all documents and consents',()=>{
+ assert.equal(legal.approved,true);
+ assert.equal(legal.version,'public-legal-2026-10-22-v1');
+ assert.equal(legal.approval.date,'2026-10-22');
+ assert.equal(legal.approval.scope,'public-legal-documents-and-form-consents-only');
+ const ordered={};for(const lang of ['es','en'])ordered[lang]={subscribe:consent[lang].subscribe,samples:consent[lang].samples,careers:consent[lang].careers};
+ const digest=createHash('sha256').update(JSON.stringify({version:legal.version,es:legal.es,en:legal.en,consent:ordered})).digest('hex');
+ assert.equal(legal.approval.contentSha256,digest);
+ assert.equal(legalReady(),true);
 });
 
-test('approved launch decisions remain drafts and remove automatic discount promises',()=>{
- assert.equal(legal.approved,false);
- assert.equal(legal.version,'');
+test('legal approval alone cannot enable forms, send requests or make the site live',async()=>{
+ for(const env of [{},{FORMS_ENABLED:'false',SITE_LIVE:'false',CONTROLLED_TEST_MODE:'false'},{FORMS_ENABLED:'true',FORMS_VERIFIED:'true',SITE_LIVE:'true'}]){
+  const config=publicSettings(env,new URL('https://cimstudio.es'));
+  assert.deepEqual(config.enabled,{subscribe:false,samples:false,careers:false});
+  assert.equal(config.siteLive,false);assert.equal(config.siteKey,null);
+  assert.deepEqual(config.legal,{es:legal.es,en:legal.en});
+  assert.equal(config.legalVersion,legal.version);
+ }
+ assert.equal(newsletterRelease.approved,true);assert.equal(newsletterRelease.acceptedResponse.status,202);
+ let calls=0;const fetcher=()=>{calls++;throw Error('Unexpected provider request');};
+ for(const kind of ['subscribe','samples','careers']){
+  const req=new Request('https://cimstudio.es/api/'+kind,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+  const response=kind==='subscribe'?await handlePublicNewsletter(req,{},fetcher):await handleRegistration(req,{},kind,fetcher);
+  assert.equal(response.status,503);
+ }
+ assert.equal(calls,0);
+});
+
+test('approved documents retain identity, purpose separation, manual Founders and agreed retention',()=>{
+ assert.deepEqual(legal.business,{name:'CIM STUDIO ESPJ',taxId:'E88749155',postalAddress:'Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears.',privacyEmail:'admin@cimstudio.es',domain:'cimstudio.es'});
+ for(const lang of ['es','en']){
+  for(const key of ['notice','privacy','cookies','terms'])assert.ok(legal[lang][key].length>1000);
+  for(const key of ['notice','privacy','cookies'])for(const token of ['CIM STUDIO ESPJ','E88749155','admin@cimstudio.es'])assert.ok(legal[lang][key].includes(token));
+  for(const token of ['Cloudflare','GetResponse','Resend','Google Workspace','Turnstile','D1','https://www.aepd.es'])assert.ok(legal[lang].privacy.includes(token));
+  assert.match(legal[lang].terms,/Europe\/Madrid/);
+  assert.doesNotMatch(JSON.stringify(legal[lang]),/Microsoft|se aplicará automáticamente|will be applied automatically|CIM Production/);
+ }
  assert.match(legal.es.terms,/15 % adicional sobre el Precio Profesional vigente/);
  assert.match(legal.en.terms,/additional 15% off the current Professional Price/);
- assert.match(legal.es.terms,/CIM Studio aplicará el descuento al preparar el presupuesto/);
- assert.match(legal.en.terms,/CIM Studio will apply the discount when preparing the quotation/);
- assert.match(legal.es.privacy,/12 meses desde la recepción/);
- assert.match(legal.en.privacy,/12 months from receipt/);
- assert.match(legal.es.privacy,/cada 12 meses/);
- assert.match(legal.en.privacy,/every 12 months/);
- for(const lang of ['es','en']){
-  const content=JSON.stringify(legal[lang]);
-  assert.doesNotMatch(content,/se aplicará automáticamente|will be applied automatically|intended to be applied automatically/);
-  assert.doesNotMatch(content,/estos son demostraciones|they are demonstrations|project descriptions/i);
+ assert.match(legal.es.terms,/CIM Studio gestionará manualmente/);
+ assert.match(legal.en.terms,/CIM Studio will administer Founders status manually/);
+ assert.match(legal.es.terms,/aunque reciban las mismas comunicaciones que los suscriptores generales/);
+ assert.match(legal.en.terms,/even if they receive the same communications as general subscribers/);
+ assert.match(legal.es.terms,/darse de baja de la newsletter no elimina el beneficio/);
+ assert.match(legal.en.terms,/unsubscribing from the newsletter does not remove the benefit/);
+ assert.match(legal.es.privacy,/12 meses desde la recepción/);assert.match(legal.en.privacy,/12 months from receipt/);
+ assert.match(legal.es.privacy,/cada 12 meses/);assert.match(legal.en.privacy,/every 12 months/);
+ assert.match(legal.es.privacy,/no constituye, por sí solo, evidencia/);
+ assert.match(legal.en.privacy,/does not, by itself, establish/);
+});
+
+test('review document and source reproduce the same approved ES/EN text and unchanged consents',()=>{
+ const md=readFileSync('PUBLIC-LEGAL-REVIEW.md','utf8');
+ for(const [lang,label] of [['es','ESPAÑOL'],['en','ENGLISH']]){
+  const section=md.split('# '+label+'\n')[1].split('\n# ')[0];
+  const headings=[...section.matchAll(/^## ([1-5])\. (.+)$/gm)];
+  for(let i=0;i<4;i++){
+   const body=section.slice(headings[i].index+headings[i][0].length,headings[i+1].index).trim().replace(/^### /gm,'').replace(/\*\*/g,'').replace(/  \n/g,'\n');
+   assert.equal(legal[lang][['notice','privacy','cookies','terms'][i]],headings[i][2].toUpperCase()+'\n\n'+body);
+  }
+  const quotes=[...section.slice(headings[4].index).matchAll(/^> (.+)$/gm)].map(m=>m[1]);
+  assert.deepEqual(quotes,[consent[lang].subscribe,consent[lang].samples,consent[lang].careers]);
  }
- assert.match(legal.es.privacy,/Solo si estos medios no son suficientes/);
- assert.match(legal.en.privacy,/Only where these sources are insufficient/);
+});
+
+test('static legal bundle includes approved documents but no internal approval metadata or operations',()=>{
+ const context={window:{}};runInNewContext(readFileSync('public/legal-content.js','utf8'),context);
+ const documents=JSON.parse(JSON.stringify(context.window.cimLegalDocuments));
+ assert.deepEqual(documents,{approved:true,es:legal.es,en:legal.en});
+ assert.equal(documents.approval,undefined);assert.equal(documents.pendingReview,undefined);
+ const html=readFileSync('public/index.html','utf8');
+ assert.ok(html.indexOf('src="legal-content.js"')<html.indexOf('src="script.js"'));
+ assert.equal((html.match(/type="submit" disabled/g)||[]).length,3);
+ assert.match(html,/noindex, nofollow, noarchive/);
 });

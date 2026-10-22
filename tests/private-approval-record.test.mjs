@@ -27,7 +27,7 @@ test('express approval records exactly 372193d text without granting public appr
    if(match[1]==='CONTROLLED_TEST_MODE'){assert.equal(match[2],'true');continue;}
    assert.equal(match[2],'false','No example gate may be enabled');closed[match[1]]='false';
   }
-  assert.equal(legal.approved,false);assert.equal(resolveNewsletterTestPolicy(closed).approved,false);
+  assert.equal(legal.approved,true);assert.equal(legal.approval.scope,'public-legal-documents-and-form-consents-only');assert.equal(resolveNewsletterTestPolicy(closed).approved,false);
   for(const kind of ['samples','careers'])assert.equal(resolveRegistrationTestPolicy(closed,kind).approved,false);
   const blocked=()=>{throw Error('No real network call allowed');};
   assert.equal((await handleControlledNewsletter(s.request('/api/controlled/subscribe',s.data),closed,{fetcher:blocked})).status,503);

@@ -29,7 +29,8 @@ export function careersReady(env) {
     Boolean(env.GETRESPONSE_CAMPAIGN_ID?.trim()) && env.GETRESPONSE_CAREERS_CAMPAIGN_ID.trim()!==env.GETRESPONSE_CAMPAIGN_ID.trim();
 }
 export function publicSettings(env, url) {
-  const enabled = { subscribe: newsletterPublicReady(env,legalReady()), samples: registrationReady(env,'samples',legalReady()), careers: registrationReady(env,'careers',legalReady()) };
+  const publicMode = env.CONTROLLED_TEST_MODE !== 'true';
+  const enabled = { subscribe: publicMode && newsletterPublicReady(env,legalReady()), samples: publicMode && registrationReady(env,'samples',legalReady()), careers: publicMode && registrationReady(env,'careers',legalReady()) };
   const verified = env.FORMS_VERIFIED === 'true';
   return { enabled, verified, newsletter:{provider:'getresponse-api-v3',reviewRequired:true}, siteKey: (enabled.subscribe||enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
     siteLive: env.CONTROLLED_TEST_MODE!=='true' && env.SITE_LIVE === 'true' && verified && env.SAMPLES_VERIFIED==='true' && env.CAREERS_VERIFIED==='true' && env.MAIL_RECEIPTS_VERIFIED==='true' && env.NEWSLETTER_EVIDENCE_REVIEWED==='true' && legalReady() && enabled.subscribe && enabled.samples && enabled.careers && url.hostname === 'cimstudio.es',

@@ -1,6 +1,32 @@
-# Cierre legal público — propuestas pendientes de validación
+# Cierre de comprobaciones comunicado por CIM Studio — 22/10/2026
 
-Estado: documento local de justificación; no aprueba documentos ni activa tratamiento. Decisiones comerciales y de conservación ya aprobadas: no se someten de nuevo a decisión.
+El titular confirma la prueba real: contacto API v3, doble opt-in completado y tipo_suscriptor=profesional. Confirma que en su recorrido «Unido/a el» corresponde al momento de confirmación; conservará esa evidencia y su fecha para gestionar Fundadores manualmente. Este registro documenta la comprobación del titular, no una inspección directa de su cuenta ni una garantía general sobre createdOn de la API. No se cambia el código para inferir automáticamente elegibilidad de esa fecha.
+
+Turnstile: titular confirma Managed/No pre-clearance y ausencia observada de cookies de challenges.cloudflare.com en incógnito; api.js y compact?lang=es HTTP 200. Existen 401 y errores de red sin URL/causa individual acreditada. La prueba real completada acredita que la comprobación requerida permitió ese envío: no hay fallo bloqueante demostrado. La ausencia observada de cookies no declara exención general o ausencia de otras tecnologías. Se mantienen las validaciones servidor de token, hostname y acción. No añadir analítica ni banner especulativo.
+
+Mailbox admin@cimstudio.es operativo y recepción administrativa ya confirmados por el titular. D1 públicas con migraciones/quick_check, secretos y variables comunicados por el titular como configurados; sin acceso autenticado a Cloudflare para inspeccionarlos. Lectura de https://cimstudio.es/api/config y documentación externa bloqueada por el proxy de este entorno, incluso con permisos ampliados; no es una respuesta del sitio.
+
+Documentos ES/EN y consentimientos expresamente aprobados. Contrato API técnico registrado. Pendiente operativo: aplicar/verificar los indicadores de activación en Production del proyecto público y desplegar el commit correspondiente. Conservar CONTROLLED_TEST_MODE=false y todos los indicadores privados, webhook, automatismos Fundadores y entrega CIM Production en false. Ninguna suscripción ni correo adicional bajo esta preparación.
+
+Lo que sigue es histórico: las menciones a segmentación, revisión legal, registro manual o inspección de Turnstile pendientes se interpretan conforme a este cierre y su alcance declarado.
+
+# Actualización de validación real — 22/10/2026
+
+El titular confirma expresamente: nueva alta privada API v3 correcta, doble opt-in completado y tipo_suscriptor=profesional almacenado en njdbT6. Se registra esta evidencia como comunicada por el titular, no inspección directa de la cuenta. Queda superado el estado histórico de segmentación pendiente. Contrato técnico de aceptación HTTP 202 registrado localmente; no equivale a confirmación ni a Fundadores. El titular confirma recursos públicos preparados. No se modifican indicadores remotos.
+
+Antes de activar: conservar evidencia que acredite confirmación completada y fecha para el registro manual de Fundadores; verificar tecnologías efectivas de Turnstile. Este entorno carece de acceso autenticado a las cuentas. No se atribuye una fecha original DOI a createdOn ni se declara una exención de consentimiento. La revisión de textos y bases ya está aprobada; no volver a solicitarla.
+
+# Cierre legal público — registro histórico y aprobación expresa
+
+Estado actual 22/10/2026: CIM Studio ha aprobado expresamente los cuatro documentos públicos ES/EN y los tres consentimientos reproducidos en PUBLIC-LEGAL-REVIEW.md, versión public-legal-2026-10-22-v1. Aprobación documental registrada localmente; ninguna activación, publicación o envío autorizado. Las menciones a validación pendiente de redacción en los apartados históricos siguientes quedan superadas por esta aprobación, sin convertir comprobaciones técnicas no realizadas en verificadas.
+
+Fundadores: gestión manual mediante evidencia de confirmación efectiva y fecha, registro mínimo separado y conservación del beneficio tras la baja; altas confirmadas desde 2027 sin beneficio, clasificación general manual. No son requisitos la elegibilidad automática, el webhook ni CIM Production. No se exige una compra previa.
+
+Únicas comprobaciones previas a activación solicitadas: (1) funcionamiento del correo de privacidad, ya confirmado por el titular para admin@cimstudio.es junto con las direcciones operativas, sin nueva prueba de envío bajo esta intervención; (2) segmentación real njdbT6 en GetResponse pendiente, la prueba duplicada anterior no acredita almacenamiento; (3) confirmar que los correos usados para la revisión manual acreditan la confirmación completada y su fecha, no la invitación a confirmar; (4) ejecución real de Turnstile/almacenamiento. Este entorno no dispone de credenciales de Cloudflare/GetResponse/Basic y no puede acreditar esos datos remotos. No volver a abrir revisión contractual ni decisiones aprobadas.
+
+La aprobación pública no debe convertir las habilitaciones privadas en autorización pública: se mantienen las rutas públicas cerradas en CONTROLLED_TEST_MODE=true, además de las comprobaciones existentes de cada entorno. Contrato de lanzamiento de newsletter sin aprobar. Variables, D1, claves y envíos remotos intactos.
+
+Los apartados siguientes conservan la justificación preparatoria histórica; el procedimiento manual y la versión expresamente aprobada prevalecen.
 
 ## 1. Bases jurídicas y coherencia ES/EN
 

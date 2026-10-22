@@ -1,7 +1,13 @@
 import {segmentationReady} from './newsletter-segmentation.js';
-// Code-owned release gate. Populate only from an authorised real test/provider contract.
-// No success URL/status is guessed; environment flags cannot approve this object.
-export const newsletterRelease=Object.freeze({approved:false,version:'',provider:'getresponse-api-v3',acceptedResponse:null});
+// Code-owned API response contract: express owner-reported private validation on 2026-10-22.
+// API acceptance is not DOI confirmation or Founders eligibility; runtime gates remain required.
+export const newsletterRelease=Object.freeze({
+ approved:true,
+ version:'getresponse-public-api-v3-2026-10-22-v1',
+ provider:'getresponse-api-v3',
+ acceptedResponse:Object.freeze({status:202}),
+ evidence:Object.freeze({date:'2026-10-22',source:'owner-reported-authorised-private-test',scope:'API acceptance, completed double opt-in and tipo_suscriptor=profesional (njdbT6); no automatic Founders grant',acceptanceBasis:'API v3 202 contract and previous recorded accepted private API delivery'})
+});
 export function validRelease(profile){
  if(profile?.approved!==true||typeof profile.version!=='string'||!profile.version.trim()||!profile.acceptedResponse)return false;
  return profile.provider==='getresponse-api-v3'&&profile.acceptedResponse.status===202;

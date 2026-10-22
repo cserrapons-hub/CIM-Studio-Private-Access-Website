@@ -33,22 +33,22 @@ test('observations require approval, authentication, owner email, same origin an
 test('samples with new request UUIDs but identical content do not repeat notifications',async()=>{
  const s=await fixture();approve();try{
   const sample={...s.sample,token:'sample-token'};
-  assert.equal((await handleRegistration(s.request('/api/samples',sample),s.env,'samples',s.fetcher)).status,202);
-  assert.equal((await handleRegistration(s.request('/api/samples',{...sample,requestId:crypto.randomUUID()}),s.env,'samples',s.fetcher)).status,202);
+  assert.equal((await handleRegistration(s.request('/api/samples',sample),{...s.env,CONTROLLED_TEST_MODE:'false'},'samples',s.fetcher)).status,202);
+  assert.equal((await handleRegistration(s.request('/api/samples',{...sample,requestId:crypto.randomUUID()}),{...s.env,CONTROLLED_TEST_MODE:'false'},'samples',s.fetcher)).status,202);
   assert.equal(s.calls.filter(c=>c.url.includes('resend')).length,2);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);
-  assert.equal((await handleRegistration(s.request('/api/samples',{...sample,shippingAddress:'changed'}),s.env,'samples',s.fetcher)).status,409);
+  assert.equal((await handleRegistration(s.request('/api/samples',{...sample,shippingAddress:'changed'}),{...s.env,CONTROLLED_TEST_MODE:'false'},'samples',s.fetcher)).status,409);
  }finally{s.close();}
 });
 test('simultaneous identical samples preserve a single claim and one pair of emails',async()=>{
  const s=await fixture();approve();try{
   const data={...s.sample,token:'sample-token'};
-  const responses=await Promise.all([handleRegistration(s.request('/api/samples',data),s.env,'samples',s.fetcher),handleRegistration(s.request('/api/samples',{...data,requestId:crypto.randomUUID()}),s.env,'samples',s.fetcher)]);
+  const responses=await Promise.all([handleRegistration(s.request('/api/samples',data),{...s.env,CONTROLLED_TEST_MODE:'false'},'samples',s.fetcher),handleRegistration(s.request('/api/samples',{...data,requestId:crypto.randomUUID()}),{...s.env,CONTROLLED_TEST_MODE:'false'},'samples',s.fetcher)]);
   assert.ok(responses.every(r=>[202,409].includes(r.status)));assert.equal(s.calls.filter(c=>c.url.includes('resend')).length,2);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);
  }finally{s.close();}
 });
 test('registration evidence detects altered consent or event seals; existing unsealed history is not invented',async()=>{
  const s=await fixture();approve();try{
-  await handleRegistration(s.request('/api/samples',{...s.sample,token:'sample-token'}),s.env,'samples',s.fetcher);
+  await handleRegistration(s.request('/api/samples',{...s.sample,token:'sample-token'}),{...s.env,CONTROLLED_TEST_MODE:'false'},'samples',s.fetcher);
   let row=s.forms.sqlite.prepare('SELECT * FROM registrations').get();assert.equal((await inspectRegistrationAudit(s.forms.db,s.env,row)).verified,true);
   assert.equal((await inspectRegistrationAudit(s.forms.db,s.env,{...row,consent_text:'changed'})).verified,false);
   s.forms.sqlite.prepare("UPDATE registration_audit_seals SET evidence_mac='wrong'").run();assert.equal((await inspectRegistrationAudit(s.forms.db,s.env,row)).verified,false);
@@ -57,7 +57,7 @@ test('registration evidence detects altered consent or event seals; existing uns
 });
 test('career confirmation and withdrawal produce sealed independent events without affecting newsletter',async()=>{
  const s=await fixture();approve();try{
-  await handleRegistration(s.request('/api/careers',{...s.data,token:'career-token'}),s.env,'careers',s.fetcher);
+  await handleRegistration(s.request('/api/careers',{...s.data,token:'career-token'}),{...s.env,CONTROLLED_TEST_MODE:'false'},'careers',s.fetcher);
   const mail=JSON.parse(s.calls.find(c=>c.url.includes('resend')).options.body),token=mail.text.match(/preferences\/#([a-f0-9]{64})/)[1];
   await withdrawCareerConsent(s.request('/api/careers/unsubscribe',{token,action:'confirm'}),s.env,new Date(),null,s.fetcher);
   await withdrawCareerConsent(s.request('/api/careers/unsubscribe',{token,action:'unsubscribe'}),{...s.env,FORMS_ENABLED:'false',CAREERS_ENABLED:'false'});
@@ -68,14 +68,14 @@ test('career confirmation and withdrawal produce sealed independent events witho
 test('Resend 429 retries are bounded, unknown responses are not resent and failed jobs retain reconciliation evidence',async()=>{
  const s=await fixture();approve();let attempts=0;const limited=async(url,options)=>url.includes('resend')?(attempts++,new Response(null,{status:429})):s.fetcher(url,options);
  try{
-  const now=new Date('2026-10-20T09:00:00Z');await handleRegistration(s.request('/api/careers',{...s.data,token:'career-token'}),s.env,'careers',limited,now);
+  const now=new Date('2026-10-20T09:00:00Z');await handleRegistration(s.request('/api/careers',{...s.data,token:'career-token'}),{...s.env,CONTROLLED_TEST_MODE:'false'},'careers',limited,now);
   for(let i=1;i<8;i++)await drainRegistrationMail(s.env,'careers',limited,new Date(now.getTime()+i*3600000));
   assert.equal(attempts,5);assert.equal(s.careers.sqlite.prepare('SELECT state FROM registration_mail').get().state,'rejected');
  }finally{s.close();}
 });
 test('owner review is read-only, defaults blocked and requires private authentication/origin before decrypting one request',async()=>{
  const s=await fixture();approve();try{
-  await handleRegistration(s.request('/api/samples',{...s.sample,token:'sample-token'}),s.env,'samples',s.fetcher);
+  await handleRegistration(s.request('/api/samples',{...s.sample,token:'sample-token'}),{...s.env,CONTROLLED_TEST_MODE:'false'},'samples',s.fetcher);
   const id=s.forms.sqlite.prepare('SELECT id FROM registrations').get().id,body={kind:'samples',action:'record',id};
   assert.equal((await controlledReview(s.request('/api/controlled/review',body),{...s.env,CONTROLLED_REVIEW_ENABLED:'false'})).status,503);
   assert.equal((await controlledReview(s.request('/api/controlled/review',body,{Authorization:'wrong'}),s.env)).status,401);
@@ -90,14 +90,14 @@ test('invalid Resend acknowledgements and corrupted pending ciphertext never pro
  const first=await fixture();approve();let sends=0;
  try{
   const invalid=async(url,options)=>url.includes('resend')?(sends++,Response.json({id:'invalid header\r\nsecret'})):first.fetcher(url,options);
-  const response=await handleRegistration(first.request('/api/careers',{...first.data,token:'career-token'}),first.env,'careers',invalid);
+  const response=await handleRegistration(first.request('/api/careers',{...first.data,token:'career-token'}),{...first.env,CONTROLLED_TEST_MODE:'false'},'careers',invalid);
   assert.equal(response.status,202);assert.equal((await response.json()).mail,'pending');assert.equal(first.careers.sqlite.prepare('SELECT state FROM registration_mail').get().state,'unknown');
   await drainRegistrationMail(first.env,'careers',invalid);assert.equal(sends,1);
  }finally{first.close();}
  const second=await fixture();approve();let calls=0;
  try{
   const limited=async(url,options)=>url.includes('resend')?(calls++,new Response(null,{status:429})):second.fetcher(url,options),now=new Date('2026-10-20T10:00:00Z');
-  await handleRegistration(second.request('/api/careers',{...second.data,token:'career-token'}),second.env,'careers',limited,now);
+  await handleRegistration(second.request('/api/careers',{...second.data,token:'career-token'}),{...second.env,CONTROLLED_TEST_MODE:'false'},'careers',limited,now);
   second.careers.sqlite.prepare("UPDATE registration_mail SET encrypted_payload='tampered'").run();
   await drainRegistrationMail(second.env,'careers',limited,new Date(now.getTime()+61000));assert.equal(calls,1);assert.equal(second.careers.sqlite.prepare('SELECT state FROM registration_mail').get().state,'unknown');
  }finally{second.close();}

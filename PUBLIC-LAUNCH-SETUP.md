@@ -1,3 +1,9 @@
+# Cierre de lanzamiento — listo en código, activación en cuenta pendiente
+
+CIM Studio comunica validación real API/DOI/segmentación, comprobación de «Unido/a el» para evidencia manual Fundadores y observación efectiva de Turnstile Managed/No pre-clearance. Ver alcance y errores no bloqueantes demostrados en LEGAL-LAUNCH-DECISIONS.md. No automatizar Fundadores ni cambiar listas automáticamente en 2027. Las reservas documentales históricas de abajo quedan superadas por la aprobación y comprobaciones comunicadas; no se afirma acceso directo a las cuentas.
+
+Production del proyecto público: indicadores de activación enumerados debajo en true solo con autorización de lanzamiento; CONTROLLED_TEST_MODE y pruebas/webhooks/CIM Production en false. MAIL_WORKER_ENABLED puede permanecer false: el acuse inmediato usa el envío existente, sin depender de activar el worker. No se han cambiado variables remotas desde Codex.
+
 # Publicación desde f7c39fb — configuración pendiente de autorización
 
 No se ha realizado ninguna operación remota. La rama privada y sus datos se conservan.
@@ -9,16 +15,9 @@ No incluye nuevas funciones, ajustes visuales o activación de bienvenidas.
   info@cimstudio.es, newsletter@cimstudio.es y pedidos@cimstudio.es. No se cambia el
   destinatario administrativo existente ni el remitente configurado en Resend.
 - Domicilio confirmado: Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears.
-- legal/content.js sigue approved:false, version vacía; la revisión completa ES/EN
-  está en PUBLIC-LEGAL-REVIEW.md. Las aprobaciones privadas no aprueban la publicación.
-- server/newsletter-release.js sigue approved:false: su contrato API y versión de
-  publicación solo se registrarán tras autorización y validación real suficiente.
-- La última prueba de clasificación se detuvo por deduplicación. No se ha probado
-  el campo tipo_suscriptor en un alta real. No se debe marcar NEWSLETTER_VERIFIED
-  para la nueva clasificación basándose solo en simulaciones o en el DOI anterior.
-- Sincronización y concesión automática de Fundadores continúan desactivadas. Antes
-  de captar con esa oferta, aprobar un procedimiento mínimo de acreditación y
-  conservación independiente de la baja comercial; no confundir solicitud con DOI.
+- legal/content.js: approved:true, version public-legal-2026-10-22-v1 por aprobación expresa del titular el 22/10/2026. Documentos y consentimientos en PUBLIC-LEGAL-REVIEW.md. No equivale a activación o despliegue.
+- server/newsletter-release.js: contrato API aprobado localmente tras la prueba real comunicada por CIM Studio el 22/10/2026 (DOI y tipo_suscriptor=profesional). HTTP 202 sigue siendo solo aceptación de solicitud. No es una activación ni una fecha acreditada de Fundadores.
+- Fundadores se gestionará manualmente: evidencia de confirmación efectiva y fecha, registro mínimo separado y descuento conservado tras la baja. Clasificación de nuevas altas desde 2027 a lista general manual. Webhook y CIM Production no son requisitos de lanzamiento.
 
 ## Cloudflare público: cim-studio-private-access-website / Production
 
@@ -125,4 +124,4 @@ registros de correo como respuesta automática a un error de formulario.
 - Verificación profesional: primero web del estudio, presencia pública o información empresarial; documentación solo cuando no baste.
 - Muestras: 12 meses desde recepción salvo relación comercial posterior u otra causa legal. Oportunidades laborales: revisión de necesidad cada 12 meses y supresión cuando no exista finalidad válida. Newsletter: consentimiento válido y evidencia mínima posterior justificada. Fundadores: acreditación mínima separada.
 - REGISTRATION_REVIEW_DAYS es una revisión técnica del registro, no un plazo de conservación ni una aprobación legal. La configuración pública deberá reflejar el procedimiento anual aprobado sin extender datos carentes de finalidad; no se ha cambiado ninguna variable.
-- Antes de captar: aprobación final de documentos y bases jurídicas pendientes, procedimiento mínimo verificable de confirmación Fundadores y conservación, comprobación real de segmentación, preparación de D1/secretos/Turnstile públicos y verificación de tecnologías efectivas. No repetir revisiones contractuales ya realizadas: comprobar su correspondencia con las cuentas usadas.
+- Antes de captar: aprobación documental ya registrada; comprobar evidencia efectiva para la gestión manual Fundadores, comprobación real de segmentación, preparación de D1/secretos/Turnstile públicos y verificación de tecnologías efectivas. No repetir revisiones contractuales ya realizadas: comprobar su correspondencia con las cuentas usadas.

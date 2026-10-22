@@ -4,7 +4,7 @@
 
 Proyecto público existente según comprobaciones expresas del titular: cim-studio-private-access-website, Production branch design/private-access-v1 y Preview branch None. Privado independiente: cim-studio-test. No crear un proyecto duplicado. Esta sesión no dispone de API/credenciales Cloudflare para verificar el estado actual de la cuenta; ninguna afirmación de comprobación remota nueva.
 
-Los cambios están exclusivamente locales en integration/three-forms-2026-10-20; no se ha promovido código a la rama pública. Las fotografías, composición y traducciones comerciales no cambian. Textos legales siguen como borradores señalizados y approved:false. Los tres botones de envío están deshabilitados hasta recibir configuración explícita habilitada del servidor; texto ES/EN de no disponibilidad sin simular éxito. APIs conservan bloqueos legales y de configuración. Abrir modal no debe cargar Turnstile con formularios deshabilitados. La compilación conserva noindex y no se declara lanzamiento/SEO completado.
+La base pública es 632350b. La incorporación de la aprobación legal es local, sin commit, push ni despliegue bajo esta intervención. Las fotografías, composición y traducciones comerciales no cambian. Documentos ES/EN y consentimientos expresamente aprobados: approved:true, versión public-legal-2026-10-22-v1. Los tres botones de envío están deshabilitados hasta recibir configuración explícita habilitada del servidor; texto ES/EN de no disponibilidad sin simular éxito. APIs conservan bloqueos legales y de configuración. Abrir modal no debe cargar Turnstile con formularios deshabilitados. La compilación conserva noindex y no se declara lanzamiento/SEO completado.
 
 ## Acciones en cuenta, sin publicar
 
@@ -54,6 +54,6 @@ No copiar Basic Auth, allowlist, claves de cifrado ni bindings de pruebas. No bo
 
 ## Comprobaciones tras un futuro deployment autorizado
 
-/api/config: enabled.subscribe/samples/careers false, siteKey null, siteLive false y legal null. Página sin Basic cuando CONTROLLED_TEST_MODE=false; /controlled/* bloqueado. ES/EN con no disponibilidad, botones de envío deshabilitados, borradores legales identificados, ningún POST proveedor/D1 por interacción con formularios. Noindex permanece hasta decisión de publicación/indexación. La aprobación legal y pruebas necesarias preceden a cualquier captación real.
+/api/config: enabled.subscribe/samples/careers false, siteKey null, siteLive false y legal con los documentos aprobados. Página sin Basic cuando CONTROLLED_TEST_MODE=false; /controlled/* bloqueado. ES/EN con no disponibilidad, botones de envío deshabilitados, borradores legales identificados, ningún POST proveedor/D1 por interacción con formularios. Noindex permanece hasta decisión de publicación/indexación. La aprobación legal y pruebas necesarias preceden a cualquier captación real.
 
 No ejecutado: commit/push, deployment, configuración remota, DNS, migración, envío o aprobación. La web pública existente no ha sido modificada.

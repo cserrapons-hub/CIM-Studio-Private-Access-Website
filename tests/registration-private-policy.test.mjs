@@ -15,9 +15,9 @@ const reviewed=kind=>({...registrationTestPolicies[kind],approved:true});
 function configure(s){Object.assign(s.env,{SAMPLES_TEST_LEGAL_APPROVED:'true',CAREERS_TEST_LEGAL_APPROVED:'true',REGISTRATIONS_TEST_ENABLED:'true',SAMPLES_VERIFIED:'false',CAREERS_VERIFIED:'false',MAIL_RECEIPTS_VERIFIED:'false'});}
 function data(s,kind,extra={}){return {...s.data,...(kind==='samples'?fictionalSample:{}),testData:true,legalVersion:registrationTestPolicies[kind].version,token:kind==='samples'?'sample-token':'career-token',...extra};}
 function submit(s,kind,body=data(s,kind),env=s.env,policy=resolveRegistrationTestPolicy(env,kind,reviewed(kind)),headers={}){return handleRegistration(s.request('/api/controlled/'+kind,body,headers),env,kind,s.fetcher,new Date('2026-10-21T09:00:00Z'),policy);}
-test('express sample and career approvals are separate, runtime-gated and cannot approve public documents',async()=>{
+test('express sample and career approvals are separate, runtime-gated and remain independent of express public approval',async()=>{
  const s=await fixture();configure(s);try{
-  assert.equal(legal.approved,false);
+  assert.equal(legal.approved,true);assert.equal(legal.approval.scope,'public-legal-documents-and-form-consents-only');
   for(const kind of ['samples','careers']){
    const p=registrationTestPolicies[kind];assert.equal(p.approved,true);assert.match(p.version,/-private-test-v1$/);
    assert.equal(resolveRegistrationTestPolicy({},kind).approved,false);
@@ -111,12 +111,12 @@ test('private challenge failures cannot create records and prior approval eviden
   assert.equal(s.careers.sqlite.prepare('SELECT consent_version FROM registrations').get().consent_version,'previous-other-scope');
  }finally{s.close();}
 });
-test('consolidated document reproduces exact approved private texts without approving public documents',async()=>{
+test('consolidated document reproduces exact approved private texts independently of express public approval',async()=>{
  const {newsletterTestPolicy}=await import('../server/newsletter-test-policy.js');
  const text=readFileSync('PRIVATE-TEST-NOTICES.md','utf8');
  for(const p of [newsletterTestPolicy,...Object.values(registrationTestPolicies)]){assert.equal(p.approved,true);assert.ok(text.includes('`'+p.version+'`'));for(const lang of ['es','en'])for(const field of ['consent','privacy'])assert.ok(text.includes(p[lang][field]));
   for(const lang of ['es','en']){assert.match(p[lang].privacy,lang==='es'?/confirmados por CIM Studio/:/confirmed by CIM Studio/);assert.match(p[lang].privacy,/Carrer Joan Sindic, 7/);assert.ok(!p[lang].privacy.includes('Juan Sindic'));assert.match(p[lang].privacy,lang==='es'?/bajo la supervisión de su responsable/:/under the supervision of its responsible representative/);}}
- assert.equal(legal.approved,false);
+ assert.equal(legal.approved,true);assert.equal(legal.approval.scope,'public-legal-documents-and-form-consents-only');
 });
 
 test('career capability page requires Basic only in controlled mode; public page has no login challenge',async()=>{

@@ -31,7 +31,7 @@ export async function handleRegistration(request,env,kind,fetcher=fetch,now=new 
  try{
   if(request.method!=='POST')return json({error:'method'},405,{Allow:'POST'});
   if(testPolicy){const blocked=await registrationTestBoundary(request,env,kind,testPolicy);if(blocked)return blocked;}
-  else if(!registrationReady(env,kind,legalReady()))return json({error:'unavailable'},503);
+  else if(env.CONTROLLED_TEST_MODE==='true'||!registrationReady(env,kind,legalReady()))return json({error:'unavailable'},503);
   const policyVersion=testPolicy?testPolicy.version:legal.version,policyConsent=testPolicy?{es:{[kind]:testPolicy.es.consent},en:{[kind]:testPolicy.en.consent}}:consent;
   sameOrigin(request,env);const raw=await readJson(request),data=kind==='samples'?validateSampleRequest(raw):validate(raw,kind);
   if(testPolicy)await validateRegistrationTestData(raw,data,env,kind);

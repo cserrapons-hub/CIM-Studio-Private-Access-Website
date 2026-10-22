@@ -1,5 +1,5 @@
 import {subscriberType} from './newsletter-segmentation.js';
-// Future public relay: defaults fail closed until real response semantics and legal/evidence review.
+// Public relay: approved contract and legal policy do not bypass runtime or security gates.
 import {json,readJson,validate,hash,Rejection} from './forms.js';
 import {legal,legalReady,consent} from './settings.js';
 import {recordNewsletterConsent,verifyConsentEvidence} from './getresponse-controlled.js';
