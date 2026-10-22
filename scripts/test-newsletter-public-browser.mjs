@@ -9,12 +9,12 @@ import {handlePublicNewsletter} from '../server/newsletter-public.js';
 import legal from '../legal/content.js';
 import {newsletterRelease} from '../server/newsletter-release.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),root=fileURLToPath(new URL('../',import.meta.url));
-const origin='https://cimstudio.es',profile={approved:true,version:'SIMULATION-ONLY',acceptedResponse:{status:302,location:'https://provider.example.test/simulated-accepted'}};
+const origin='https://cimstudio.es',profile={approved:true,version:'SIMULATION-ONLY',provider:'getresponse-api-v3',acceptedResponse:{status:202}};
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
 try{
  for(const width of [1440,390])for(const lang of ['es','en'])for(const scenario of ['accepted','rejected','unknown']){
   const s=await fixture(),context=await browser.newContext({viewport:{width,height:900},isMobile:width<500,hasTouch:width<500}),errors=[];let sends=0,posts=0;
-  Object.assign(s.env,{NEWSLETTER_ENABLED:'true',NEWSLETTER_PUBLIC_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-html',NEWSLETTER_EVIDENCE_REVIEWED:'true',NEWSLETTER_VERIFIED:'true',NEWSLETTER_ORIGIN:origin});
+  Object.assign(s.env,{GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_ENABLED:'true',NEWSLETTER_PUBLIC_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-api-v3',NEWSLETTER_EVIDENCE_REVIEWED:'true',NEWSLETTER_VERIFIED:'true',NEWSLETTER_ORIGIN:origin});
   try{
    await context.route('**/*',async route=>{
     const r=route.request(),url=new URL(r.url());
@@ -25,8 +25,8 @@ try{
      posts++;const request=new Request(r.url(),{method:'POST',headers:{...r.headers(),'CF-Connecting-IP':'192.0.2.1'},body:r.postData()});
      const response=await handlePublicNewsletter(request,s.env,{policy,profile,fetcher:async(target)=>{
       if(target.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});
-      assert.equal(target,'https://app.getresponse.com/add_subscriber.html');sends++;
-      return new Response('SIMULATED ONLY',{status:scenario==='rejected'?422:302,headers:{Location:scenario==='unknown'?'https://provider.example.test/unknown':profile.acceptedResponse.location}});
+      if(target.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(target.includes('/contacts?'))return Response.json([]);assert.equal(target,'https://api.getresponse.com/v3/contacts');sends++;
+      return new Response('SIMULATED ONLY',{status:scenario==='rejected'?422:scenario==='unknown'?302:202,headers:{Location:scenario==='unknown'?'https://provider.example.test/unknown':'https://never-follow.example.test'}});
      }});
      return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:await response.text()});
     }

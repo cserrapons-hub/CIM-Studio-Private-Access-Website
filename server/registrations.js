@@ -30,7 +30,7 @@ export async function handleRegistration(request,env,kind,fetcher=fetch,now=new 
   if(testPolicy)await validateRegistrationTestData(raw,data,env,kind);
   if(raw.legalVersion!==policyVersion)throw new Rejection('consent');
   const db=database(env,kind);await checkStore(db,kind);await rate(request,env,db,now);
-  const response=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'error',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:raw.token})});
+  const response=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:raw.token})});
   if(!response.ok)throw new Rejection('unavailable',503);const proof=await response.json();
   if(!proof.success||proof.hostname!==new URL(request.url).hostname||proof.action!==kind)throw new Rejection('challenge',403);
   const subject=await hash(env.AUDIT_HASH_SECRET,'registration-email:'+data.email),id=kind==='careers'?'careers:'+subject:'samples:'+raw.requestId;
@@ -85,7 +85,7 @@ export async function drainRegistrationMail(env,kind,fetcher=fetch,now=new Date(
   const claim=await db.prepare("UPDATE registration_mail SET state='sending',attempts=attempts+1,lease_until=?,updated_at=? WHERE id=? AND state='pending' RETURNING id").bind(seconds+30,at,row.id).first();if(!claim)continue;
   try{
    const payload=await decryptRegistration(env,kind,row.id,row.encrypted_payload);
-   const response=await fetcher('https://api.resend.com/emails',{method:'POST',redirect:'error',signal:AbortSignal.timeout(12000),headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':row.id},body:JSON.stringify(payload)});
+   const response=await fetcher('https://api.resend.com/emails',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),headers:{Authorization:'Bearer '+env.RESEND_API_KEY,'Content-Type':'application/json','Idempotency-Key':row.id},body:JSON.stringify(payload)});
    if(response.status===429){const exhausted=row.attempts+1>=5;await db.prepare('UPDATE registration_mail SET state=?,next_attempt=?,updated_at=? WHERE id=?').bind(exhausted?'rejected':'pending',seconds+Math.min(3600,60*2**row.attempts),at,row.id).run();continue;}
    if(!response.ok){await db.prepare("UPDATE registration_mail SET state=?,updated_at=? WHERE id=?").bind(response.status>=500?'unknown':'rejected',at,row.id).run();continue;}
    const body=await response.json();if(typeof body.id!=='string'||!/^[a-zA-Z0-9_.:-]{1,120}$/.test(body.id))throw Error();

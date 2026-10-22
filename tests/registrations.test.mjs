@@ -95,3 +95,12 @@ test('rate limiting and invalid/untrusted withdrawal requests cannot change a re
  assert.equal((await withdrawCareerConsent(s.preferences('a'.repeat(64)),s.env)).status,200);assert.equal(s.careers.sqlite.prepare('SELECT state FROM registrations').get().state,'pending');
  assert.equal((await withdrawCareerConsent(s.preferences('bad'),s.env)).status,400);
 });
+test('registration Turnstile and transactional mail use manual redirects and fail closed on 3xx',async()=>{
+ for(const kind of ['samples','careers'])for(const stage of ['challenge','mail']){
+ const s=setup(kind);try{let mails=0;const response=await handleRegistration(s.request(),s.env,kind,async(url,options)=>{
+ assert.equal(options.redirect,'manual');
+ if(url.includes('siteverify'))return stage==='challenge'?new Response(null,{status:302,headers:{Location:'https://never-follow.example.test'}}):Response.json({success:true,hostname:'cim.test',action:kind});
+ assert.equal(url,'https://api.resend.com/emails');mails++;return new Response(null,{status:302,headers:{Location:'https://never-follow.example.test'}});
+ });assert.equal(response.status,stage==='challenge'?503:202);if(stage==='challenge')assert.equal(mails,0);
+ }finally{s.forms.sqlite.close();s.careers.sqlite.close();}}
+});

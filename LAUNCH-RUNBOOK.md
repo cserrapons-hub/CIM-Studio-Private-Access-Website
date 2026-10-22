@@ -1,3 +1,5 @@
+> **Cierre actual de lanzamiento:** [LAUNCH-CLOSEOUT.md](LAUNCH-CLOSEOUT.md). Sustituye las instrucciones de transporte HTML y limita la próxima intervención a una ronda privada normal de los tres formularios, sin permisos históricos.
+
 # CIM Studio — one integral validation and release runbook
 
 This is the single current operational checklist. Previous task-specific notes remain as history; in case of conflict follow this file and the actual code. Work branch: integration/three-forms-2026-10-20. Current local change: record the owner’s express approval of the three private ES/EN policies only. No new commit/push/deployment, configuration change, subscription or email is authorised. Public legal approval remains false. Baseline 372193d was previously pushed and privately deployed.

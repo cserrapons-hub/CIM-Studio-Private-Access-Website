@@ -11,7 +11,7 @@ test('standalone HTML release remains blocked until the real response and consen
  assert.equal(htmlFormReady({FORMS_ENABLED:'true',NEWSLETTER_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-html'},true),false);
  assert.equal(htmlFormReady({FORMS_ENABLED:'true',NEWSLETTER_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-hosted',GETRESPONSE_HOSTED_FORM_REVIEWED:'true',GETRESPONSE_HOSTED_FORM_URL:'https://cim.getresponse.com/example'},true),false);
  const config=publicSettings({},new URL('https://cim.test'));
- assert.equal(config.newsletter.provider,'getresponse-html');assert.equal(config.enabled.subscribe,false);
+ assert.equal(config.newsletter.provider,'getresponse-api-v3');assert.equal(config.enabled.subscribe,false);
  assert.equal(Object.hasOwn(config.newsletter,'url'),false);
 });
 test('old public API signup cannot be activated accidentally; no tracking or hosted-link replacement is installed',async()=>{

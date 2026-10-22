@@ -1,3 +1,5 @@
+> Preparación vigente para terminar los tres formularios: [LAUNCH-CLOSEOUT.md](LAUNCH-CLOSEOUT.md). Newsletter por API v3; sin HTML, Web Connect ni Analytics. Las activaciones y la publicación siguen pendientes de autorización.
+
 > Procedimiento vigente: [LAUNCH-RUNBOOK.md](LAUNCH-RUNBOOK.md). Consolida los tres formularios y sustituye estados e instrucciones de fases anteriores; se conservan debajo como referencia histórica. Las aprobaciones y activaciones siguen deshabilitadas.
 
 # CIM Studio — Private Access

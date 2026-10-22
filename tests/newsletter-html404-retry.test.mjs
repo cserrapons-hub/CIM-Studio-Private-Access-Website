@@ -134,3 +134,10 @@ test('0009 then 0010 create fresh sidecar tables over existing signed HTML 404 e
  assert.equal(s.forms.sqlite.prepare('PRAGMA quick_check').get().quick_check,'ok');assert.equal(s.forms.sqlite.prepare('PRAGMA foreign_key_check').get(),undefined);
  }finally{s.close();}
 });
+test('existing runtime UUID guards reject terminal newlines without needing relaxed validation',async()=>{
+ const {retryConfigured}=await import('../server/newsletter-html404-retry.js');const s=await setup();try{
+ assert.equal(retryConfigured(s.env),true);
+ for(const suffix of ['\n','\r','\r\n',' ','\u200b'])assert.equal(retryConfigured({...s.env,NEWSLETTER_HTML404_RETRY_PARENT_ID:s.oldId+suffix}),false);
+ s.forms.sqlite.prepare('UPDATE newsletter_retry_permits SET api_request_id=?').run(s.newId+'\n');assert.notEqual((await s.run()).status,202);assert.equal(s.posts().length,0);assert.equal(s.forms.sqlite.prepare('SELECT consumed_at FROM newsletter_retry_permits').get().consumed_at,null);s.unchanged();
+ }finally{s.close();}
+});

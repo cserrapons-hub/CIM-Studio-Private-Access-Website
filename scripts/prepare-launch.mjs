@@ -1,9 +1,9 @@
 import {createHash} from 'node:crypto';
-import {htmlFormReady} from '../server/getresponse-form.js';
+import {newsletterBuildReady} from '../server/newsletter-release.js';
 import {readFile,writeFile} from 'node:fs/promises';
 import {versionStylesheet} from './version-styles.mjs';
 import {legalReady} from '../server/settings.js';
-const live=process.env.CONTROLLED_TEST_MODE!=='true'&&htmlFormReady(process.env,legalReady())&&process.env.SAMPLES_ENABLED==='true'&&process.env.CAREERS_ENABLED==='true'&&process.env.REGISTRATIONS_STORAGE_REVIEWED==='true'&&process.env.SAMPLES_VERIFIED==='true'&&process.env.CAREERS_VERIFIED==='true'&&process.env.MAIL_RECEIPTS_VERIFIED==='true'&&process.env.SITE_LIVE==='true'&&process.env.FORMS_ENABLED==='true'&&process.env.FORMS_VERIFIED==='true'&&legalReady();
+const live=process.env.CONTROLLED_TEST_MODE!=='true'&&newsletterBuildReady(process.env,legalReady())&&process.env.SAMPLES_ENABLED==='true'&&process.env.CAREERS_ENABLED==='true'&&process.env.REGISTRATIONS_STORAGE_REVIEWED==='true'&&process.env.SAMPLES_VERIFIED==='true'&&process.env.CAREERS_VERIFIED==='true'&&process.env.MAIL_RECEIPTS_VERIFIED==='true'&&process.env.SITE_LIVE==='true'&&process.env.FORMS_ENABLED==='true'&&process.env.FORMS_VERIFIED==='true'&&legalReady();
 let html=await readFile('public/index.html','utf8');
 const stylesheet=await readFile('public/styles.css');
 html=versionStylesheet(html,stylesheet);

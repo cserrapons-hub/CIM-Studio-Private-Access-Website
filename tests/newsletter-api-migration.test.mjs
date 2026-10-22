@@ -14,7 +14,7 @@ async function setup(){
  if(url.includes('/contacts?'))return Response.json(mock.contacts);
  assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.method,'POST');assert.equal(options.headers['Content-Type'],'application/json');
  assert.deepEqual(JSON.parse(options.body),{email:s.data.email,campaign:{campaignId:'PL6jh'},customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']}]});
- assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_html_deliveries').get().state,'sending');assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_api_deliveries').get().state,'sending');
+ assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_html_deliveries WHERE request_id=?').get(s.data.requestId).state,'sending');assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_api_deliveries').get().state,'sending');
  assert.ok(await verifyConsentEvidence(s.forms.sqlite.prepare('SELECT * FROM newsletter_consent_requests').get(),s.env.AUDIT_HASH_SECRET));
  if(mock.throw)throw new DOMException('PRIVATE provider timeout','TimeoutError');return new Response('PRIVATE PROVIDER BODY',{status:mock.status,headers:{Location:'https://must-not-follow.example.test'}});
  };
@@ -78,5 +78,16 @@ test('API sidecar migration is additive and repeatable without changing the HTML
  s.forms.sqlite.prepare("INSERT INTO newsletter_html_deliveries VALUES(?,?,'rejected',404,?,?,?)").run(s.data.requestId,evidence.subject_hash,'2026-10-21T09:00:00Z','2026-10-21T09:00:00Z',0);
  const before=s.forms.sqlite.prepare('SELECT * FROM newsletter_html_deliveries').get(),sql=readFileSync('migrations/0009_newsletter_api_deliveries.sql','utf8');
  s.forms.sqlite.exec(sql);s.forms.sqlite.exec(sql);assert.deepEqual(s.forms.sqlite.prepare('SELECT * FROM newsletter_html_deliveries').get(),before);assert.deepEqual(s.forms.sqlite.prepare('SELECT * FROM newsletter_consent_requests').get(),evidence);assert.equal(s.forms.sqlite.prepare('PRAGMA quick_check').get().quick_check,'ok');assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_api_deliveries').get().n,0);
+ }finally{s.close();}
+});
+
+test('normal new-owner signup ignores an invalid retry parent and expired historical permission without changing either',async()=>{
+ const s=await setup();try{
+ const oldId=crypto.randomUUID(),old={...s.data,requestId:oldId,email:'previous-owner@example.test'};
+ const {evidence}=await recordControlledConsent(s.env,old,new Date('2026-10-21T09:00:00Z'),policy);
+ s.forms.sqlite.prepare("INSERT INTO newsletter_html_deliveries VALUES(?,?,'rejected',404,?,?,0)").run(oldId,evidence.subject_hash,'2026-10-21T09:00:00Z','2026-10-21T09:00:00Z');
+ s.forms.sqlite.prepare('INSERT INTO newsletter_retry_permits VALUES(?,?,?,?,?,?,1,NULL)').run(oldId,crypto.randomUUID(),evidence.subject_hash,1,600,'CIM Studio simulation');
+ Object.assign(s.env,{NEWSLETTER_HTML404_RETRY_ENABLED:'false',NEWSLETTER_HTML404_RETRY_PARENT_ID:'invalid historical configuration'});
+ const r=await s.run();assert.equal(r.status,202);assert.equal(s.posts().length,1);assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_html_deliveries WHERE request_id=?').get(oldId).state,'rejected');assert.equal(s.forms.sqlite.prepare('SELECT consumed_at FROM newsletter_retry_permits').get().consumed_at,null);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_retry_attempts').get().n,0);
  }finally{s.close();}
 });

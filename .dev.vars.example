@@ -17,8 +17,8 @@ GR_CONSENT_TEXT_FIELD_ID=
 GR_LANGUAGE_FIELD_ID=
 RESEND_API_KEY=
 MAIL_FROM=
-# Support-confirmed HTML mapping; real acknowledgement/DOI evidence still need verification.
-NEWSLETTER_PROVIDER=getresponse-html
+# API v3 transport; real acknowledgement/DOI evidence still requires verification.
+NEWSLETTER_PROVIDER=getresponse-api-v3
 # Webhook processing remains blocked pending real contract/authentication tests.
 GETRESPONSE_WEBHOOK_ENABLED=false
 GETRESPONSE_WEBHOOK_CIDRS=
