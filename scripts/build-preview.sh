@@ -2,7 +2,7 @@
 set -eu
 # Publish only explicitly selected static files. Never copy the checkout wholesale.
 mkdir -p public
-cp index.html styles.css script.js integrations.js _headers public/
+cp index.html styles.css script.js integrations.js editorial-effects.js _headers public/
 cp assets/favicon.png assets/apple-touch-icon.png public/
 cp "LOGO PNG.png" "public/LOGO PNG.png"
 mkdir -p public/assets/fonts

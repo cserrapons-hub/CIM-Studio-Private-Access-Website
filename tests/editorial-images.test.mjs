@@ -35,12 +35,16 @@ test('editorial images ship with explicit sRGB profiles, expected dimensions and
   assert.deepEqual(readFileSync('public/assets/'+name),file);
  }
 });
-test('the same four processed sources are used at all breakpoints without a second CSS filter',()=>{
+test('the same processed sources are retained with the explicitly requested decorative hover filter',()=>{
  const html=readFileSync('public/index.html','utf8'),css=readFileSync('public/styles.css','utf8');
- const sources=[...html.matchAll(/<figure class="photograph [^>]+><img src="assets\/([^"]+)"/g)].map(m=>m[1]);
+ const sources=[...html.matchAll(/<img src="assets\/(cover-[^"]+)"/g)].map(m=>m[1]);
  assert.deepEqual(sources.toSorted(),assets.map(([name])=>name).toSorted());
  assert.ok(!/<picture|\bsrcset=/.test(html));
  const photoRule=css.match(/\.photograph img\{([^}]+)\}/)?.[1];assert.ok(photoRule);
- assert.ok(!/\bfilter\s*:/.test(photoRule));
- assert.ok(!/saturate\(|brightness\(/.test(css));
+ assert.match(photoRule,/filter:saturate\(\.85\)/);
+ assert.match(css,/filter:saturate\(1\)/);
+ assert.ok(!/brightness\(/.test(css));
+ for(const name of ['Tramuntana','Binari','Fita','Cleda'])assert.ok(html.includes('<figcaption>'+name+'</figcaption>'));
+ assert.match(html,/<div class="photograph-frame"><div class="photograph-motion"><img/);
+ assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 });
