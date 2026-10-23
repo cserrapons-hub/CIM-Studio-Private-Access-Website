@@ -1,5 +1,5 @@
 // Future public newsletter UI tested ONLY with a simulated release contract and providers.
-// Real source release/legal approvals remain false. All browser requests are intercepted.
+// All browser requests are intercepted; source approval settings must remain unchanged.
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
 import {readFileSync} from 'node:fs';
@@ -9,6 +9,7 @@ import {handlePublicNewsletter} from '../server/newsletter-public.js';
 import legal from '../legal/content.js';
 import {newsletterRelease} from '../server/newsletter-release.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'),root=fileURLToPath(new URL('../',import.meta.url));
+const sourceApprovals=[legal.approved,newsletterRelease.approved];
 const origin='https://cimstudio.es',profile={approved:true,version:'SIMULATION-ONLY',provider:'getresponse-api-v3',acceptedResponse:{status:202}};
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
 try{
@@ -47,8 +48,8 @@ try{
     await page.waitForFunction(expected=>document.querySelector('#subscribe-dialog .status').dataset.message===expected,scenario==='unknown'?'pending':'unavailable');
     assert.equal(await page.locator('#subscription-pending-dialog').evaluate(e=>e.open),false);
    }
-   assert.equal(sends,1);assert.equal(posts,1);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);assert.equal(legal.approved,false);assert.equal(newsletterRelease.approved,false);count++;
+   assert.equal(sends,1);assert.equal(posts,1);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);assert.deepEqual([legal.approved,newsletterRelease.approved],sourceApprovals);count++;
   }finally{await context.close();s.close();}
  }
- console.log('PASS '+count+' future-public UI cases: ES/EN desktop/mobile, mandatory unchecked consent, simulated accepted/rejected/unknown responses and conditional DOI modal. All providers intercepted; actual release/legal gates remain false.');
+ console.log('PASS '+count+' future-public UI cases: ES/EN desktop/mobile, mandatory unchecked consent, simulated accepted/rejected/unknown responses and conditional DOI modal. All providers intercepted; actual release/legal settings unchanged.');
 }finally{await browser.close();}
