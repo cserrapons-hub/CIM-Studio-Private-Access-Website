@@ -52,3 +52,11 @@ Se añade una flecha absoluta bajo el logotipo, con el mismo SVG que la flecha i
 Etiquetas ES/EN con categoría Montserrat Light 9 px y nombre Montserrat Medium 13–14 px, separados 5 px. Medium se aloja localmente bajo la misma licencia OFL. En móvil el texto de Fita queda sobre su línea y el de Cleda bajo ella para evitar invadir las fotos, conservando los extremos y posiciones de las líneas.
 
 Validación: geometría de referencia inalterada, flecha visible al abrir, navegación, traducciones, tipografía, ausencia de solapamientos y desbordamientos; saturación y zoom conservados. No se modifican formularios, integraciones, fotografías ni configuración de Cloudflare.
+
+## Ajuste de escala y movimiento — 23/10/2026
+
+Tramuntana y Binari se reducen al 92 % de su ancho y alto anteriores, conservando la unión central y sus posiciones verticales. Fita, Cleda, logotipo, bloque de texto y encuadres permanecen intactos. Las etiquetas y sus líneas siguen ancladas a cada fotografía.
+
+La flecha superior baja 40 px en escritorio y 35 px en móvil. En móvil su altura se reduce de 48 a 28 px para conservar el espacio disponible antes de las fotografías incluso durante su oscilación, sin desplazarlas. Ambas flechas comparten la animación de 8 px, 3,6 s y ritmo ease-in-out; ambas quedan inmóviles con movimiento reducido.
+
+Pruebas: compilación estática, 217 pruebas automatizadas y recorridos ES/EN de navegador en 2480, 1920, 1440, 1024, 768, 390 y 320 px, incluyendo geometría, ausencia de solapamientos, navegación, zoom y saturación, animación compartida y movimiento reducido.
