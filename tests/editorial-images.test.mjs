@@ -5,8 +5,8 @@ import {readFileSync} from 'node:fs';
 const assets=[
  ['editorial-fita-srgb.webp',614,620],
  ['editorial-tramuntana-srgb.webp',976,1067],
- ['editorial-cleda-srgb.webp',737,620],
- ['editorial-binari-srgb.webp',985,1476]
+ ['editorial-cleda-nueva-srgb.webp',1367,1150],
+ ['editorial-binari-nueva-srgb.webp',1024,1536]
 ];
 function chunks(bytes){
  assert.equal(bytes.toString('ascii',0,4),'RIFF');

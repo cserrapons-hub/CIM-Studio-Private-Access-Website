@@ -76,3 +76,11 @@ Ambas flechas pasan de 1,2 a 0,72 px (−40 % adicional), conservando SVG, tama�
 Solo en móvil (hasta 600 px), las imágenes comienzan al 35 % de saturación. Tocar una imagen alterna su color original al 100 % y desactiva las demás, con la transición existente de 700 ms; movimiento reducido elimina la transición. No se añade zoom móvil ni indicadores visibles. Los marcos adquieren semántica de botón, estado `aria-pressed`, nombre accesible ES/EN y navegación por teclado con Enter/Espacio; al volver a escritorio se retiran estos atributos.
 
 Los movimientos táctiles superiores a 8 px, cancelaciones y desplazamientos descartan la activación. No se previene ningún gesto nativo de scroll. Pruebas de navegador con eventos táctiles de Chromium comprueban desplazamiento efectivo sin activación, toques consecutivos, desactivación, teclado, traducciones, movimiento reducido y regreso a escritorio. Fotografías, formularios, integraciones y configuración permanecen intactos.
+
+## Sustitución de Binari/Cleda y color móvil permanente — 23/10/2026
+
+Nuevas fuentes: `binari-nueva.jpg` (1024×1536, RGB sin ICC, interpretado como sRGB) y `cleda-nueva.png` (1367×1150, perfil Adobe RGB convertido a sRGB). Se generan nuevas WebP de calidad 92, sin realce ni cambios en los originales; las fotografías anteriores también permanecen conservadas. Las nuevas rutas evitan reutilizar las imágenes antiguas por caché. El script admite `--only` para regenerar exclusivamente estas fuentes.
+
+Se conservan los marcos y posiciones de escritorio. La diferencia mínima de proporciones entre las fuentes nuevas y los marcos existentes se resuelve mediante el object-fit:cover previo, sin deformación (Binari: ajuste inferior al 0,11 %). En móvil se usan las proporciones exactas nuevas dentro de la galería vertical al 92 %. Tramuntana y Fita no cambian.
+
+Se elimina íntegramente la interacción táctil de saturación, incluidos eventos, estados ARIA y atributos de control. En móvil las cuatro fotos permanecen al 100 % de saturación y sin zoom, incluso al tocarlas. Se mantienen las alternativas textuales de las imágenes. El hover de escritorio sigue al 20 % → 100 %, con zoom 1,05 y transición de 700 ms. Flechas, logotipo, etiquetas, textos y formularios permanecen intactos.

@@ -155,10 +155,9 @@ footer{margin-top:auto}
  .photograph-soporte{order:4}
  .photograph figcaption{position:static;width:100%;border:0;padding:0;margin-top:14px;text-align:left;white-space:normal}
  .photograph .product-label{position:static;width:auto;max-width:none;padding:0;text-align:left;gap:5px}
- .photograph img{filter:saturate(.35)}
- .photograph-frame[aria-pressed="true"] img{filter:saturate(1)}
- .photograph-frame[role="button"]{cursor:pointer}
- .photograph-frame[role="button"]:focus-visible{outline:1px solid var(--ink);outline-offset:4px}
+ .photograph .photograph-frame img{filter:saturate(1);transform:none}
+ .photograph-tramuntana .photograph-frame{aspect-ratio:1024/1536}
+ .photograph-soporte .photograph-frame{aspect-ratio:1367/1150}
  .intro{font-size:12.35px;line-height:1.75}
  .dialog-intro{font-size:11.4px}
 }
