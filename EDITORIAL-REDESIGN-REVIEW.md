@@ -68,3 +68,11 @@ Solo hasta 600 px, las fotografías se muestran en columna al 92 % del ancho: Tr
 Los párrafos introductorios móviles pasan de 13 a 12,35 px (−5 %); los de ventanas de 12 a 11,4 px. Los controles, el logotipo y los títulos conservan sus tamaños. Escritorio conserva su geometría y tipografía. Solo el trazo de ambas flechas cambia en todos los tamaños, de 1,5 a 1,2 px (−20 %); tamaños, navegación y animación permanecen intactos.
 
 Validación de navegador ES/EN, incluyendo 320, 375, 390 y 430 px: orden vertical, anchos y proporciones, etiquetas alineadas, ausencia de desbordamientos, navegación de ambas flechas, colores, movimiento reducido y composición de escritorio. Sin solicitudes reales ni cambios en formularios, integraciones o configuración.
+
+## Saturación táctil y trazos — 23/10/2026
+
+Ambas flechas pasan de 1,2 a 0,72 px (−40 % adicional), conservando SVG, tamaños, posiciones, animación y navegación.
+
+Solo en móvil (hasta 600 px), las imágenes comienzan al 35 % de saturación. Tocar una imagen alterna su color original al 100 % y desactiva las demás, con la transición existente de 700 ms; movimiento reducido elimina la transición. No se añade zoom móvil ni indicadores visibles. Los marcos adquieren semántica de botón, estado `aria-pressed`, nombre accesible ES/EN y navegación por teclado con Enter/Espacio; al volver a escritorio se retiran estos atributos.
+
+Los movimientos táctiles superiores a 8 px, cancelaciones y desplazamientos descartan la activación. No se previene ningún gesto nativo de scroll. Pruebas de navegador con eventos táctiles de Chromium comprueban desplazamiento efectivo sin activación, toques consecutivos, desactivación, teclado, traducciones, movimiento reducido y regreso a escritorio. Fotografías, formularios, integraciones y configuración permanecen intactos.

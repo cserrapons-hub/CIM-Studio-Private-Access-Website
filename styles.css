@@ -35,7 +35,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .photograph-pool figcaption{left:100%;top:0;width:15cqw;border-top:1px solid #77766f;text-align:right;padding:.88709677cqw 2.01612903cqw 0 0}
 .photograph-soporte figcaption{right:100%;bottom:0;width:9.43548387cqw;border-bottom:1px solid #77766f;padding:0 0 .88709677cqw 1.29032258cqw}
 .editorial-scroll{display:block;width:1.77419355cqw;height:6.73387097cqw;margin:14.07258065cqw auto 0;color:var(--ink);scroll-margin:0;position:relative}
-.editorial-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.editorial-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:.72;vector-effect:non-scaling-stroke}
 .invitation{position:relative;z-index:1;width:40.32258065%;max-width:1000px;margin:15.28225806cqw 0 0 30.24193548%;scroll-margin-top:36px}
 h1{font:normal clamp(43px,5.08064516cqw,126px)/1.05 var(--serif);letter-spacing:-1.8px;margin:0 0 2.90322581cqw}
 .intro{font-size:clamp(13px,.96774194cqw,24px);font-weight:300;line-height:1.9;letter-spacing:.01em;color:#555550;max-width:none;margin:0 0 3.06451613cqw}.intro:has(+ .intro){margin-bottom:1.4516129cqw}
@@ -126,7 +126,7 @@ footer{margin-top:auto}
 
 /* Decorative refinements: absolute header cue and labels leave image geometry intact. */
 .header-scroll{position:absolute;left:50%;top:var(--header-scroll-top,50%);width:20px;height:76px;margin-left:-10px;color:var(--ink)}
-.header-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:1.2}
+.header-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:.72}
 .header-scroll path{vector-effect:non-scaling-stroke}
 .header-scroll::before{content:"";position:absolute;inset:-12px}
 .header-scroll,.editorial-scroll{animation:editorial-cue 3.6s ease-in-out infinite}
@@ -155,7 +155,10 @@ footer{margin-top:auto}
  .photograph-soporte{order:4}
  .photograph figcaption{position:static;width:100%;border:0;padding:0;margin-top:14px;text-align:left;white-space:normal}
  .photograph .product-label{position:static;width:auto;max-width:none;padding:0;text-align:left;gap:5px}
- .photograph img{filter:saturate(1)}
+ .photograph img{filter:saturate(.35)}
+ .photograph-frame[aria-pressed="true"] img{filter:saturate(1)}
+ .photograph-frame[role="button"]{cursor:pointer}
+ .photograph-frame[role="button"]:focus-visible{outline:1px solid var(--ink);outline-offset:4px}
  .intro{font-size:12.35px;line-height:1.75}
  .dialog-intro{font-size:11.4px}
 }
