@@ -60,3 +60,11 @@ Tramuntana y Binari se reducen al 92 % de su ancho y alto anteriores, conservand
 La flecha superior baja 40 px en escritorio y 35 px en móvil. En móvil su altura se reduce de 48 a 28 px para conservar el espacio disponible antes de las fotografías incluso durante su oscilación, sin desplazarlas. Ambas flechas comparten la animación de 8 px, 3,6 s y ritmo ease-in-out; ambas quedan inmóviles con movimiento reducido.
 
 Pruebas: compilación estática, 217 pruebas automatizadas y recorridos ES/EN de navegador en 2480, 1920, 1440, 1024, 768, 390 y 320 px, incluyendo geometría, ausencia de solapamientos, navegación, zoom y saturación, animación compartida y movimiento reducido.
+
+## Galería móvil — 23/10/2026
+
+Solo hasta 600 px, las fotografías se muestran en columna al 92 % del ancho: Tramuntana, Binari, Fita y Cleda. Se conservan los archivos y proporciones originales; el color es natural, sin desaturación móvil. Separación entre piezas de 56 px; categorías y nombres debajo a 14 px de la imagen, alineados a su borde izquierdo, sin líneas decorativas.
+
+Los párrafos introductorios móviles pasan de 13 a 12,35 px (−5 %); los de ventanas de 12 a 11,4 px. Los controles, el logotipo y los títulos conservan sus tamaños. Escritorio conserva su geometría y tipografía. Solo el trazo de ambas flechas cambia en todos los tamaños, de 1,5 a 1,2 px (−20 %); tamaños, navegación y animación permanecen intactos.
+
+Validación de navegador ES/EN, incluyendo 320, 375, 390 y 430 px: orden vertical, anchos y proporciones, etiquetas alineadas, ausencia de desbordamientos, navegación de ambas flechas, colores, movimiento reducido y composición de escritorio. Sin solicitudes reales ni cambios en formularios, integraciones o configuración.
