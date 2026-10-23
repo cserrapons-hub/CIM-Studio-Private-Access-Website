@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
 const assets=[
- ['cover-pool-s135-b120-srgb.webp',700,706],
- ['cover-volcan-s135-b120-srgb.webp',1000,1093],
- ['cover-jaboneras-s135-b120-srgb.webp',1004,844],
- ['cover-tramuntana-s135-b120-srgb.webp',694,1536]
+ ['editorial-fita-srgb.webp',614,620],
+ ['editorial-tramuntana-srgb.webp',976,1067],
+ ['editorial-cleda-srgb.webp',737,620],
+ ['editorial-binari-srgb.webp',985,1476]
 ];
 function chunks(bytes){
  assert.equal(bytes.toString('ascii',0,4),'RIFF');
@@ -27,7 +27,7 @@ test('editorial images ship with explicit sRGB profiles, expected dimensions and
   const profile=data.get('ICCP');assert.ok(profile,'missing ICC profile: '+name);
   assert.equal(profile.toString('ascii',16,20),'RGB ');
   assert.equal(profile.toString('ascii',36,40),'acsp');
-  assert.ok(profile.includes(Buffer.from('sRGB')),'profile must identify sRGB');
+  assert.ok(profile.includes(Buffer.from('sRGB'))||profile.includes(Buffer.from('0073005200470042','hex')),'ICC description must identify sRGB (ASCII or UTF-16BE)');
   const extended=data.get('VP8X');assert.ok(extended);
   assert.equal(extended.readUIntLE(4,3)+1,width);
   assert.equal(extended.readUIntLE(7,3)+1,height);
@@ -37,14 +37,19 @@ test('editorial images ship with explicit sRGB profiles, expected dimensions and
 });
 test('the same processed sources are retained with the explicitly requested decorative hover filter',()=>{
  const html=readFileSync('public/index.html','utf8'),css=readFileSync('public/styles.css','utf8');
- const sources=[...html.matchAll(/<img src="assets\/(cover-[^"]+)"/g)].map(m=>m[1]);
+ const sources=[...html.matchAll(/<img src="assets\/(editorial-[^"]+)"/g)].map(m=>m[1]);
  assert.deepEqual(sources.toSorted(),assets.map(([name])=>name).toSorted());
  assert.ok(!/<picture|\bsrcset=/.test(html));
  const photoRule=css.match(/\.photograph img\{([^}]+)\}/)?.[1];assert.ok(photoRule);
- assert.match(photoRule,/filter:saturate\(\.85\)/);
+ assert.match(photoRule,/filter:saturate\(0\.2\)/);
  assert.match(css,/filter:saturate\(1\)/);
  assert.ok(!/brightness\(/.test(css));
  for(const name of ['Tramuntana','Binari','Fita','Cleda'])assert.ok(html.includes('<figcaption>'+name+'</figcaption>'));
  assert.match(html,/<div class="photograph-frame"><div class="photograph-motion"><img/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(css,/@media\(hover:none\),\(pointer:coarse\)/);
+ assert.match(photoRule,/700ms/);
+ assert.equal((html.match(/class="editorial-scroll"/g)||[]).length,1);
+ assert.ok(html.indexOf('class="editorial-scroll"')>html.indexOf('<figcaption>Cleda</figcaption>'));
+ assert.match(html,/id="invitation"/);
 });

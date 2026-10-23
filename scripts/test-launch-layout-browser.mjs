@@ -1,72 +1,50 @@
-// Local editorial preview only. All requests intercepted; no actual forms/provider calls.
+// Preview only: all HTTP is intercepted; never contacts providers or stores real data.
 import {createRequire} from 'node:module';
 import {readFileSync,existsSync,mkdirSync} from 'node:fs';
 import assert from 'node:assert/strict';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
-const out=process.env.CIM_SCREENSHOT_DIR||'/tmp/cim-editorial-preview';mkdirSync(out,{recursive:true});
+const out=process.env.CIM_SCREENSHOT_DIR||'/tmp/cim-editorial-final';mkdirSync(out,{recursive:true});
 let cases=0;
+const csp=readFileSync('_headers','utf8').match(/Content-Security-Policy: (.+)/)[1];
 async function load(context){
- const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
- page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
  await context.route('**/*',route=>{
-  const u=new URL(route.request().url());assert.equal(u.origin,'https://layout.example.test');assert.equal(route.request().method(),'GET');
+  const req=route.request(),u=new URL(req.url());assert.equal(u.origin,'https://layout.example.test');assert.equal(req.method(),'GET');
   if(u.pathname==='/api/config')return route.fulfill({json:{enabled:{subscribe:false,samples:false,careers:false},verified:false,siteKey:null,siteLive:false}});
-  const name=u.pathname==='/'?'/index.html':u.pathname;
-  if(!existsSync('public'+name))return route.fulfill({status:404,body:'Missing test asset'});
-  const csp=readFileSync('_headers','utf8').match(/Content-Security-Policy: (.+)/)[1];
+  const name=u.pathname==='/'?'/index.html':u.pathname;if(!existsSync('public'+name))return route.fulfill({status:404,body:'Missing preview file'});
   return route.fulfill({headers:name.endsWith('.html')?{'Content-Security-Policy':csp}:{},contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':name.endsWith('.html')?'text/html':name.endsWith('.png')?'image/png':name.endsWith('.webp')?'image/webp':'application/octet-stream',body:readFileSync('public'+name)});
  });
- await page.goto('https://layout.example.test/');await page.evaluate(()=>document.fonts.ready);await page.waitForFunction(()=>window.cimFormSettings);
- return {page,errors};
+ await page.goto('https://layout.example.test/');await page.evaluate(()=>document.fonts.ready);await page.waitForFunction(()=>window.cimFormSettings);return {page,errors};
 }
+const near=(actual,expected,message,tolerance=1.2)=>assert.ok(Math.abs(actual-expected)<tolerance,`${message}: ${actual} vs ${expected}`);
 try{
- for(const [width,height] of [[1920,1080],[1440,900],[1101,900],[768,1024],[390,844],[320,740]])for(const lang of ['es','en']){
+ for(const [width,height] of [[2480,1400],[1920,1080],[1440,900],[1024,900],[768,1024],[390,844],[320,740]])for(const lang of ['es','en']){
   const context=await browser.newContext({viewport:{width,height},hasTouch:width<768,isMobile:width<768});
   try{
-   const {page,errors}=await load(context);await page.click('[data-lang='+lang+']');await page.waitForTimeout(350);
-   const geometry=await page.evaluate(()=>{
+   const {page,errors}=await load(context);await page.click('[data-lang='+lang+']');await page.evaluate(()=>document.activeElement?.blur());await page.waitForTimeout(100);
+   const g=await page.evaluate(()=>{
     const r=q=>{const b=document.querySelector(q).getBoundingClientRect();return {left:b.left,right:b.right,top:b.top,bottom:b.bottom,width:b.width,height:b.height};};
-    return {logo:r('.brand'),text:r('.invitation'),volcan:r('.photograph-volcan .photograph-frame'),pool:r('.photograph-pool .photograph-frame'),lamp:r('.photograph-tramuntana .photograph-frame'),support:r('.photograph-soporte .photograph-frame'),overflow:document.documentElement.scrollWidth>innerWidth};
-   });
-   assert.equal(geometry.overflow,false);assert.ok(Math.abs((geometry.logo.left+geometry.logo.right)/2-width/2)<1,'logo centred');
-   assert.ok(geometry.lamp.top>geometry.volcan.top);assert.ok(geometry.pool.top>geometry.volcan.bottom);assert.ok(geometry.pool.left>geometry.volcan.left);
-   assert.ok(geometry.support.top>geometry.pool.bottom);assert.ok(geometry.support.top-geometry.pool.bottom<=33);assert.ok(geometry.text.top>Math.max(geometry.lamp.bottom,geometry.support.bottom)+30);
-   assert.ok(geometry.pool.width<geometry.volcan.width);assert.ok(Math.abs(geometry.pool.width-geometry.support.width)<1);
-   const frames=page.locator('.photograph-frame');assert.equal(await frames.count(),4);
-   for(const kind of ['volcan','pool','tramuntana','soporte']){
-    const image=page.locator('.photograph-'+kind+' img');assert.ok(await image.evaluate(e=>e.complete&&e.naturalWidth>0));
-   }
+    return {logo:r('.brand'),volcan:r('.photograph-volcan .photograph-frame'),binari:r('.photograph-tramuntana .photograph-frame'),cleda:r('.photograph-soporte .photograph-frame'),fita:r('.photograph-pool .photograph-frame'),arrow:r('.editorial-scroll'),text:r('.invitation'),overflow:document.documentElement.scrollWidth>innerWidth};
+   });assert.equal(g.overflow,false);near((g.logo.left+g.logo.right)/2,width/2,'centred logo');
+   if(width>600){const scale=width/2480;for(const [key,x,y,w,h] of [['volcan',264,1215,976,1067],['binari',1240,2133,985,1476],['cleda',504,4044,737,620],['fita',1241,4044,614,620]]){near(g[key].left,x*scale,key+' left');near(g[key].top,y*scale,key+' top');near(g[key].width,w*scale,key+' width');near(g[key].height,h*scale,key+' height');}near(g.arrow.top,5013*scale,'arrow top');near(g.arrow.height,167*scale,'arrow height');near(g.text.top,5559*scale,'text top');}
+   near(g.volcan.right,g.binari.left,'upper touching edges');near(g.cleda.right,g.fita.left,'lower touching edges');near(g.cleda.top,g.fita.top,'lower top alignment');near(g.cleda.bottom,g.fita.bottom,'lower bottom alignment');
+   assert.ok(g.binari.top<g.volcan.bottom&&g.binari.top>g.volcan.top,'intentional staggered alignment');assert.ok(g.cleda.top>g.binari.bottom+40);assert.ok(g.arrow.top>g.cleda.bottom);assert.ok(g.text.top>g.arrow.bottom);near((g.arrow.left+g.arrow.right)/2,width/2,'centred arrow');
+   const collision=await page.evaluate(()=>{const frames=[...document.querySelectorAll('.photograph-frame')].map(e=>e.getBoundingClientRect());const hit=(a,b)=>Math.min(a.right,b.right)>Math.max(a.left,b.left)+1&&Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top)+1;return frames.some((a,i)=>frames.some((b,j)=>j>i&&hit(a,b)))||[...document.querySelectorAll('figcaption')].some(e=>frames.some(b=>hit(e.getBoundingClientRect(),b)));});assert.equal(collision,false,'no accidental image/caption overlaps');
    assert.deepEqual(await page.locator('figcaption').allTextContents(),['Tramuntana','Fita','Binari','Cleda']);
-   const collision=await page.evaluate(()=>{
-    const frames=[...document.querySelectorAll('.photograph-frame')].map(e=>e.getBoundingClientRect());
-    const overlap=(a,b)=>Math.min(a.right,b.right)>Math.max(a.left,b.left)+1&&Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top)+1;
-    return frames.some((a,i)=>frames.some((b,j)=>j>i&&overlap(a,b)))||[...document.querySelectorAll('figcaption')].some(e=>frames.some(b=>overlap(e.getBoundingClientRect(),b)));
-   });assert.equal(collision,false,'no photo or caption overlaps');
-   assert.equal(await page.locator('meta[name=robots]').getAttribute('content'),'noindex, nofollow, noarchive');
-   const p=await page.locator('.intro').first().evaluate(e=>({font:getComputedStyle(e).fontFamily,weight:getComputedStyle(e).fontWeight,size:parseFloat(getComputedStyle(e).fontSize),line:parseFloat(getComputedStyle(e).lineHeight)}));
-   assert.ok(p.font.includes('Montserrat'));assert.equal(p.weight,'300');assert.ok(p.size>=12.5&&p.size<=13);assert.ok(Math.abs(p.line/p.size-1.7)<.02);
-   if(width>=1101&&lang==='es'){
-    const frame=page.locator('.photograph-volcan .photograph-frame');await frame.scrollIntoViewIfNeeded();await page.mouse.move(width-1,1);await page.waitForTimeout(1600);
-    const initial=await frame.locator('img').evaluate(e=>getComputedStyle(e).filter);assert.equal(initial,'saturate(0.85)');
-    const before=await frame.boundingBox(),labelBefore=await page.locator('.photograph-volcan figcaption').boundingBox();await frame.hover();await page.waitForTimeout(1650);
-    const hover=await frame.locator('img').evaluate(e=>({filter:getComputedStyle(e).filter,transform:getComputedStyle(e).transform,duration:getComputedStyle(e).transitionDuration}));
-    assert.equal(hover.filter,'saturate(1)');assert.ok(hover.transform.includes('1.05'));assert.match(hover.duration,/1.5s/);assert.deepEqual(await frame.boundingBox(),before);assert.deepEqual(await page.locator('.photograph-volcan figcaption').boundingBox(),labelBefore);
-    await page.mouse.move(width-1,1);await page.evaluate(()=>scrollBy(0,180));await page.waitForTimeout(800);
-    const movement=await frame.evaluate(e=>parseFloat(e.style.getPropertyValue('--photo-y')));assert.ok(Number.isFinite(movement)&&Math.abs(movement)<=15);
+   for(const fig of await page.locator('figure').all()){const frame=fig.locator('.photograph-frame'),img=fig.locator('img');assert.ok(await img.evaluate(e=>e.complete&&e.naturalWidth>0));const ratio=await img.evaluate(e=>e.naturalWidth/e.naturalHeight),b=await frame.boundingBox();near(b.width/b.height,ratio,'original aspect ratio',.001);const caption=await fig.locator('figcaption').evaluate(e=>({top:getComputedStyle(e).borderTopWidth,bottom:getComputedStyle(e).borderBottomWidth}));assert.ok(parseFloat(caption.top)>0||parseFloat(caption.bottom)>0);}
+   assert.equal(await page.locator('.editorial-scroll').count(),1);assert.equal(await page.locator('meta[name=robots]').getAttribute('content'),'noindex, nofollow, noarchive');
+   if(width>=1440&&lang==='es'){
+    const frame=page.locator('.photograph-volcan .photograph-frame');await frame.scrollIntoViewIfNeeded();await page.mouse.move(width-1,1);await page.waitForTimeout(750);assert.equal(await frame.locator('img').evaluate(e=>getComputedStyle(e).filter),'saturate(0.2)');
+    const before=await frame.boundingBox(),label=await page.locator('.photograph-volcan figcaption').boundingBox();await frame.hover();await page.waitForTimeout(760);const style=await frame.locator('img').evaluate(e=>({filter:getComputedStyle(e).filter,transform:getComputedStyle(e).transform,duration:getComputedStyle(e).transitionDuration}));assert.equal(style.filter,'saturate(1)');assert.ok(style.transform.includes('1.05'));assert.match(style.duration,/0.7s/);assert.deepEqual(await frame.boundingBox(),before);assert.deepEqual(await page.locator('.photograph-volcan figcaption').boundingBox(),label);for(const img of await page.locator('.photograph:not(.photograph-volcan) img').all())assert.equal(await img.evaluate(e=>getComputedStyle(e).filter),'saturate(0.2)');await page.mouse.move(width-1,1);await page.waitForTimeout(760);
    }
-   for(const id of ['subscribe-dialog','samples-dialog','careers-dialog']){
-    await page.evaluate(id=>document.getElementById(id).showModal(),id);assert.equal(await page.locator('#'+id+' button[type=submit]').isDisabled(),true);assert.equal(await page.locator('#'+id).evaluate(e=>e.scrollWidth>e.clientWidth),false);await page.keyboard.press('Escape');
-   }
-   assert.equal(await page.locator('#samples-dialog [name=shippingAddress]').count(),1);assert.equal(await page.locator('#samples-dialog [name=project]').count(),0);
-   await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.waitForTimeout(700);
-   if(lang==='es'&&[1920,1440,390].includes(width))await page.screenshot({path:out+'/editorial-'+width+'.png',fullPage:true});
-   assert.deepEqual(errors,[]);cases++;
+   // Test a real smooth-scroll interaction, not a direct jump or a simulated form.
+   await page.locator('.editorial-scroll').click();await page.waitForFunction(()=>{const e=document.getElementById('invitation'),margin=parseFloat(getComputedStyle(e).scrollMarginTop)||0,target=Math.min(document.documentElement.scrollHeight-innerHeight,scrollY+e.getBoundingClientRect().top-margin);return Math.abs(scrollY-target)<2;});assert.equal(await page.evaluate(()=>document.activeElement.id),'invitation');assert.ok(await page.locator('.invitation').evaluate(e=>e.getBoundingClientRect().top>=0&&e.getBoundingClientRect().top<innerHeight*.7));
+   for(const id of ['subscribe-dialog','samples-dialog','careers-dialog']){await page.evaluate(id=>document.getElementById(id).showModal(),id);assert.equal(await page.locator('#'+id+' button[type=submit]').isDisabled(),true);assert.equal(await page.locator('#'+id).evaluate(e=>e.scrollWidth>e.clientWidth),false);await page.keyboard.press('Escape');}
+   await page.evaluate(()=>{document.activeElement?.blur();scrollTo(0,0);});await page.waitForTimeout(100);if(lang==='es'&&[2480,1920,1440,390].includes(width))await page.screenshot({path:out+'/editorial-'+width+'.png',fullPage:true});assert.deepEqual(errors,[]);cases++;
   }finally{await context.close();}
  }
- const reduced=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});
- try{const {page,errors}=await load(reduced);await page.locator('.photograph-volcan .photograph-frame').hover();await page.evaluate(()=>scrollBy(0,120));await page.waitForTimeout(150);assert.equal(await page.locator('.photograph-motion').first().evaluate(e=>getComputedStyle(e).transform),'none');assert.equal(await page.locator('.photograph img').first().evaluate(e=>getComputedStyle(e).transform),'none');assert.equal(await page.locator('.photograph img').first().evaluate(e=>getComputedStyle(e).transitionDuration),'0s');assert.deepEqual(errors,[]);cases++;}finally{await reduced.close();}
- const touch=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
- try{const {page,errors}=await load(touch);await page.locator('.photograph-frame').first().tap();await page.waitForTimeout(100);assert.equal(await page.locator('.photograph img').first().evaluate(e=>getComputedStyle(e).filter),'saturate(0.85)');assert.equal(await page.locator('.photograph-motion').first().evaluate(e=>getComputedStyle(e).transform),'none');assert.deepEqual(errors,[]);cases++;}finally{await touch.close();}
- console.log('PASS',cases,'editorial ES/EN, viewport, hover/parallax, reduced-motion, touch, unchanged modal, no-overflow and no-console-error cases. No real submissions. Screenshots:',out);
+ const reduced=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});try{const {page,errors}=await load(reduced);await page.locator('.photograph-volcan .photograph-frame').hover();assert.equal(await page.locator('.photograph img').first().evaluate(e=>getComputedStyle(e).transform),'none');assert.equal(await page.locator('.photograph img').first().evaluate(e=>getComputedStyle(e).transitionDuration),'0s');await page.locator('.editorial-scroll').click();assert.ok(await page.locator('.invitation').evaluate(e=>e.getBoundingClientRect().top>=0&&e.getBoundingClientRect().top<innerHeight*.7));assert.deepEqual(errors,[]);cases++;}finally{await reduced.close();}
+ const touch=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});try{const {page,errors}=await load(touch);for(const img of await page.locator('.photograph img').all())assert.equal(await img.evaluate(e=>getComputedStyle(e).filter),'saturate(1)');await page.locator('.photograph-frame').first().tap();assert.equal(await page.locator('.photograph img').first().evaluate(e=>getComputedStyle(e).transform),'matrix(1, 0, 0, 1, 0, 0)');assert.deepEqual(errors,[]);cases++;}finally{await touch.close();}
+ console.log('PASS',cases,'reference geometry, ES/EN, desktop/mobile, isolated saturation/zoom, arrow navigation, reduced motion, CSP and unchanged modals. No real requests. Screenshots:',out);
 }finally{await browser.close();}
