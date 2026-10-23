@@ -44,3 +44,11 @@ La rama está destinada al proyecto independiente cim-studio-editorial-preview. 
 Con despliegue automático habilitado para esta rama, el push puede actualizar la vista previa. Si no se actualiza, Cloudflare → cim-studio-editorial-preview → Deployments → desplegar/reintentar el último commit de esta rama. Nunca hacerlo en cim-studio-private-access-website ni cambiar la rama pública.
 
 Vista local: sh scripts/build-preview.sh y python3 -m http.server 4173 --directory public. Las capturas no equivalen a verificar el estado remoto del deployment.
+
+## Refinamiento de flecha y etiquetas — 23/10/2026
+
+Se añade una flecha absoluta bajo el logotipo, con el mismo SVG que la flecha inferior, oscilación de 8 px y navegación al conjunto fotográfico. No ocupa espacio en el flujo. Movimiento desactivado con `prefers-reduced-motion`. La flecha inferior se conserva.
+
+Etiquetas ES/EN con categoría Montserrat Light 9 px y nombre Montserrat Medium 13–14 px, separados 5 px. Medium se aloja localmente bajo la misma licencia OFL. En móvil el texto de Fita queda sobre su línea y el de Cleda bajo ella para evitar invadir las fotos, conservando los extremos y posiciones de las líneas.
+
+Validación: geometría de referencia inalterada, flecha visible al abrir, navegación, traducciones, tipografía, ausencia de solapamientos y desbordamientos; saturación y zoom conservados. No se modifican formularios, integraciones, fotografías ni configuración de Cloudflare.

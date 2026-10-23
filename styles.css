@@ -1,3 +1,4 @@
+@font-face{font-family:Montserrat;font-style:normal;font-weight:500;font-display:swap;src:url("assets/fonts/montserrat-latin-500.986ead3c175a.woff2") format("woff2")}
 @font-face{font-family:Montserrat;font-style:normal;font-weight:300;font-display:swap;src:url("assets/fonts/montserrat-latin-300.8df42ef175d6.woff2") format("woff2")}
 @font-face{font-family:Montserrat;font-style:normal;font-weight:400;font-display:swap;src:url("assets/fonts/montserrat-latin-400.021091be0b08.woff2") format("woff2")}
 :root{--paper:#f8f7f3;--page-background:#f7f6f4;--ink:#292a26;--muted:#77766f;--line:#d7d5ce;--serif:Georgia,'Times New Roman',serif}
@@ -122,3 +123,23 @@ footer{margin-top:auto}
 
 .editorial-scroll::before{content:"";position:absolute;inset:-12px}
 .editorial-scroll path{vector-effect:non-scaling-stroke}
+
+/* Decorative refinements: absolute header cue and labels leave image geometry intact. */
+.header-scroll{position:absolute;left:50%;top:calc(22.05645161cqw + 32px);width:20px;height:76px;margin-left:-10px;color:var(--ink);animation:editorial-cue 3.6s ease-in-out infinite}
+.header-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:1.5}
+.header-scroll path{vector-effect:non-scaling-stroke}
+.header-scroll::before{content:"";position:absolute;inset:-12px}
+@keyframes editorial-cue{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.product-label{display:flex;flex-direction:column;gap:5px}
+.product-category{font:300 9px/1.25 Montserrat,Arial,sans-serif;letter-spacing:.09em}
+.product-name{font:500 14px/1.2 Montserrat,Arial,sans-serif;letter-spacing:0}
+@media(max-width:1100px) and (min-width:601px){.photograph-soporte .product-category{white-space:normal}}
+@media(max-width:600px){
+ .header-scroll{top:158px;width:14px;height:48px;margin-left:-7px}
+ .photograph-volcan .product-label{width:160px;max-width:46vw;text-align:left;padding-left:8px}
+ .photograph-tramuntana .product-label{padding-left:4px}
+ .photograph-pool .product-label{position:absolute;right:0;bottom:calc(100% + 8px);width:140px;text-align:right}
+ .photograph-soporte .product-label{position:absolute;left:24px;top:9px;width:160px;text-align:left}
+ .product-name{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.header-scroll{animation:none}}

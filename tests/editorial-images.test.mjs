@@ -44,12 +44,12 @@ test('the same processed sources are retained with the explicitly requested deco
  assert.match(photoRule,/filter:saturate\(0\.2\)/);
  assert.match(css,/filter:saturate\(1\)/);
  assert.ok(!/brightness\(/.test(css));
- for(const name of ['Tramuntana','Binari','Fita','Cleda'])assert.ok(html.includes('<figcaption>'+name+'</figcaption>'));
+ for(const name of ['Tramuntana','Binari','Fita','Cleda'])assert.ok(html.includes('<span class="product-name">'+name+'</span>'));
  assert.match(html,/<div class="photograph-frame"><div class="photograph-motion"><img/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(css,/@media\(hover:none\),\(pointer:coarse\)/);
  assert.match(photoRule,/700ms/);
  assert.equal((html.match(/class="editorial-scroll"/g)||[]).length,1);
- assert.ok(html.indexOf('class="editorial-scroll"')>html.indexOf('<figcaption>Cleda</figcaption>'));
+ assert.ok(html.indexOf('class="editorial-scroll"')>html.indexOf('<span class="product-name">Cleda</span>'));
  assert.match(html,/id="invitation"/);
 });

@@ -6,3 +6,5 @@ Generated with fontTools and Brotli outside the deployment build. The original f
 The build copies committed WOFF2 files; no font service or new application dependency.
 Filenames contain the SHA-256 prefix of the exact bytes. Total font download approximately 58 KB.
 Georgia remains the system font used by the existing headings; it is not redistributed.
+
+Editorial product names additionally use self-hosted Montserrat Medium 500 from the same source and license, with the same Latin subset.
