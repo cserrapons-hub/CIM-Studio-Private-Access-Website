@@ -10,13 +10,19 @@ Object.assign(copy.en,{
  careersLink:'WANT TO WORK WITH US?',careersTitle:'Become part of CIM Studio.',careersDetails:"If you'd like to work with us someday, leave us your email. When a new opportunity opens up at the studio, you'll be among the first to hear about it.",careersEmail:'Email address',careersConsent:'I agree to receive updates about career opportunities at CIM Studio and have read the ',careersPrivacy:'Privacy Policy',careersSubmit:'Keep me updated'
 });
 Object.assign(copy.es,{
- confirmationTitle:'Aún no podemos darte acceso.',
+ confirmationTitle:'Confirma tu suscripción',
+ genericSubscriptionTitle:'Gracias por tu interés en CIM Studio.',
+ genericSubscriptionIntro:'Si todavía no has confirmado tu suscripción, revisa tu correo electrónico. Si ya formas parte de nuestra lista, no necesitas realizar ninguna otra acción.',
+ genericSubscriptionContact:'Para cualquier consulta, puedes escribirnos a ',
  confirmationIntro:'Para poder entrar, necesitamos que confirmes tu correo electrónico. Abre tu bandeja de entrada y confirma tu suscripción a nuestra lista de correo.',
  confirmationHelp:'Si no encuentras el mensaje, revisa la carpeta de spam, promociones o cualquier otra carpeta donde pueda haber llegado.',
  confirmationClose:'Entendido'
 });
 Object.assign(copy.en,{
- confirmationTitle:"We can't give you access just yet.",
+ confirmationTitle:'Confirm your subscription',
+ genericSubscriptionTitle:'Thank you for your interest in CIM Studio.',
+ genericSubscriptionIntro:"If you haven't confirmed your subscription yet, please check your email. If you are already on our mailing list, you don't need to take any further action.",
+ genericSubscriptionContact:'For any enquiries, you can email ',
  confirmationIntro:'To access our private space, we need you to confirm your email address. Open your inbox and confirm your subscription to our mailing list.',
  confirmationHelp:"If you can't find the email, check your spam, promotions or other folders where it might have arrived.",
  confirmationClose:'Got it'

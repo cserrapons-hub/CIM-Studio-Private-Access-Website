@@ -85,3 +85,8 @@ button,input,select,textarea,form label,.languages,.overline,footer,.demo,.statu
 
 .shipping-fields{border:0;padding:0;margin:24px 0 0;min-width:0}.shipping-fields legend{font-size:10px;padding:0;margin-bottom:12px}.shipping-fields input{min-width:0}
 @media(max-width:480px){.shipping-fields .fields{grid-template-columns:1fr}.shipping-fields .wide{grid-column:auto}}
+
+/* One newsletter response dialog: both messages share layout, size and controls. */
+#subscription-pending-dialog .newsletter-response-panels{display:grid}
+#subscription-pending-dialog [data-newsletter-response]{grid-area:1/1;min-width:0}
+#subscription-pending-dialog [data-newsletter-response][aria-hidden="true"]{visibility:hidden}
