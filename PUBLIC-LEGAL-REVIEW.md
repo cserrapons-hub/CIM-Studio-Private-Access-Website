@@ -195,7 +195,7 @@ El plazo se computa en la zona horaria Europe/Madrid y finaliza al comenzar el 1
 El beneficio consiste en un **15 % de descuento de por vida desde la confirmación**, sin permanencia mínima, aplicable a piezas de colección y proyectos personalizados:
 
 - Para particulares: 15 % sobre el PVP vigente.
-- Para profesionales acreditados: 15 % adicional sobre el Precio Profesional vigente, multiplicando esa tarifa por 0,85.
+- Para profesionales acreditados: 15 % de descuento adicional sobre el Precio Profesional vigente.
 
 Es compatible con el Precio Profesional, pero no acumulable con otras promociones.
 
@@ -426,7 +426,7 @@ The deadline is calculated in Europe/Madrid time and ends at 00:00 on January 1,
 The benefit is a **lifetime 15% discount from confirmation**, with no minimum subscription period, applicable to collection pieces and bespoke projects:
 
 - For private customers: 15% off the current retail price.
-- For accredited professionals: an additional 15% off the current Professional Price, calculated by multiplying that price by 0.85.
+- For accredited professionals: an additional 15% off the current Professional Price.
 
 It can be combined with Professional Pricing, but not with other promotions.
 

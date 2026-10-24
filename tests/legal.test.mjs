@@ -47,7 +47,7 @@ test('approved documents retain identity, purpose separation, manual Founders an
   assert.match(legal[lang].terms,/Europe\/Madrid/);
   assert.doesNotMatch(JSON.stringify(legal[lang]),/Microsoft|se aplicará automáticamente|will be applied automatically|CIM Production/);
  }
- assert.match(legal.es.terms,/15 % adicional sobre el Precio Profesional vigente/);
+ assert.match(legal.es.terms,/15 % de descuento adicional sobre el Precio Profesional vigente/);
  assert.match(legal.en.terms,/additional 15% off the current Professional Price/);
  assert.match(legal.es.terms,/CIM Studio gestionará manualmente/);
  assert.match(legal.en.terms,/CIM Studio will administer Founders status manually/);
