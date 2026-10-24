@@ -1,5 +1,6 @@
 // Public newsletter UI, using intercepted requests and simulated providers only.
 import {createRequire} from 'node:module';
+import {createHash} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
@@ -44,6 +45,7 @@ try{
      return route.fulfill({status:response.status,headers:Object.fromEntries(response.headers),body:await response.text()});
     }
     const relative=url.pathname==='/'?'index.html':url.pathname.replace(/^\//,'');
+    if(['script.js','integrations.js'].includes(relative))assert.equal(url.searchParams.get('v'),createHash('sha256').update(readFileSync(root+'public/'+relative)).digest('hex').slice(0,12),'request current content version instead of a cached unversioned script');
     return route.fulfill({contentType:relative.endsWith('.js')?'application/javascript':relative.endsWith('.css')?'text/css':relative.endsWith('.html')?'text/html':'application/octet-stream',body:readFileSync(root+'public/'+relative)});
    });
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/');await page.waitForFunction(()=>window.cimFormSettings);

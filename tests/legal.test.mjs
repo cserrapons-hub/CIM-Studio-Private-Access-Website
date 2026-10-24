@@ -81,7 +81,7 @@ test('static legal bundle includes approved documents but no internal approval m
  assert.deepEqual(documents,{approved:true,es:legal.es,en:legal.en});
  assert.equal(documents.approval,undefined);assert.equal(documents.pendingReview,undefined);
  const html=readFileSync('public/index.html','utf8');
- assert.ok(html.indexOf('src="legal-content.js"')<html.indexOf('src="script.js"'));
+ assert.ok(html.indexOf('src="legal-content.js"')<html.indexOf('src="script.js'));
  assert.equal((html.match(/type="submit" disabled/g)||[]).length,3);
  assert.match(html,/noindex, nofollow, noarchive/);
 });
