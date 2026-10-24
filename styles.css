@@ -90,3 +90,10 @@ button,input,select,textarea,form label,.languages,.overline,footer,.demo,.statu
 #subscription-pending-dialog .newsletter-response-panels{display:grid}
 #subscription-pending-dialog [data-newsletter-response]{grid-area:1/1;min-width:0}
 #subscription-pending-dialog [data-newsletter-response][aria-hidden="true"]{visibility:hidden}
+
+/* Samples use the same native dialog and controls as newsletter responses. */
+#samples-response-dialog .samples-response-panels{display:grid}
+#samples-response-dialog [data-samples-response]{grid-area:1/1;min-width:0}
+#samples-response-dialog [data-samples-response][aria-hidden="true"]{visibility:hidden}
+
+#samples-response-dialog .samples-inbox-prompt{font-weight:400;color:var(--ink)}

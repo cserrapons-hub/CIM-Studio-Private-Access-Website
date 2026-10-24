@@ -31,6 +31,24 @@ Object.assign(copy.es,{subscriberType:'Me suscribo como',subscriberTypeChoose:'S
 Object.assign(copy.en,{subscriberType:'I am subscribing as',subscriberTypeChoose:'Select an option',subscriberTypePrivate:'Private individual',subscriberTypeProfessional:'Professional'});
 Object.assign(copy.es,{shippingLegend:'Datos de envío',shippingAddress:'Dirección de envío',postalCode:'Código postal',city:'Población',province:'Provincia',country:'País',gastronomy:'Gastronomía y restauración'});
 Object.assign(copy.en,{shippingLegend:'Shipping details',shippingAddress:'Shipping address',postalCode:'Postal code',city:'Town / city',province:'Province / region',country:'Country',gastronomy:'Gastronomy and restaurants'});
+Object.assign(copy.es,{
+ samplesResponseTitle:'Hemos recibido tu solicitud.',
+ samplesResponseThanks:'Gracias por tu interés en nuestras muestras cerámicas.',
+ samplesResponseInbox:'Revisa tu bandeja de entrada.',
+ samplesResponseSent:'Te hemos enviado un correo con información sobre tu solicitud desde ',
+ samplesResponseAutomatic:'Este es un correo automático, por lo que te pedimos que no respondas directamente. Encontrarás las indicaciones para contactar con nosotros en el propio mensaje.',
+ samplesResponsePending:'Hemos registrado tu solicitud de muestras, pero no podemos confirmar el envío del correo de recepción. No es necesario repetirla.',
+ samplesResponseContact:'Para cualquier consulta, puedes escribirnos a '
+});
+Object.assign(copy.en,{
+ samplesResponseTitle:'We have received your request.',
+ samplesResponseThanks:'Thank you for your interest in our ceramic samples.',
+ samplesResponseInbox:'Check your inbox.',
+ samplesResponseSent:'We have sent you an email with information about your request from ',
+ samplesResponseAutomatic:'This is an automated email, so please do not reply directly. You will find instructions on how to contact us in the message itself.',
+ samplesResponsePending:'Your sample request has been recorded, but we cannot confirm that the acknowledgement email has been sent. There is no need to submit it again.',
+ samplesResponseContact:'For any enquiries, you can email '
+});
 let language='es';let legal='notice';
 const legalLabels={es:{notice:'Aviso legal',privacy:'Privacidad',cookies:'Cookies y tecnologías',terms:'Tarifa Fundadores',draft:'Borrador pendiente de revisión y aprobación legal. Los formularios todavía no están disponibles.',navigation:'Documentos legales'},en:{notice:'Legal notice',privacy:'Privacy',cookies:'Cookies and technologies',terms:'Founders Rate',draft:'Draft awaiting legal review and approval. Forms are not available yet.',navigation:'Legal documents'}};
 function updateLegal(){

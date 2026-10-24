@@ -17,6 +17,15 @@
   confirmationDialog.setAttribute('aria-describedby',prefix+'-intro '+prefix+'-help');
   form.closest('dialog').close();confirmationDialog.showModal();
  }
+ const samplesResponseDialog=document.getElementById('samples-response-dialog');
+ samplesResponseDialog.querySelector('[data-samples-response-close]').addEventListener('click',()=>samplesResponseDialog.close());
+ samplesResponseDialog.addEventListener('close',()=>document.querySelector('[data-open="samples-dialog"]').focus({preventScroll:true}));
+ function showSamplesResponse(form,result){
+  const mode=result.receiptMailState==='accepted'?'accepted':'pending';
+  for(const panel of samplesResponseDialog.querySelectorAll('[data-samples-response]')){const active=panel.dataset.samplesResponse===mode;panel.setAttribute('aria-hidden',String(!active));panel.inert=!active;}
+  samplesResponseDialog.setAttribute('aria-describedby','samples-response-'+mode);
+  form.closest('dialog').close();samplesResponseDialog.showModal();
+ }
  function status(form,key,error=false){const el=form.querySelector('.status');el.dataset.message=key;el.dataset.error=String(error);el.textContent=copy[language][key];}
  function refresh(){
   document.querySelectorAll('[data-privacy-read]').forEach(e=>e.textContent=copy[language].privacyRead);
@@ -53,6 +62,11 @@
    const response=await fetch('/api/'+kind,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,token,requestId:entry.id}),signal:AbortSignal.timeout(45000)});
    const result=await response.json();
    if(!response.ok||result.ok!==true){if(kind==='subscribe'&&response.status===409&&result.error==='pending'){status(form,'pending',true);showNewsletterResponse(form,'generic');return;}const key=Object.hasOwn(messages[language],result.error)?result.error:'unavailable';status(form,key,true);return;}
+   if(kind==='samples'){
+    if(result.recorded!==true){status(form,'unavailable',true);return;}
+    const previousStatus=form.querySelector('.status');previousStatus.textContent='';delete previousStatus.dataset.message;delete previousStatus.dataset.error;
+    form.reset();requests.delete(form);showSamplesResponse(form,result);return;
+   }
    status(form,result.mail==='pending'?'recordedPendingMail':kind==='subscribe'?'receivedSubscribe':kind==='careers'?'receivedCareers':'receivedSamples',result.mail==='pending');form.reset();requests.delete(form);
    // A queued API request is not a confirmed subscriber or a Founders entitlement.
    // Replays/existing contacts have no promise that a new confirmation email was sent.
