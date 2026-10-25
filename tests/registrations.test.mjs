@@ -51,7 +51,7 @@ test('renewed career consent rotates link, preserves history and blocks an old w
 });
 test('samples persist all current fields and send separate admin/receipt emails exactly once',async()=>{
  const s=setup('samples');assert.equal((await handleRegistration(s.request(),s.env,'samples',s.fetcher)).status,202);
- const emails=s.calls.filter(x=>x.url.includes('resend')).map(x=>JSON.parse(x.options.body));assert.equal(emails.length,2);assert.deepEqual(emails[0].to,['admin@cimstudio.es']);assert.match(emails[0].text,/Studio/);assert.match(emails[0].text,/Test street 1/);assert.deepEqual(emails[1].to,['person@example.test']);assert.match(emails[1].text,/acuse no confirma/);assert.ok(!emails[1].text.includes('Test street 1'));
+ const emails=s.calls.filter(x=>x.url.includes('resend')).map(x=>JSON.parse(x.options.body));assert.equal(emails.length,2);assert.deepEqual(emails[0].to,['admin@cimstudio.es']);assert.match(emails[0].text,/Studio/);assert.match(emails[0].text,/Test street 1/);assert.deepEqual(emails[1].to,['person@example.test']);assert.match(emails[1].text,/Datos correctos/);assert.ok(emails[1].text.includes('Test street 1'));assert.equal(emails[1].reply_to,'admin@cimstudio.es');assert.ok(emails[1].html.includes('Test street 1'));assert.equal(emails[0].reply_to,'person@example.test');
  assert.equal((await handleRegistration(s.request(),s.env,'samples',s.fetcher)).status,202);assert.equal(s.calls.filter(x=>x.url.includes('resend')).length,2);
  assert.equal((await handleRegistration(s.request({shippingAddress:'tampered'}),s.env,'samples',s.fetcher)).status,409);
  assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);assert.ok(!JSON.stringify(s.forms.sqlite.prepare('SELECT * FROM registrations').get()).includes('Test street 1'));
@@ -188,7 +188,7 @@ test('shipping samples validate all five address fields and five sectors, and om
  }
  const s=setup('samples');for(const changes of [{shippingAddress:'x'.repeat(251)},{postalCode:'x'.repeat(21)},{city:'x'.repeat(121)},{province:'x'.repeat(121)},{country:'x'.repeat(101)},{country:'Test\nInjected'},{discipline:'invalid'}])assert.equal((await handleRegistration(s.request(changes),s.env,'samples',s.fetcher)).status,400);
 });
-test('new sample address is encrypted, included only in admin mail, and legacy encrypted projects remain intact',async()=>{
+test('new sample address is encrypted, included in admin and applicant mail, and legacy encrypted projects remain intact',async()=>{
  const s=setup('samples');await handleRegistration(s.request(),s.env,'samples',s.fetcher);
  const old=s.forms.sqlite.prepare('SELECT * FROM registrations').get();
  const legacy={email:'person@example.test',name:'Legacy professional',company:'Legacy studio',discipline:'architecture',project:'Historical project - preserve'};
@@ -203,5 +203,5 @@ test('new sample address is encrypted, included only in admin mail, and legacy e
  assert.ok(!recent.encrypted_data.includes('New test address 2'));
  const mails=s.calls.filter(call=>call.url.includes('resend')).slice(-2).map(call=>JSON.parse(call.options.body));
  for(const value of ['New test address 2','00000','Test city','Test region','Test country','Gastronomía y restauración'])assert.ok(mails[0].text.includes(value));
- assert.ok(!mails[1].text.includes('New test address 2'));assert.ok(!mails[0].text.includes('Proyecto:'));
+ assert.ok(mails[1].text.includes('New test address 2'));assert.ok(!mails[0].text.includes('Proyecto:'));
 });

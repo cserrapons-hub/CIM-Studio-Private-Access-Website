@@ -1,0 +1,18 @@
+// Sample acknowledgement only. No network, persistence or external assets.
+const website='https://cimstudio.es/';
+const clean=value=>typeof value==='string'?value.trim():'';
+const escape=value=>value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+export function sampleReceipt(data={},language='es'){
+ const en=language==='en';
+ const address=[clean(data.shippingAddress),[clean(data.postalCode),clean(data.city)].filter(Boolean).join(' '),[clean(data.province),clean(data.country)].filter(Boolean).join(' · ')].filter(Boolean);
+ const c=en?{
+  subject:'CIM Studio | We have received your sample request',hello:'Hello,',thanks:'Thank you for your interest in CIM Studio.',received:'We have received your sample request.',process:'To process your request, we just need you to confirm your shipping details:',address:'Shipping address',confirm:'You can do this by replying to this email with “Details correct”.',mallorca:'If you are in Mallorca',visit:'we can also deliver the samples in person. It would be a lovely opportunity to meet you and introduce you to our work.',prefer:'If you would prefer a visit rather than postal delivery, please let us know by replying to this email.',thankyou:'Thank you very much,',signoff:'Warm regards,'
+ }:{
+  subject:'CIM Studio | Hemos recibido tu solicitud de muestras',hello:'Hola,',thanks:'Gracias por tu interés en CIM Studio.',received:'Hemos recibido tu solicitud de muestras correctamente.',process:'Para procesar tu solicitud solo necesitamos que nos confirmes tus datos de envío:',address:'Dirección de envío',confirm:'Puedes hacerlo respondiendo a este email diciendo «Datos correctos».',mallorca:'Si estás en Mallorca',visit:'también podemos entregarte las muestras personalmente. Será una buena ocasión para conocernos y presentarte nuestro trabajo.',prefer:'Si prefieres nuestra visita al envío postal, responde también a este email.',thankyou:'Muchas gracias,',signoff:'Un abrazo,'
+ };
+ const text=[c.hello,c.thanks+'\n'+c.received,c.process,[c.address,...(address.length?['',...address]:[])].join('\n'),c.confirm,c.mallorca+', '+c.visit,c.prefer,c.thankyou,c.signoff+'\nCIM Studio\nwww.cimstudio.es'].join('\n\n');
+ const p=content=>'<p style="margin:0 0 22px">'+content+'</p>';
+ const addressHtml=address.length?'<div style="margin:0 0 24px;padding:20px;background:#f7f6f2"><p style="margin:0 0 10px;font-weight:600">'+c.address+'</p>'+address.map(escape).join('<br>')+'</div>':'';
+ const html='<!doctype html><html lang="'+(en?'en':'es')+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+c.subject+'</title></head><body style="margin:0;padding:0;background:#faf9f6;color:#292923"><table role="presentation" style="width:100%;border-collapse:collapse"><tr><td style="padding:24px 16px"><table role="presentation" style="width:100%;max-width:600px;margin:0 auto;border-collapse:collapse;background:#ffffff"><tr><td style="padding:32px 24px;font-family:Montserrat,Arial,Helvetica,sans-serif;font-size:16px;line-height:1.7">'+p(c.hello)+p(c.thanks+'<br>'+c.received)+p(c.process)+addressHtml+p(c.confirm)+p('<strong>'+c.mallorca+'</strong>, '+c.visit)+p(c.prefer)+p(c.thankyou)+'<p style="margin:0">'+c.signoff+'<br><strong>CIM Studio</strong><br><a href="'+website+'" style="color:#292923;text-decoration:underline">www.cimstudio.es</a></p></td></tr></table></td></tr></table></body></html>';
+ return {subject:c.subject,text,html};
+}

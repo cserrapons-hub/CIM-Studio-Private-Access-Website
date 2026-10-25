@@ -23,7 +23,7 @@ Gracias por tu interés en nuestras muestras cerámicas.
 
 Te hemos enviado un correo con información sobre tu solicitud desde [notificaciones@envios.cimstudio.es](mailto:notificaciones@envios.cimstudio.es).
 
-Este es un correo automático, por lo que te pedimos que no respondas directamente. Encontrarás las indicaciones para contactar con nosotros en el propio mensaje.
+Puedes responder directamente al email recibido. Tu respuesta llegará a CIM Studio.
 
 Botón: **Entendido**.
 
@@ -37,7 +37,7 @@ Thank you for your interest in our ceramic samples.
 
 We have sent you an email with information about your request from [notificaciones@envios.cimstudio.es](mailto:notificaciones@envios.cimstudio.es).
 
-This is an automated email, so please do not reply directly. You will find instructions on how to contact us in the message itself.
+You can reply directly to the email you receive. Your reply will reach CIM Studio.
 
 Button: **Got it**.
 
@@ -56,3 +56,9 @@ Un único componente de modal de muestras, con los estilos nativos compartidos d
 ## Validación local
 
 227 pruebas automatizadas, 40 recorridos de muestras ES/EN en escritorio/móvil, 40 regresiones de newsletter y 6 simulaciones workerd de muestras/candidaturas superadas. Compilación estática y Pages Functions correctas. Los escenarios cubren acuse aceptado con aviso administrativo fallido, acuse pendiente/rechazado/incierto, idempotencia, fallo de persistencia y ausencia de confirmación inferior simultánea. Proveedores y datos simulados en todas las pruebas.
+
+## Correo personalizado de muestras — 25/10/2026, pendiente de publicar
+
+`server/sample-receipt.js` genera el nuevo asunto, HTML adaptable y alternativa de texto plano ES/EN. Inserta únicamente los datos de envío suministrados, escapados en HTML; no inventa valores ausentes. La firma muestra `www.cimstudio.es` con enlace HTTPS al dominio público canónico. El acuse mantiene `MAIL_FROM` y añade `reply_to:admin@cimstudio.es`; el aviso administrativo conserva el Reply-To del solicitante. El modal solo cambia la indicación para permitir responder directamente al correo recibido. No se modifican estados, SQL, consentimientos o mensajes de candidaturas/newsletter; no se reescriben trabajos de correo anteriores.
+
+Validación actualizada: 231 pruebas automatizadas, 40 casos del modal de muestras, 40 regresiones de newsletter, 6 simulaciones workerd y cuatro renderizados HTML ES/EN escritorio/móvil sin recursos externos ni ejecución de datos HTML maliciosos. Compilaciones estática y Pages Functions correctas. Ningún envío real.

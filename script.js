@@ -36,7 +36,7 @@ Object.assign(copy.es,{
  samplesResponseThanks:'Gracias por tu interés en nuestras muestras cerámicas.',
  samplesResponseInbox:'Revisa tu bandeja de entrada.',
  samplesResponseSent:'Te hemos enviado un correo con información sobre tu solicitud desde ',
- samplesResponseAutomatic:'Este es un correo automático, por lo que te pedimos que no respondas directamente. Encontrarás las indicaciones para contactar con nosotros en el propio mensaje.',
+ samplesResponseAutomatic:'Puedes responder directamente al email recibido. Tu respuesta llegará a CIM Studio.',
  samplesResponsePending:'Hemos registrado tu solicitud de muestras, pero no podemos confirmar el envío del correo de recepción. No es necesario repetirla.',
  samplesResponseContact:'Para cualquier consulta, puedes escribirnos a '
 });
@@ -45,7 +45,7 @@ Object.assign(copy.en,{
  samplesResponseThanks:'Thank you for your interest in our ceramic samples.',
  samplesResponseInbox:'Check your inbox.',
  samplesResponseSent:'We have sent you an email with information about your request from ',
- samplesResponseAutomatic:'This is an automated email, so please do not reply directly. You will find instructions on how to contact us in the message itself.',
+ samplesResponseAutomatic:'You can reply directly to the email you receive. Your reply will reach CIM Studio.',
  samplesResponsePending:'Your sample request has been recorded, but we cannot confirm that the acknowledgement email has been sent. There is no need to submit it again.',
  samplesResponseContact:'For any enquiries, you can email '
 });
