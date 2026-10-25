@@ -47,3 +47,13 @@ test('career acknowledgement is not given sample text, HTML or Reply-To',async()
   });assert.equal(response.status,202);assert.equal(mails.length,1);assert.equal(Object.hasOwn(mails[0],'reply_to'),false);assert.equal(Object.hasOwn(mails[0],'html'),false);assert.ok(!mails[0].text.includes('Datos correctos'));
  }finally{s.close();}
 });
+
+test('sample email uses a single cream background and removes only the word just/solo in both alternatives',()=>{
+ for(const lang of ['es','en']){
+  const result=sampleReceipt(address,lang),sentence=lang==='es'?'Para procesar tu solicitud necesitamos que nos confirmes tus datos de envío:':'To process your request, we need you to confirm your shipping details:';
+  assert.ok(result.text.includes(sentence));assert.ok(result.html.includes(sentence));assert.doesNotMatch(result.html+result.text,/sol[o] necesitamos|we just need/);
+  const backgrounds=[...result.html.matchAll(/background:([^;"}]+)/g)].map(m=>m[1]);assert.ok(backgrounds.length>=5);assert.deepEqual([...new Set(backgrounds)],['#faf9f6']);
+  assert.doesNotMatch(result.html,/background:#ffffff|background:#f7f6f2|border:|box-shadow:/);
+  assert.ok(result.html.includes('margin:0 0 24px;padding:20px;'));assert.ok(result.html.includes('padding:32px 24px;'));assert.ok(result.html.includes('padding:24px 16px'));
+ }
+});

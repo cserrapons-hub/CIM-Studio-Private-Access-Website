@@ -23,7 +23,8 @@
  function showSamplesResponse(form,result){
   const mode=result.receiptMailState==='accepted'?'accepted':'pending';
   for(const panel of samplesResponseDialog.querySelectorAll('[data-samples-response]')){const active=panel.dataset.samplesResponse===mode;panel.setAttribute('aria-hidden',String(!active));panel.inert=!active;}
-  samplesResponseDialog.setAttribute('aria-describedby','samples-response-'+mode);
+  samplesResponseDialog.querySelector('.samples-delivery-help').hidden=mode!=='accepted';
+  samplesResponseDialog.setAttribute('aria-describedby','samples-response-'+mode+(mode==='accepted'?' samples-delivery-help':''));
   form.closest('dialog').close();samplesResponseDialog.showModal();
  }
  function status(form,key,error=false){const el=form.querySelector('.status');el.dataset.message=key;el.dataset.error=String(error);el.textContent=copy[language][key];}

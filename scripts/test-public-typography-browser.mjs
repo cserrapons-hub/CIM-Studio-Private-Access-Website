@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import legal from '../legal/content.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
-const baseline=execFileSync('git',['show','c6c68a0:styles.css'],{encoding:'utf8'});
+const baseline=execFileSync('git',['show','a803c86:styles.css'],{encoding:'utf8'});
 const out=process.env.CIM_SCREENSHOT_DIR||'/tmp/cim-public-typography';mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
 const results={};
@@ -24,7 +24,8 @@ try{
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto('https://cimstudio.es');await page.waitForFunction(()=>window.cimFormSettings);await page.locator('[data-lang='+lang+']').click();await page.evaluate(()=>document.fonts.ready);
    const geometry=await page.evaluate(()=>Object.fromEntries(['.brand','.invitation','h1','.intro','.photograph-volcan','.photograph-tramuntana','.photograph-pool','.photograph-soporte'].map(selector=>{const e=document.querySelector(selector),b=e.getBoundingClientRect(),s=getComputedStyle(e);return [selector,{x:b.x,y:b.y,width:b.width,height:b.height,fontSize:s.fontSize,lineHeight:s.lineHeight,fontWeight:s.fontWeight,margin:s.margin}];})));
    const key=width+'-'+lang;
-   if(version==='before')results[key]=geometry;else assert.deepEqual(geometry,results[key],'homepage geometry and paragraph metrics unchanged');
+   if(version==='before')results[key]=geometry;else{const expected=structuredClone(results[key]);expected['.intro'].fontWeight='400';assert.deepEqual(geometry,expected,'geometry and paragraph metrics unchanged apart from requested weight');}
+   if(version==='after'){assert.equal(await page.locator('.intro').first().evaluate(e=>getComputedStyle(e).fontWeight),'400');assert.equal(await page.evaluate(()=>[...document.fonts].some(f=>f.family==='Montserrat'&&f.weight==='400'&&f.status==='loaded')),true,'real Montserrat Regular loaded');}
    if(version==='after')for(const selector of ['.intro','.professional'])assert.equal(await page.locator(selector).first().evaluate(e=>getComputedStyle(e).color),'rgb(41, 42, 38)');
    await page.screenshot({path:out+'/'+key+'-home-'+version+'.png',fullPage:true});
    for(const kind of ['subscribe','samples','careers']){
@@ -48,8 +49,8 @@ try{
     assert.equal(await form.evaluate(e=>e.closest('dialog').scrollWidth>e.closest('dialog').clientWidth),false);await page.screenshot({path:out+'/'+key+'-'+kind+'-'+version+'.png',fullPage:true});await page.keyboard.press('Escape');
    }
    // Real approved text, but no legal, backend or provider writes.
-   await page.locator('[data-legal=privacy]').first().click();if(version==='after')assert.equal(await page.locator('#legal-body').evaluate(e=>getComputedStyle(e).color),'rgb(41, 42, 38)');await page.screenshot({path:out+'/'+key+'-legal-'+version+'.png',fullPage:true});await page.keyboard.press('Escape');
-   for(const id of ['subscription-pending-dialog','samples-response-dialog']){await page.evaluate(id=>document.getElementById(id).showModal(),id);if(version==='after')for(const p of await page.locator('#'+id+' .dialog-intro:visible').all())assert.equal(await p.evaluate(e=>getComputedStyle(e).color),'rgb(41, 42, 38)');assert.equal(await page.locator('#'+id).evaluate(e=>e.scrollWidth>e.clientWidth),false);await page.keyboard.press('Escape');}
+   await page.locator('[data-legal=privacy]').first().click();if(version==='after'){assert.equal(await page.locator('#legal-body').evaluate(e=>getComputedStyle(e).color),'rgb(41, 42, 38)');assert.equal(await page.locator('#legal-body').evaluate(e=>getComputedStyle(e).fontWeight),'400');}await page.screenshot({path:out+'/'+key+'-legal-'+version+'.png',fullPage:true});await page.keyboard.press('Escape');
+   for(const id of ['subscription-pending-dialog','samples-response-dialog']){await page.evaluate(id=>document.getElementById(id).showModal(),id);if(version==='after')for(const p of await page.locator('#'+id+' .dialog-intro:visible').all()){assert.equal(await p.evaluate(e=>getComputedStyle(e).color),'rgb(41, 42, 38)');assert.equal(await p.evaluate(e=>getComputedStyle(e).fontWeight),'400');}assert.equal(await page.locator('#'+id).evaluate(e=>e.scrollWidth>e.clientWidth),false);await page.keyboard.press('Escape');}
    assert.deepEqual(errors,[]);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));cases++;
   }finally{await context.close();}
  }
