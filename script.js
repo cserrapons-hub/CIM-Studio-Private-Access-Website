@@ -38,6 +38,7 @@ Object.assign(copy.es,{
  samplesResponseSent:'Te hemos enviado un correo con información sobre tu solicitud desde ',
  samplesResponseAutomatic:'Puedes responder directamente al email recibido. Tu respuesta llegará a CIM Studio.',
  samplesResponsePending:'Hemos registrado tu solicitud de muestras, pero no podemos confirmar el envío del correo de recepción. No es necesario repetirla.',
+ samplesResponseMissingEmail:'¿No has recibido el correo? Contacta a ',
  samplesResponseContact:'Para cualquier consulta, puedes escribirnos a '
 });
 Object.assign(copy.en,{
@@ -47,6 +48,7 @@ Object.assign(copy.en,{
  samplesResponseSent:'We have sent you an email with information about your request from ',
  samplesResponseAutomatic:'You can reply directly to the email you receive. Your reply will reach CIM Studio.',
  samplesResponsePending:'Your sample request has been recorded, but we cannot confirm that the acknowledgement email has been sent. There is no need to submit it again.',
+ samplesResponseMissingEmail:"Haven't received the email? Contact us at ",
  samplesResponseContact:'For any enquiries, you can email '
 });
 let language='es';let legal='notice';

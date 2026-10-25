@@ -107,3 +107,5 @@ input::placeholder,textarea::placeholder{font-weight:400;color:#6b6c65;opacity:1
 select:required:invalid{font-weight:400;color:#6b6c65}
 select option{font-weight:500;color:var(--ink)}
 select option[value=""]{font-weight:400;color:#6b6c65}
+
+#samples-response-dialog .samples-delivery-help{font-size:11px;line-height:1.7;font-weight:400;overflow-wrap:anywhere}
