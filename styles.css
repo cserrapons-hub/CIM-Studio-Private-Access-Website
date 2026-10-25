@@ -1,3 +1,4 @@
+@font-face{font-family:Montserrat;font-style:normal;font-weight:500;font-display:swap;src:url("assets/fonts/montserrat-latin-500.986ead3c175a.woff2") format("woff2")}
 @font-face{font-family:Montserrat;font-style:normal;font-weight:300;font-display:swap;src:url("assets/fonts/montserrat-latin-300.8df42ef175d6.woff2") format("woff2")}
 @font-face{font-family:Montserrat;font-style:normal;font-weight:400;font-display:swap;src:url("assets/fonts/montserrat-latin-400.021091be0b08.woff2") format("woff2")}
 :root{--paper:#f8f7f3;--page-background:#f7f6f4;--ink:#292a26;--muted:#77766f;--line:#d7d5ce;--serif:Georgia,'Times New Roman',serif}
@@ -97,3 +98,12 @@ button,input,select,textarea,form label,.languages,.overline,footer,.demo,.statu
 #samples-response-dialog [data-samples-response][aria-hidden="true"]{visibility:hidden}
 
 #samples-response-dialog .samples-inbox-prompt{font-weight:400;color:var(--ink)}
+
+/* Legibility only: existing font sizes, line heights and geometry are retained. */
+p,.intro,.dialog-intro,.professional,.consent,.demo,.status,.privacy-inline,.preview-notice,footer,.legal-links button,form label,.shipping-fields legend,#legal-body,#legal-navigation{color:var(--ink)}
+form label,.shipping-fields legend,.privacy-inline{font-weight:400}
+input:not([type=checkbox]):not([type=radio]),textarea,select{font-family:Montserrat,Arial,Helvetica,sans-serif;font-weight:500;color:var(--ink)}
+input::placeholder,textarea::placeholder{font-weight:400;color:#6b6c65;opacity:1}
+select:required:invalid{font-weight:400;color:#6b6c65}
+select option{font-weight:500;color:var(--ink)}
+select option[value=""]{font-weight:400;color:#6b6c65}

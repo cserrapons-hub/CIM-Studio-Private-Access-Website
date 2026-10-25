@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {publicSettings} from '../server/settings.js';
-test('Montserrat is self-hosted, fingerprinted, preloaded, licensed and uses only the two required weights',()=>{
+test('Montserrat is self-hosted, fingerprinted, preloaded, licensed and uses Light/Regular/Medium with preloads limited to initial text',()=>{
  const css=readFileSync('styles.css','utf8'),html=readFileSync('public/index.html','utf8');
- const fonts=[...css.matchAll(/assets\/fonts\/(montserrat-latin-(300|400)\.([a-f0-9]{12})\.woff2)/g)];
- assert.equal(fonts.length,2);
- for(const [,name,,digest] of fonts){const bytes=readFileSync('assets/fonts/'+name);assert.equal(createHash('sha256').update(bytes).digest('hex').slice(0,12),digest);assert.deepEqual(readFileSync('public/assets/fonts/'+name),bytes);assert.ok(html.includes('href="assets/fonts/'+name+'" as="font"'));}
+ const fonts=[...css.matchAll(/assets\/fonts\/(montserrat-latin-(300|400|500)\.([a-f0-9]{12})\.woff2)/g)];
+ assert.equal(fonts.length,3);
+ for(const [,name,weight,digest] of fonts){const bytes=readFileSync('assets/fonts/'+name);assert.equal(createHash('sha256').update(bytes).digest('hex').slice(0,12),digest);assert.deepEqual(readFileSync('public/assets/fonts/'+name),bytes);assert.equal(html.includes('href="assets/fonts/'+name+'" as="font"'),weight!=='500');}
  assert.ok(existsSync('public/assets/fonts/OFL-Montserrat.txt'));assert.ok(css.includes("--serif:Georgia,'Times New Roman',serif"));assert.ok(!/fonts\.googleapis|fonts\.gstatic/.test(css+html));
 });
 test('Welcome is bilingual and never interprets visits or query parameters as confirmation',()=>{
