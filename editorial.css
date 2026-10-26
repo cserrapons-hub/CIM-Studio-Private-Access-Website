@@ -107,3 +107,19 @@ footer{margin-top:auto}
  .intro{font-size:12px;line-height:1.8}
  .invitation .professional{margin-top:18px}
 }
+
+/* Desktop-only trial: centred presentation and names within the unchanged photo frames. */
+@media(min-width:1101px){
+ .invitation,.invitation h1,.invitation .intro,.invitation .professional{text-align:center}
+}
+@media(min-width:1101px) and (hover:hover) and (pointer:fine){
+ .photograph figcaption{inset:auto 0 0 0;width:auto;margin:0;padding:18px;border:0;text-align:left;color:#f7f6f4;opacity:0;transition:opacity 350ms ease;z-index:2;text-shadow:0 1px 3px rgb(0 0 0 / .8),0 0 8px rgb(0 0 0 / .25)}
+ .photograph .product-category{display:none}
+ .photograph .product-label{gap:0}
+ .photograph .product-name{font:300 12px/1.4 Montserrat,Arial,Helvetica,sans-serif;letter-spacing:.03em}
+ .photograph:hover figcaption,.photograph:focus-within figcaption{opacity:1}
+ .photograph:focus-visible{outline:1px solid var(--ink);outline-offset:4px}
+}
+@media(min-width:1101px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:reduce){
+ .photograph figcaption{transition:none}
+}

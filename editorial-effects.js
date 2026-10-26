@@ -15,5 +15,12 @@
   cue.style.setProperty('--header-scroll-top',top+'px');
  }
  if(cue&&logo&&photo){const observer=new ResizeObserver(centreCue);for(const element of [logo,photo,cue,cue.offsetParent])observer.observe(element);logo.addEventListener('load',centreCue);addEventListener('resize',centreCue);motion.addEventListener('change',centreCue);centreCue();}
+ // Names revealed on hover must also be reachable by keyboard on the trial desktop layout.
+ const desktopNames=matchMedia('(min-width:1101px) and (hover:hover) and (pointer:fine)');
+ function focusableNames(){for(const figure of document.querySelectorAll('.photograph')){
+  if(desktopNames.matches)figure.setAttribute('tabindex','0');
+  else{figure.removeAttribute('tabindex');if(document.activeElement===figure)figure.blur();}
+ }}
+ desktopNames.addEventListener('change',focusableNames);focusableNames();
  addEventListener('cim:language',labels);labels();
 })();

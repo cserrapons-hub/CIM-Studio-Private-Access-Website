@@ -27,12 +27,12 @@ try{
     });
     if(version==='before')baseline=measure;else{
      assert.deepEqual(measure.fixed,baseline.fixed,'Logo, photos and arrow unchanged');assert.equal(measure.block.x,baseline.block.x);assert.equal(measure.block.y,baseline.block.y);assert.equal(measure.block.width,baseline.block.width);assert.ok(measure.block.height<baseline.block.height,'Presentation is more compact');
-     assert.ok(Math.abs(measure.heading.size/baseline.heading.size-.75)<.001,'Heading reduced by 25%');assert.ok(measure.paragraph.size<=baseline.paragraph.size);assert.ok(measure.paragraph.size>=(width<600?12:11.5),'Readable floor');assert.equal(measure.paragraph.weight,'400');assert.equal(measure.heading.align,'left');assert.equal(measure.paragraph.align,'left');assert.equal(measure.copy,baseline.copy);assert.equal(measure.overflow,false);
+     assert.ok(Math.abs(measure.heading.size/baseline.heading.size-.75)<.001,'Heading reduced by 25%');assert.ok(measure.paragraph.size<=baseline.paragraph.size);assert.ok(measure.paragraph.size>=(width<600?12:11.5),'Readable floor');assert.equal(measure.paragraph.weight,'400');assert.equal(measure.heading.align,width>1100?'center':'left');assert.equal(measure.paragraph.align,width>1100?'center':'left');assert.equal(measure.copy,baseline.copy);assert.equal(measure.overflow,false);
      const arrow=measure.fixed.at(-1);assert.ok(Math.abs(measure.block.x+measure.block.width/2-arrow.x-arrow.width/2)<1,'Block stays aligned with arrow');
     }
     await page.locator('.invitation').screenshot({path:out+'/'+width+'-'+lang+'-'+version+'.png'});assert.deepEqual(errors,[]);cases++;
    }finally{await context.close();}
   }
  }
- console.log('PASS '+cases+' before/after cases, ES/EN desktop/tablet/mobile: 25% smaller headings, readable Regular paragraphs, compact spacing, left alignment, unchanged copy, photos and arrow, no submissions.');
+ console.log('PASS '+cases+' before/after cases, ES/EN desktop/tablet/mobile: 25% smaller headings, readable Regular paragraphs, compact spacing, responsive alignment, unchanged copy, photos and arrow, no submissions.');
 }finally{await browser.close();}
