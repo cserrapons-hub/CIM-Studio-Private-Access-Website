@@ -16,7 +16,7 @@ Object.assign(copy.es,{
  genericSubscriptionContact:'Para cualquier consulta, puedes escribirnos a ',
  confirmationIntro:'Necesitamos que confirmes tu correo electrónico.',
  confirmationInstructions:'Abre tu bandeja de entrada. Te hemos enviado un correo con el asunto «Confirma tu suscripción a CIM Studio». Ábrelo y pulsa en el enlace de confirmación.',
- confirmationHelp:'Si no encuentras el mensaje, revisa las carpetas de spam, promociones o cualquier otra carpeta donde pueda haber llegado.',
+ confirmationHelp:'Puede que esté en spam o en la bandeja de notificaciones, en ese caso añade la dirección <a href="mailto:newsletter@cimstudio.es">newsletter@cimstudio.es</a> a tu lista de contactos.',
  confirmationClose:'Entendido'
 });
 Object.assign(copy.en,{
@@ -26,7 +26,7 @@ Object.assign(copy.en,{
  genericSubscriptionContact:'For any enquiries, you can email ',
  confirmationIntro:'We need you to confirm your email address.',
  confirmationInstructions:'Open your inbox. We have sent you an email with the subject “Confirma tu suscripción a CIM Studio”. Open it and click the confirmation link.',
- confirmationHelp:"If you can't find the email, check your spam, promotions or other folders where it might have arrived.",
+ confirmationHelp:'It may be in your spam or notifications folder. If so, add <a href="mailto:newsletter@cimstudio.es">newsletter@cimstudio.es</a> to your contacts.',
  confirmationClose:'Got it'
 });
 Object.assign(copy.es,{subscriberType:'Me suscribo como',subscriberTypeChoose:'Selecciona una opción',subscriberTypePrivate:'Particular',subscriberTypeProfessional:'Profesional'});

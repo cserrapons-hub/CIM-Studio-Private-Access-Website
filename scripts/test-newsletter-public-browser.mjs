@@ -49,7 +49,9 @@ try{
     return route.fulfill({contentType:relative.endsWith('.js')?'application/javascript':relative.endsWith('.css')?'text/css':relative.endsWith('.html')?'text/html':'application/octet-stream',body:readFileSync(root+'public/'+relative)});
    });
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(origin+'/');await page.waitForFunction(()=>window.cimFormSettings);
-   await page.locator('[data-lang='+lang+']').click();await page.locator('[data-open=subscribe-dialog]').click();await page.waitForFunction(()=>window.turnstile);
+   await page.locator('[data-lang='+lang+']').click();
+   if(width===390){const positions=await page.evaluate(()=>{const b=document.querySelector('.invitation').getBoundingClientRect();return [...document.querySelectorAll('.invitation h1,.invitation > .primary')].map(e=>{const r=e.getBoundingClientRect();return Math.abs(r.x+r.width/2-(b.x+b.width/2));});});for(const offset of positions)assert.ok(offset<1,'Mobile title and CTA centred');assert.equal(await page.locator('.invitation .intro').first().evaluate(e=>getComputedStyle(e).textAlign),'left');}
+   await page.locator('[data-open=subscribe-dialog]').click();await page.waitForFunction(()=>window.turnstile);
    assert.equal(await page.locator('#subscriber-type').inputValue(),'');await page.locator('#email').fill('owner@example.test');await page.locator('[name=marketing_consent]').check();await page.locator('#subscribe-dialog [type=submit]').click();assert.equal(posts,0,'Audience is mandatory');await page.locator('[name=marketing_consent]').uncheck();
    await page.selectOption('#subscriber-type',lang==='en'?'profesional':'particular');await page.locator('#subscribe-dialog [type=submit]').click();assert.equal(posts,0,'Consent stays mandatory and unchecked');
    await page.locator('[name=marketing_consent]').check();await page.locator('#subscribe-dialog [type=submit]').click();
@@ -64,6 +66,8 @@ try{
     assert.equal(await panel.locator('h2').textContent(),mode==='confirmation'?(lang==='es'?'Aún no podemos darte acceso':"We can't give you access yet"):(lang==='es'?'Gracias por tu interés en CIM Studio.':'Thank you for your interest in CIM Studio.'));
     assert.equal(await responseDialog.getAttribute('aria-labelledby'),await panel.locator('h2').getAttribute('id'));
     if(mode==='confirmation'){
+     assert.equal(await panel.locator('#subscription-pending-help a').getAttribute('href'),'mailto:newsletter@cimstudio.es');
+     assert.equal(await panel.locator('#subscription-pending-help').textContent(),lang==='es'?'Puede que esté en spam o en la bandeja de notificaciones, en ese caso añade la dirección newsletter@cimstudio.es a tu lista de contactos.':'It may be in your spam or notifications folder. If so, add newsletter@cimstudio.es to your contacts.');
      assert.equal(await panel.locator('#subscription-pending-intro').textContent(),lang==='es'?'Necesitamos que confirmes tu correo electrónico.':'We need you to confirm your email address.');
      assert.equal(await panel.locator('#subscription-pending-instructions').textContent(),lang==='es'?'Abre tu bandeja de entrada. Te hemos enviado un correo con el asunto «Confirma tu suscripción a CIM Studio». Ábrelo y pulsa en el enlace de confirmación.':'Open your inbox. We have sent you an email with the subject “Confirma tu suscripción a CIM Studio”. Open it and click the confirmation link.');
      assert.ok((await responseDialog.getAttribute('aria-describedby')).includes('subscription-pending-instructions'));

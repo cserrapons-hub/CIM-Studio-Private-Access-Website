@@ -149,3 +149,9 @@ footer{margin-top:auto}
 }
 @media(min-width:1101px) and (hover:none){.editorial-v2 .talaia-on{opacity:1}.editorial-v2 [data-piece=Talaia] img:first-child{opacity:0}}
 @media(prefers-reduced-motion:reduce){.editorial-v2 img{transition:none!important;transform:none!important}}
+
+/* Centre only the mobile invitation heading and subscription CTA. */
+@media(max-width:600px){
+ .invitation h1{text-align:center}
+ .invitation > .primary{display:flex;width:fit-content;margin-left:auto;margin-right:auto}
+}
