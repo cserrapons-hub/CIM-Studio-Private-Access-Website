@@ -155,3 +155,19 @@ footer{margin-top:auto}
  .invitation h1{text-align:center}
  .invitation > .primary{display:flex;width:fit-content;margin-left:auto;margin-right:auto}
 }
+
+/* Arrel loses only the excess column height; its original pixels stay untouched.
+   Ratios: left = 4550/976; right excluding Arrel = 1536/1024 + 620/614 + 1448/1086. */
+@media(min-width:1101px){
+ .editorial-v2 [data-piece=Arrel] .photograph-frame{aspect-ratio:1 / .818779925597622}
+ .editorial-v2 [data-piece=Arrel] .photograph-motion{position:absolute;inset:0}
+ .editorial-v2 [data-piece=Arrel] img{object-position:top;height:auto}
+}
+/* Reuse the existing compact gallery slots, twice, in reading order. */
+@media(min-width:601px) and (max-width:1100px){
+ .photographic-composition{height:calc(278.1451613cqw + 56px)}
+ .compact-second{transform:translateY(calc(139.07258065cqw + 56px))}
+}
+@media(max-width:600px){
+ .compact-photo{order:0}
+}
