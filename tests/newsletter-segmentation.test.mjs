@@ -13,6 +13,7 @@ test('audience is mandatory and uses an independently configured real field ID, 
  for(const type of ['particular','profesional']){
   const prepared=prepareNewsletterApi(env,'person@example.test',type),body=JSON.parse(prepared.options.body);
   assert.equal(prepared.url,'https://api.getresponse.com/v3/contacts');assert.deepEqual(body.campaign,{campaignId:'PL6jh'});
+  assert.equal(body.dayOfCycle,'0');assert.equal(typeof body.dayOfCycle,'string');
   assert.deepEqual(body.customFieldValues,[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:'simulation-type',value:[type]}]);
   assert.ok(!Object.keys(body).some(key=>/confirmed|founder|autoresponder/i.test(key)));
  }

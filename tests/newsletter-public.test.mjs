@@ -4,7 +4,7 @@ import {fixture,policy} from './helpers/launch-fixture.mjs';
 import {handlePublicNewsletter} from '../server/newsletter-public.js';
 import {newsletterPublicReady,newsletterRelease,acceptedNewsletterResponse} from '../server/newsletter-release.js';
 const profile={approved:true,version:'SIMULATED-NOT-A-REAL-CONTRACT',provider:'getresponse-api-v3',acceptedResponse:{status:202}};
-async function setup(){const s=await fixture();Object.assign(s.env,{GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_ENABLED:'true',NEWSLETTER_PUBLIC_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-api-v3',NEWSLETTER_EVIDENCE_REVIEWED:'true',NEWSLETTER_VERIFIED:'true',NEWSLETTER_ORIGIN:'https://cimstudio.es'});const req=(changes={},headers={})=>new Request('https://cimstudio.es/api/subscribe',{method:'POST',headers:{Origin:'https://cimstudio.es','Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1',...headers},body:JSON.stringify({...s.data,...changes})});let provider=0;const mock={status:202,location:'https://must-not-follow.example.test',throw:false};const fetcher=async(url,options)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(url.includes('/contacts?'))return Response.json([]);assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.redirect,'manual');provider++;if(mock.throw)throw Error('simulation timeout');return new Response('SIMULATED ONLY',{status:mock.status,headers:{Location:mock.location}});};return {...s,req,mock,run:(changes={},headers={})=>handlePublicNewsletter(req(changes,headers),s.env,{fetcher,policy,profile}),count:()=>provider};}
+async function setup(){const s=await fixture();Object.assign(s.env,{GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_ENABLED:'true',NEWSLETTER_PUBLIC_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-api-v3',NEWSLETTER_EVIDENCE_REVIEWED:'true',NEWSLETTER_VERIFIED:'true',NEWSLETTER_ORIGIN:'https://cimstudio.es'});const req=(changes={},headers={})=>new Request('https://cimstudio.es/api/subscribe',{method:'POST',headers:{Origin:'https://cimstudio.es','Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1',...headers},body:JSON.stringify({...s.data,...changes})});let provider=0;const mock={status:202,location:'https://must-not-follow.example.test',throw:false};const fetcher=async(url,options)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(url.includes('/contacts?'))return Response.json([]);assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.redirect,'manual');assert.equal(JSON.parse(options.body).dayOfCycle,'0');provider++;if(mock.throw)throw Error('simulation timeout');return new Response('SIMULATED ONLY',{status:mock.status,headers:{Location:mock.location}});};return {...s,req,mock,run:(changes={},headers={})=>handlePublicNewsletter(req(changes,headers),s.env,{fetcher,policy,profile}),count:()=>provider};}
 test('public newsletter cannot be activated by environment flags or scoped test approval without reviewed source contract',async()=>{
  const s=await setup();try{assert.equal(newsletterRelease.approved,true);const blocked={...newsletterRelease,approved:false};assert.equal(newsletterPublicReady(s.env,true,blocked),false);assert.equal((await handlePublicNewsletter(s.req(),s.env,{policy,profile:blocked,fetcher:async()=>{throw Error('Provider must not be called');}})).status,503);assert.equal(s.count(),0);}finally{s.close();}
 });
@@ -41,4 +41,27 @@ test('public newsletter validates server-side double opt-in and does not re-add 
  const s=await setup();try{
  for(const mode of ['single','existing']){let posts=0;const response=await handlePublicNewsletter(s.req(),s.env,{policy,profile,fetcher:async(url,options)=>{assert.equal(options.redirect,'manual');if(url.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:mode==='single'?'single':'double'}});if(url.includes('/contacts?'))return Response.json([{email:s.data.email,campaign:{campaignId:'PL6jh'}}]);posts++;throw Error('No POST allowed');}});assert.notEqual(response.status,202);assert.equal(posts,0);}
  }finally{s.close();}
+});
+
+// This checks our gate and request contract, not GetResponse's actual send timing.
+test('day-zero enrolment requires API double opt-in and never sends a separate welcome from Cloudflare',async()=>{
+ for(const type of ['particular','profesional'])for(const optin of ['double','single',undefined]){
+  const s=await setup();const calls=[];
+  try{
+   const response=await handlePublicNewsletter(s.req({subscriberType:type}),s.env,{policy,profile,logger:()=>{},fetcher:async(url,options)=>{
+    calls.push(url);
+    if(url.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});
+    if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:optin}});
+    if(url.includes('/contacts?'))return Response.json([]);
+    assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.method,'POST');
+    assert.deepEqual(JSON.parse(options.body),{email:s.data.email,campaign:{campaignId:'PL6jh'},dayOfCycle:'0',customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:s.env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID,value:[type]}]});
+    return new Response(null,{status:202});
+   }});
+   const posts=calls.filter(url=>url==='https://api.getresponse.com/v3/contacts');
+   assert.equal(posts.length,optin==='double'?1:0);
+   assert.equal(calls.some(url=>url.includes('resend')),false);
+   if(optin==='double')assert.deepEqual(await response.json(),{ok:true,subscription:'confirmation_required'});
+   else{assert.equal(response.status,503);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);}
+  }finally{s.close();}
+ }
 });
