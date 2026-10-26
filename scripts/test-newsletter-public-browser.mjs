@@ -61,8 +61,14 @@ try{
     const mode=scenario==='accepted'?'confirmation':'generic',panel=responseDialog.locator('[data-newsletter-response='+mode+']');
     assert.equal(await panel.getAttribute('aria-hidden'),'false');assert.equal(await panel.evaluate(e=>e.inert),false);
     const other=responseDialog.locator('[data-newsletter-response='+(mode==='confirmation'?'generic':'confirmation')+']');assert.equal(await other.getAttribute('aria-hidden'),'true');assert.equal(await other.evaluate(e=>e.inert),true);assert.equal(await other.isVisible(),false);
-    assert.equal(await panel.locator('h2').textContent(),mode==='confirmation'?(lang==='es'?'Confirma tu suscripción':'Confirm your subscription'):(lang==='es'?'Gracias por tu interés en CIM Studio.':'Thank you for your interest in CIM Studio.'));
+    assert.equal(await panel.locator('h2').textContent(),mode==='confirmation'?(lang==='es'?'Aún no podemos darte acceso':"We can't give you access yet"):(lang==='es'?'Gracias por tu interés en CIM Studio.':'Thank you for your interest in CIM Studio.'));
     assert.equal(await responseDialog.getAttribute('aria-labelledby'),await panel.locator('h2').getAttribute('id'));
+    if(mode==='confirmation'){
+     assert.equal(await panel.locator('#subscription-pending-intro').textContent(),lang==='es'?'Necesitamos que confirmes tu correo electrónico.':'We need you to confirm your email address.');
+     assert.equal(await panel.locator('#subscription-pending-instructions').textContent(),lang==='es'?'Abre tu bandeja de entrada. Te hemos enviado un correo con el asunto «Confirma tu suscripción a CIM Studio». Ábrelo y pulsa en el enlace de confirmación.':'Open your inbox. We have sent you an email with the subject “Confirma tu suscripción a CIM Studio”. Open it and click the confirmation link.');
+     assert.ok((await responseDialog.getAttribute('aria-describedby')).includes('subscription-pending-instructions'));
+     assert.equal(await responseDialog.locator('[data-confirmation-close]').innerText(),lang==='es'?'Entendido':'Got it');
+    }
     if(mode==='generic'){
      assert.equal(await panel.locator('a').getAttribute('href'),'mailto:admin@cimstudio.es');
      assert.equal(await panel.locator('.dialog-intro').first().textContent(),lang==='es'?'Si todavía no has confirmado tu suscripción, revisa tu correo electrónico. Si ya formas parte de nuestra lista, no necesitas realizar ninguna otra acción.':"If you haven't confirmed your subscription yet, please check your email. If you are already on our mailing list, you don't need to take any further action.");

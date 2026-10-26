@@ -14,7 +14,7 @@
   for(const panel of confirmationDialog.querySelectorAll('[data-newsletter-response]')){const active=panel.dataset.newsletterResponse===mode;panel.setAttribute('aria-hidden',String(!active));panel.inert=!active;}
   const prefix=mode==='confirmation'?'subscription-pending':'subscription-generic';
   confirmationDialog.setAttribute('aria-labelledby',prefix+'-title');
-  confirmationDialog.setAttribute('aria-describedby',prefix+'-intro '+prefix+'-help');
+  confirmationDialog.setAttribute('aria-describedby',prefix+'-intro '+(mode==='confirmation'?'subscription-pending-instructions ':'')+prefix+'-help');
   form.closest('dialog').close();confirmationDialog.showModal();
  }
  const samplesResponseDialog=document.getElementById('samples-response-dialog');
