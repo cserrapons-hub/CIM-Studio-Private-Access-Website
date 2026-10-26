@@ -23,3 +23,5 @@ mkdir -p public/controlled/registrations
 cp controlled/registrations/index.html controlled/registrations/test.css controlled/registrations/test.js public/controlled/registrations/
 node scripts/prepare-legal.mjs
 node scripts/prepare-launch.mjs
+node scripts/build-subscription-welcome.mjs
+cp _redirects public/
