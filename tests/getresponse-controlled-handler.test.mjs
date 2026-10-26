@@ -75,7 +75,7 @@ test('relay stores encrypted signed evidence before sending only supported field
   const response=await s.run();assert.equal(response.status,409);assert.equal((await response.json()).subscription,'pending_provider_verification');
   assert.equal(response.headers.get('Location'),null);assert.equal(response.headers.get('Set-Cookie'),null);
   const provider=s.calls.find(x=>x.url==='https://api.getresponse.com/v3/contacts');assert.equal(provider.options.redirect,'manual');assert.ok(provider.options.signal);
-  assert.deepEqual(JSON.parse(provider.options.body),{email:'owner@example.test',campaign:{campaignId:'PL6jh'},dayOfCycle:'0',customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:'simulation-subscriber-type',value:['particular']}]});assert.equal(provider.options.headers['X-Auth-Token'],'api-key simulation-api-key');
+  assert.deepEqual(JSON.parse(provider.options.body),{email:'owner@example.test',campaign:{campaignId:'PL6jh'},customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:'simulation-subscriber-type',value:['particular']}]});assert.equal(provider.options.headers['X-Auth-Token'],'api-key simulation-api-key');
   const record=s.sqlite.prepare('SELECT * FROM newsletter_consent_requests').get();assert.ok(await verifyConsentEvidence(record,s.env.AUDIT_HASH_SECRET));assert.ok(!JSON.stringify(record).includes(s.data.email));
   const delivery=s.sqlite.prepare('SELECT * FROM newsletter_html_deliveries').get();assert.equal(delivery.state,'unverified');assert.equal(delivery.provider_http_status,302);assert.ok(!JSON.stringify(delivery).includes(s.data.email));
  }finally{s.sqlite.close();}

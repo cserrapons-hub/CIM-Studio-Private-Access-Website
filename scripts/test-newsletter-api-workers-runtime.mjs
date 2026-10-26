@@ -24,7 +24,7 @@ for(const mode of ['accepted','rejected','server_error','redirect','existing_con
   if(url.pathname==='/v3/campaigns/PL6jh'){assert.equal(request.method,'GET');return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});}
   assert.equal(url.pathname,'/v3/contacts');
   if(request.method==='GET')return Response.json(mode==='existing_contact'?[{email:s.data.email,campaign:{campaignId:'PL6jh'}}]:[]);
-  assert.equal(request.method,'POST');posts++;assert.deepEqual(await request.json(),{email:s.data.email,campaign:{campaignId:'PL6jh'},dayOfCycle:'0',customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:'simulation-subscriber-type',value:['particular']}]});
+  assert.equal(request.method,'POST');posts++;assert.deepEqual(await request.json(),{email:s.data.email,campaign:{campaignId:'PL6jh'},customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:'simulation-subscriber-type',value:['particular']}]});
   assert.equal(s.forms.sqlite.prepare('SELECT state FROM '+(mode.startsWith('retry_')?'newsletter_retry_attempts':'newsletter_api_deliveries')).get().state,'sending');if(mode.startsWith('retry_'))assert.ok(s.forms.sqlite.prepare('SELECT consumed_at FROM newsletter_retry_permits').get().consumed_at);
   return new Response(null,{status:mode==='rejected'?404:['server_error','retry_5xx'].includes(mode)?503:mode==='redirect'?302:202,headers:{Location:'https://never-follow.example.test/'}});
  }}]}));
