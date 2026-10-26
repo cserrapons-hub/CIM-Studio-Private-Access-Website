@@ -119,8 +119,7 @@ footer{margin-top:auto}
  .photograph-volcan{--photo-label-color:#ffffff;--photo-label-weight:300;--photo-label-shadow:none}
  .photograph-tramuntana,.photograph-pool{--photo-label-color:#000000;--photo-label-weight:600;--photo-label-shadow:none}
  .photograph-soporte{--photo-label-color:#ffffff;--photo-label-weight:300;--photo-label-shadow:0 1px 2px rgb(0 0 0 / .35)}
- .photograph figcaption{inset:auto 0 0 0;width:auto;margin:0;padding:18px;border:0;text-align:left;color:var(--photo-label-color);opacity:0;transition:opacity 350ms ease;z-index:2;text-shadow:var(--photo-label-shadow)}
- .photograph-volcan figcaption{top:0;bottom:auto}
+ .photograph figcaption{inset:0 0 auto 0;width:auto;margin:0;padding:18px;border:0;text-align:left;color:var(--photo-label-color);opacity:0;transition:opacity 350ms ease;z-index:2;text-shadow:var(--photo-label-shadow)}
  .photograph .product-category{display:block;font-weight:var(--photo-label-weight);font-synthesis:none}
  .photograph .product-label{gap:5px}
  .photograph .product-name{font:var(--photo-label-weight) 12px/1.4 Montserrat,Arial,Helvetica,sans-serif;letter-spacing:.03em;font-synthesis:none}
