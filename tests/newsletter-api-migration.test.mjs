@@ -13,7 +13,7 @@ async function setup(){
  if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:mock.optin}});
  if(url.includes('/contacts?'))return Response.json(mock.contacts);
  assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.method,'POST');assert.equal(options.headers['Content-Type'],'application/json');
- assert.deepEqual(JSON.parse(options.body),{email:s.data.email,campaign:{campaignId:'PL6jh'},customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:'simulation-subscriber-type',value:['particular']}]});
+ assert.deepEqual(JSON.parse(options.body),{email:s.data.email,campaign:{campaignId:'PL6jh'},dayOfCycle:'0',customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:'simulation-subscriber-type',value:['particular']}]});
  assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_html_deliveries WHERE request_id=?').get(s.data.requestId).state,'sending');assert.equal(s.forms.sqlite.prepare('SELECT state FROM newsletter_api_deliveries').get().state,'sending');
  assert.ok(await verifyConsentEvidence(s.forms.sqlite.prepare('SELECT * FROM newsletter_consent_requests').get(),s.env.AUDIT_HASH_SECRET));
  if(mock.throw)throw new DOMException('PRIVATE provider timeout','TimeoutError');return new Response('PRIVATE PROVIDER BODY',{status:mock.status,headers:{Location:'https://must-not-follow.example.test'}});
