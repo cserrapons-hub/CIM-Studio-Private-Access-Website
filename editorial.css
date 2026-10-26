@@ -171,3 +171,10 @@ footer{margin-top:auto}
 @media(max-width:600px){
  .compact-photo{order:0}
 }
+
+/* Desktop refinements only; compact layouts keep their approved spacing. */
+@media(min-width:1101px){
+ .languages{font-size:clamp(9px,.798387093cqw,19.8px)}
+ .invitation h1{margin-bottom:2.830645168cqw}
+ .invitation .intro:not(:has(+ .intro)){margin-bottom:2.98790323cqw}
+}
