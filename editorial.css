@@ -178,3 +178,24 @@ footer{margin-top:auto}
  .invitation h1{margin-bottom:2.830645168cqw}
  .invitation .intro:not(:has(+ .intro)){margin-bottom:2.98790323cqw}
 }
+
+/* Final responsive refinements; paragraph-to-paragraph spacing is unchanged. */
+@media(min-width:1101px){
+ .languages{font-size:clamp(7.65px,.67862902905cqw,16.83px)}
+ .invitation h1{margin-bottom:3.6798387184cqw}
+ .invitation .intro{width:85%;margin-left:auto;margin-right:auto}
+ .invitation .intro:not(:has(+ .intro)){margin-bottom:3.884274199cqw}
+ .editorial-v2 [data-piece=Cova] .photograph-frame{aspect-ratio:976/1195}
+ .editorial-v2 [data-piece=Cova] .photograph-motion{position:absolute;inset:0}
+ .editorial-v2 [data-piece=Cova] img{height:100%;object-fit:cover}
+}
+@media(max-width:600px){
+ .compact-photo[data-piece=Arrel] .photograph-frame{aspect-ratio:1}
+ .compact-photo[data-piece=Fil] .photograph-frame,
+ .compact-photo[data-piece=Talaia] .photograph-frame{aspect-ratio:3/4}
+ .compact-photo[data-piece=Arrel] img{object-position:center top}
+ .compact-photo[data-piece=Fil] img{object-position:center bottom}
+ .compact-photo[data-piece=Talaia] img{object-position:center}
+ .invitation h1{margin-bottom:27.3px}
+ .invitation .intro:not(:has(+ .intro)){margin-bottom:24.7px}
+}
