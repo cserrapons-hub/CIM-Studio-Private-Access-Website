@@ -25,6 +25,10 @@ try{
   assert.equal(visual.overflow,false);assert.equal(visual.background,'rgb(247, 246, 244)');assert.equal(visual.color,'rgb(41, 42, 38)');assert.ok(visual.font.includes('Montserrat'));assert.equal(visual.loaded,true);assert.equal(visual.logo,true);assert.deepEqual(errors,[]);
   const layout=await page.evaluate(()=>{const text=document.querySelector('main').getBoundingClientRect(),logo=document.querySelector('.welcome-brand').getBoundingClientRect();return {centre:(text.top+text.bottom)/2,logoBottom:logo.bottom,textTop:text.top,textBottom:text.bottom,height:innerHeight,scrollHeight:document.documentElement.scrollHeight};});
   assert.ok(layout.textTop>layout.logoBottom+30,'Text separate from logo');
+  const refinement=await page.evaluate(()=>{const logo=document.querySelector('.welcome-brand img').getBoundingClientRect(),title=document.querySelector('h1').getBoundingClientRect(),rule=document.querySelector('.welcome-rule').getBoundingClientRect(),style=getComputedStyle(document.querySelector('main p'));return {lineCentre:(rule.top+rule.bottom)/2,gapCentre:(logo.bottom+title.top)/2,lineX:(rule.left+rule.right)/2,logoTop:logo.top,weight:style.fontWeight,size:parseFloat(style.fontSize),regular:[...document.fonts].some(f=>f.family==='Montserrat'&&f.weight==='400'&&f.status==='loaded')};});
+  assert.ok(Math.abs(refinement.lineCentre-refinement.gapCentre)<1,'Rule at exact midpoint of actual logo/title gap');
+  assert.ok(Math.abs(refinement.lineX-width/2)<1,'Rule horizontally centred');
+  assert.equal(refinement.logoTop,width<=600?66:30,'Logo position retained');assert.equal(refinement.weight,'400');assert.equal(refinement.size,13);assert.equal(refinement.regular,true,'Real self-hosted Montserrat Regular');
   if(height>=800)assert.ok(Math.abs(layout.centre-height/2)<2,'Text centred independently in viewport');
   assert.ok(layout.textBottom<=layout.scrollHeight,'Short screens scroll naturally without cropped content');
   if(path==='/bienvenido')await page.screenshot({path:out+'/'+language+'-'+width+'-'+height+'.png',fullPage:true});

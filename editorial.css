@@ -29,14 +29,14 @@
 .photograph-soporte figcaption{right:100%;bottom:0;width:9.43548387cqw;border-bottom:1px solid #77766f;padding:0 0 .88709677cqw 1.29032258cqw}
 .editorial-scroll{display:block;width:1.77419355cqw;height:6.73387097cqw;margin:14.07258065cqw auto 0;color:var(--ink);scroll-margin:0;position:relative}
 .editorial-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:.72;vector-effect:non-scaling-stroke}
-.invitation{position:relative;z-index:1;width:40.32258065%;max-width:1000px;margin:15.28225806cqw 0 0 30.24193548%;scroll-margin-top:36px}
+.invitation{position:relative;z-index:1;width:40.32258065%;max-width:1000px;margin:15.28225806cqw auto 0;scroll-margin-top:36px;text-align:left}
 h1{font:normal clamp(43px,5.08064516cqw,126px)/1.05 var(--serif);letter-spacing:-1.8px;margin:0 0 2.90322581cqw}
-.intro{font-size:clamp(13px,.96774194cqw,24px);font-weight:400;line-height:1.9;letter-spacing:.01em;color:var(--ink);max-width:none;margin:0 0 3.06451613cqw}.intro:has(+ .intro){margin-bottom:1.4516129cqw}
+.intro{font-size:clamp(12px,.85cqw,21px);font-weight:400;line-height:1.85;letter-spacing:.01em;color:var(--ink);max-width:none;margin:0 0 3.06451613cqw}.intro:has(+ .intro){margin-bottom:1.4516129cqw}
 @media(hover:hover) and (pointer:fine){.photograph-frame:hover img{transform:scale(1.05);filter:saturate(1)}}
 @media(hover:none),(pointer:coarse){.photograph img{filter:saturate(1)}}
 @media(prefers-reduced-motion:reduce){.photograph img{transition:none}.photograph-frame:hover img{transform:none}}
 
-@media(max-width:1100px){.intro{font-size:13px}}
+@media(max-width:1100px){.intro{font-size:12px}}
 @media(max-width:600px){
  .page-shell{min-height:100svh}
  .header{height:230px}
@@ -104,5 +104,5 @@ footer{margin-top:auto}
  .photograph .photograph-frame img{filter:saturate(1);transform:none}
  .photograph-tramuntana .photograph-frame{aspect-ratio:1024/1536}
  .photograph-soporte .photograph-frame{aspect-ratio:1367/1150}
- .intro{font-size:12.35px;line-height:1.75}
+ .intro{font-size:12px;line-height:1.8}
 }
