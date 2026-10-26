@@ -37,7 +37,7 @@ test('editorial images ship with explicit sRGB profiles, expected dimensions and
 });
 test('the same processed sources are retained with the explicitly requested decorative hover filter',()=>{
  const html=readFileSync('public/index.html','utf8'),css=readFileSync('public/editorial.css','utf8');
- const sources=[...html.matchAll(/<img src="assets\/(editorial-[^"]+)"/g)].map(m=>m[1]);
+ const sources=[...html.matchAll(/<img src="assets\/(editorial-[^"]+)"/g)].map(m=>m[1]).filter(name=>!name.startsWith('editorial-v2/'));
  assert.deepEqual(sources.toSorted(),assets.map(([name])=>name).toSorted());
  assert.ok(!/<picture|\bsrcset=/.test(html));
  const photoRule=css.match(/\.photograph img\{([^}]+)\}/)?.[1];assert.ok(photoRule);

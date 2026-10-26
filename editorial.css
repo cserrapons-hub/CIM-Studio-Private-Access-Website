@@ -129,3 +129,23 @@ footer{margin-top:auto}
 @media(min-width:1101px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:reduce){
  .photograph figcaption{transition:none}
 }
+
+/* Desktop-only two independent, flush editorial columns. Legacy mobile stays intact. */
+.editorial-v2{display:none}
+@media(min-width:1101px){
+ .photographic-composition{height:auto}
+ .photograph-pair,.photograph-right{display:none}
+ .editorial-v2{display:grid;grid-template-columns:1fr 1fr;width:72.5%;margin:0 auto;gap:0;align-items:start}
+ .editorial-v2-column{min-width:0}
+ .editorial-v2 .photograph{position:relative;inset:auto;width:100%;margin:0;--photo-label-color:#fff;--photo-label-weight:300;--photo-label-shadow:0 1px 2px rgb(0 0 0 / .35)}
+ .editorial-v2 [data-piece=Binari],.editorial-v2 [data-piece=Fita],.editorial-v2 [data-piece=Arrel]{--photo-label-color:#000;--photo-label-weight:600;--photo-label-shadow:none}
+ .editorial-v2 .photograph-frame{aspect-ratio:auto}
+ .editorial-v2 img{height:auto;transition:transform 700ms cubic-bezier(.22,1,.36,1),filter 350ms ease,opacity 350ms ease}
+ .editorial-v2 figcaption{inset:0 0 auto 0;width:auto;margin:0;padding:18px;border:0;text-align:left;color:var(--photo-label-color);z-index:2;text-shadow:var(--photo-label-shadow)}
+ .editorial-v2 .talaia-on{position:absolute;inset:0;opacity:0;filter:saturate(1)}
+ .editorial-v2 .photograph:focus-within img{filter:saturate(1);transform:scale(1.05)}
+ .editorial-v2 [data-piece=Talaia]:is(:hover,:focus-within) .talaia-on{opacity:1}
+ .editorial-v2 [data-piece=Talaia]:is(:hover,:focus-within) img:first-child{opacity:0}
+}
+@media(min-width:1101px) and (hover:none){.editorial-v2 .talaia-on{opacity:1}.editorial-v2 [data-piece=Talaia] img:first-child{opacity:0}}
+@media(prefers-reduced-motion:reduce){.editorial-v2 img{transition:none!important;transform:none!important}}
