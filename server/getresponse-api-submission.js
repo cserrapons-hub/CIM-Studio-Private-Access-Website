@@ -6,6 +6,6 @@ export function prepareNewsletterApi(env,email,type,{startTimeout=true}={}){
  if(!segmentationReady(env))throw Error('segmentation_configuration');
  type=subscriberType(type);
  if(env.GETRESPONSE_CAMPAIGN_ID!=='PL6jh'||typeof env.GETRESPONSE_API_KEY!=='string'||!env.GETRESPONSE_API_KEY.trim())throw Error('api_configuration');
- const options={method:'POST',redirect:'manual',...(startTimeout?{signal:AbortSignal.timeout(12000)}:{}),headers:{'Content-Type':'application/json',Accept:'application/json','X-Auth-Token':'api-key '+env.GETRESPONSE_API_KEY},body:JSON.stringify({email,campaign:{campaignId:'PL6jh'},dayOfCycle:'0',customFieldValues:[{customFieldId:NEWSLETTER_CONSENT.customFieldId,value:[NEWSLETTER_CONSENT.value]},{customFieldId:env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID,value:[type]}]})};
+ const options={method:'POST',redirect:'manual',...(startTimeout?{signal:AbortSignal.timeout(12000)}:{}),headers:{'Content-Type':'application/json',Accept:'application/json','X-Auth-Token':'api-key '+env.GETRESPONSE_API_KEY},body:JSON.stringify({email,campaign:{campaignId:'PL6jh'},customFieldValues:[{customFieldId:NEWSLETTER_CONSENT.customFieldId,value:[NEWSLETTER_CONSENT.value]},{customFieldId:env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID,value:[type]}]})};
  const url='https://api.getresponse.com/v3/contacts';new Request(url,options);return {url,options};
 }

@@ -4,7 +4,7 @@ import {fixture,policy} from './helpers/launch-fixture.mjs';
 import {handlePublicNewsletter} from '../server/newsletter-public.js';
 import {newsletterPublicReady,newsletterRelease,acceptedNewsletterResponse} from '../server/newsletter-release.js';
 const profile={approved:true,version:'SIMULATED-NOT-A-REAL-CONTRACT',provider:'getresponse-api-v3',acceptedResponse:{status:202}};
-async function setup(){const s=await fixture();Object.assign(s.env,{GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_ENABLED:'true',NEWSLETTER_PUBLIC_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-api-v3',NEWSLETTER_EVIDENCE_REVIEWED:'true',NEWSLETTER_VERIFIED:'true',NEWSLETTER_ORIGIN:'https://cimstudio.es'});const req=(changes={},headers={})=>new Request('https://cimstudio.es/api/subscribe',{method:'POST',headers:{Origin:'https://cimstudio.es','Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1',...headers},body:JSON.stringify({...s.data,...changes})});let provider=0;const mock={status:202,location:'https://must-not-follow.example.test',throw:false};const fetcher=async(url,options)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(url.includes('/contacts?'))return Response.json([]);assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.redirect,'manual');assert.equal(JSON.parse(options.body).dayOfCycle,'0');provider++;if(mock.throw)throw Error('simulation timeout');return new Response('SIMULATED ONLY',{status:mock.status,headers:{Location:mock.location}});};return {...s,req,mock,run:(changes={},headers={})=>handlePublicNewsletter(req(changes,headers),s.env,{fetcher,policy,profile}),count:()=>provider};}
+async function setup(){const s=await fixture();Object.assign(s.env,{GETRESPONSE_CAMPAIGN_ID:'PL6jh',NEWSLETTER_ENABLED:'true',NEWSLETTER_PUBLIC_ENABLED:'true',NEWSLETTER_PROVIDER:'getresponse-api-v3',NEWSLETTER_EVIDENCE_REVIEWED:'true',NEWSLETTER_VERIFIED:'true',NEWSLETTER_ORIGIN:'https://cimstudio.es'});const req=(changes={},headers={})=>new Request('https://cimstudio.es/api/subscribe',{method:'POST',headers:{Origin:'https://cimstudio.es','Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1',...headers},body:JSON.stringify({...s.data,...changes})});let provider=0;const mock={status:202,location:'https://must-not-follow.example.test',throw:false};const fetcher=async(url,options)=>{if(url.includes('siteverify'))return Response.json({success:true,hostname:'cimstudio.es',action:'subscribe'});if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:'double'}});if(url.includes('/contacts?'))return Response.json([]);assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.redirect,'manual');assert.equal(Object.hasOwn(JSON.parse(options.body),'dayOfCycle'),false);provider++;if(mock.throw)throw Error('simulation timeout');return new Response('SIMULATED ONLY',{status:mock.status,headers:{Location:mock.location}});};return {...s,req,mock,run:(changes={},headers={})=>handlePublicNewsletter(req(changes,headers),s.env,{fetcher,policy,profile}),count:()=>provider};}
 test('public newsletter cannot be activated by environment flags or scoped test approval without reviewed source contract',async()=>{
  const s=await setup();try{assert.equal(newsletterRelease.approved,true);const blocked={...newsletterRelease,approved:false};assert.equal(newsletterPublicReady(s.env,true,blocked),false);assert.equal((await handlePublicNewsletter(s.req(),s.env,{policy,profile:blocked,fetcher:async()=>{throw Error('Provider must not be called');}})).status,503);assert.equal(s.count(),0);}finally{s.close();}
 });
@@ -44,7 +44,7 @@ test('public newsletter validates server-side double opt-in and does not re-add 
 });
 
 // This checks our gate and request contract, not GetResponse's actual send timing.
-test('day-zero enrolment requires API double opt-in and never sends a separate welcome from Cloudflare',async()=>{
+test('rollback omits dayOfCycle but still requires API double opt-in and never sends a Cloudflare welcome',async()=>{
  for(const type of ['particular','profesional'])for(const optin of ['double','single',undefined]){
   const s=await setup();const calls=[];
   try{
@@ -54,7 +54,7 @@ test('day-zero enrolment requires API double opt-in and never sends a separate w
     if(url.includes('/campaigns/'))return Response.json({campaignId:'PL6jh',name:'cim_studio_newsletter',optinTypes:{api:optin}});
     if(url.includes('/contacts?'))return Response.json([]);
     assert.equal(url,'https://api.getresponse.com/v3/contacts');assert.equal(options.method,'POST');
-    assert.deepEqual(JSON.parse(options.body),{email:s.data.email,campaign:{campaignId:'PL6jh'},dayOfCycle:'0',customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:s.env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID,value:[type]}]});
+    assert.deepEqual(JSON.parse(options.body),{email:s.data.email,campaign:{campaignId:'PL6jh'},customFieldValues:[{customFieldId:'njH9fM',value:['aceptado']},{customFieldId:s.env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID,value:[type]}]});
     return new Response(null,{status:202});
    }});
    const posts=calls.filter(url=>url==='https://api.getresponse.com/v3/contacts');
@@ -62,6 +62,20 @@ test('day-zero enrolment requires API double opt-in and never sends a separate w
    assert.equal(calls.some(url=>url.includes('resend')),false);
    if(optin==='double')assert.deepEqual(await response.json(),{ok:true,subscription:'confirmation_required'});
    else{assert.equal(response.status,503);assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,0);}
+  }finally{s.close();}
+ }
+});
+
+// Hypothetical provider validation failures: no real incident response is available yet.
+test('provider 400/422 is recorded as rejected, exposes no body, creates no acceptance receipt and cannot silently retry',async()=>{
+ for(const status of [400,422]){
+  const s=await setup();try{
+   s.mock.status=status;
+   const response=await s.run();assert.equal(response.status,502);assert.deepEqual(await response.json(),{error:'unavailable'});assert.equal(s.count(),1);
+   const api=s.forms.sqlite.prepare('SELECT state,provider_http_status FROM newsletter_api_deliveries').get();assert.deepEqual({...api},{state:'rejected',provider_http_status:status});
+   assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_consent_requests').get().n,1);
+   assert.equal(s.forms.sqlite.prepare('SELECT COUNT(*) n FROM newsletter_http_receipts').get().n,0);
+   assert.equal((await s.run({requestId:crypto.randomUUID()})).status,409);assert.equal(s.count(),1);
   }finally{s.close();}
  }
 });
