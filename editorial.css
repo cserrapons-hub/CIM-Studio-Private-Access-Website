@@ -110,7 +110,9 @@ footer{margin-top:auto}
 
 /* Desktop-only trial: centred presentation and names within the unchanged photo frames. */
 @media(min-width:1101px){
- .invitation,.invitation h1,.invitation .intro,.invitation .professional{text-align:center}
+ .invitation{width:34.27419355%;max-width:850px;text-align:center}
+ .invitation h1{text-align:center}
+ .invitation .intro,.invitation .professional{text-align:left}
 }
 @media(min-width:1101px) and (hover:hover) and (pointer:fine){
  @font-face{font-family:Montserrat;font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/montserrat-latin-600.9557c09a5982.woff2") format("woff2")}

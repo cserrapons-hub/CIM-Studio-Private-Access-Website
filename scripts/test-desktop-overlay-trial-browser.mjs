@@ -27,10 +27,11 @@ try{
      const style=selector=>{const s=getComputedStyle(document.querySelector(selector));return {size:s.fontSize,weight:s.fontWeight,lineHeight:s.lineHeight,margin:s.margin};};
      return {fixed:['.brand','.photograph-volcan .photograph-frame','.photograph-tramuntana .photograph-frame','.photograph-pool .photograph-frame','.photograph-soporte .photograph-frame','.editorial-scroll'].map(rect),block:rect('.invitation'),text:['.invitation h1','.intro','.professional'].map(style),overflow:document.documentElement.scrollWidth>innerWidth};
     });
-    if(version==='before')before=geometry;else{assert.deepEqual(geometry.fixed,before.fixed,'Logo, frames and arrow unchanged');assert.deepEqual(geometry.block,before.block,'Container geometry unchanged');assert.deepEqual(geometry.text,before.text,'Typography and spacing unchanged');assert.equal(geometry.overflow,false);}
+    if(version==='before')before=geometry;else{assert.deepEqual(geometry.fixed,before.fixed,'Logo, frames and arrow unchanged');if(profile.width>1100){assert.ok(Math.abs(geometry.block.width/before.block.width-.85)<.0001,'Desktop presentation width reduced by 15%');assert.equal(geometry.block.y,before.block.y);assert.ok(Math.abs(geometry.block.x+geometry.block.width/2-profile.width/2)<1,'Narrower container stays centred');}else assert.deepEqual(geometry.block,before.block,'Mobile/tablet container unchanged');assert.deepEqual(geometry.text,before.text,'Font sizes, weights, line heights and spacing unchanged');assert.equal(geometry.overflow,false);}
     const desktop=profile.width>1100,overlay=desktop&&!profile.touch&&version==='after';
     assert.equal(await page.locator('.invitation').evaluate(e=>getComputedStyle(e).textAlign),desktop&&version==='after'?'center':'left');
-    if(desktop&&version==='after')for(const selector of ['.invitation h1','.invitation .intro','.invitation .professional'])assert.equal(await page.locator(selector).first().evaluate(e=>getComputedStyle(e).textAlign),'center');
+    if(desktop&&version==='after')for(const selector of ['.invitation h1','.invitation .intro','.invitation .professional'])assert.equal(await page.locator(selector).first().evaluate(e=>getComputedStyle(e).textAlign),selector==='.invitation h1'?'center':'left');
+    if(desktop&&version==='after'){const block=await page.locator('.invitation').boundingBox();for(const p of await page.locator('.invitation .intro').all()){const r=await p.boundingBox();assert.ok(Math.abs(r.x-block.x)<1&&Math.abs(r.width-block.width)<1,'All paragraphs fill the same left-aligned column');}}
     assert.deepEqual(await page.locator('.product-name').allTextContents(),['Tramuntana','Fita','Binari','Cleda']);
     for(const fig of await page.locator('.photograph').all()){
      const caption=fig.locator('figcaption');assert.equal(await caption.evaluate(e=>getComputedStyle(e).opacity),overlay?'0':'1');assert.equal(await fig.getAttribute('tabindex'),overlay?'0':null);
@@ -63,5 +64,5 @@ try{
    }finally{await context.close();}
   }
  }
- console.log('PASS '+cases+' visual cases: ES/EN 1440/1920/390, identical mobile pixels, unchanged geometry/typography, centred desktop text, two-line hover/focus labels with exact per-photo colour, position and real SemiBold 600, touch fallback, reduced motion, no real requests. Screenshots: '+out);
+ console.log('PASS '+cases+' visual cases: ES/EN 1440/1920/390, identical mobile pixels, unchanged photo geometry/typography, narrower centred column, centred heading and left-aligned paragraphs, two-line hover/focus labels with exact per-photo colour, position and real SemiBold 600, touch fallback, reduced motion, no real requests. Screenshots: '+out);
 }finally{await browser.close();}
