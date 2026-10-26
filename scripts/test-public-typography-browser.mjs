@@ -15,7 +15,7 @@ try{
   try{
    await context.route('**/*',route=>{
     const req=route.request(),url=new URL(req.url());assert.equal(req.method(),'GET','no submissions');
-    if(url.hostname==='challenges.cloudflare.com')return route.fulfill({contentType:'application/javascript',body:"window.turnstile={render:()=>1,remove:()=>{},reset:()=>{}};window.cimTurnstileReady();"});
+    if(url.hostname==='challenges.cloudflare.com')return route.fulfill({contentType:'application/javascript',body:"window.turnstile={render:()=>1,getResponse:()=> 'simulation-token',remove:()=>{},reset:()=>{}};window.cimTurnstileReady();"});
     assert.equal(url.origin,'https://cimstudio.es');
     if(url.pathname==='/api/config')return route.fulfill({json:{enabled:{subscribe:true,samples:true,careers:true},verified:true,siteKey:'simulation-only',siteLive:true,legalVersion:legal.version,legal:{es:legal.es,en:legal.en}}});
     const name='public'+(url.pathname==='/'?'/index.html':url.pathname),body=version==='before'&&url.pathname==='/styles.css'?baseline:readFileSync(name);

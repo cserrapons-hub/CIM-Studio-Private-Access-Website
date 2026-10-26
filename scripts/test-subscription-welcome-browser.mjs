@@ -8,8 +8,8 @@ assert.ok(['127.0.0.1','localhost'].includes(new URL(origin).hostname),'Use a lo
 const out=process.env.CIM_WELCOME_SCREENSHOTS||'/tmp/cim-subscription-welcome';mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
 try{
- for(const width of [1440,768,390])for(const language of ['es','en'])for(const path of ['/bienvenido','/bienvenido/']){
-  const context=await browser.newContext({viewport:{width,height:900}}),errors=[];
+ for(const [width,height] of [[1440,900],[768,900],[390,844],[390,360]])for(const language of ['es','en'])for(const path of ['/bienvenido','/bienvenido/']){
+  const context=await browser.newContext({viewport:{width,height}}),errors=[];
   await context.route('**/*',route=>{const url=new URL(route.request().url());assert.equal(url.origin,origin,'No external request');assert.ok(!url.pathname.startsWith('/api/'),'No API calls');return route.continue();});
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
   const response=await page.goto(origin+path);assert.equal(response.status(),200);assert.equal(new URL(page.url()).pathname,'/bienvenido');
@@ -23,7 +23,11 @@ try{
   await page.evaluate(()=>document.fonts.ready);
   const visual=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,background:getComputedStyle(document.documentElement).backgroundColor,color:getComputedStyle(document.documentElement).color,font:getComputedStyle(document.body).fontFamily,loaded:document.fonts.check('300 13px Montserrat'),logo:document.querySelector('img').complete&&document.querySelector('img').naturalWidth>0}));
   assert.equal(visual.overflow,false);assert.equal(visual.background,'rgb(247, 246, 244)');assert.equal(visual.color,'rgb(41, 42, 38)');assert.ok(visual.font.includes('Montserrat'));assert.equal(visual.loaded,true);assert.equal(visual.logo,true);assert.deepEqual(errors,[]);
-  if(path==='/bienvenido')await page.screenshot({path:out+'/'+language+'-'+width+'.png',fullPage:true});
+  const layout=await page.evaluate(()=>{const text=document.querySelector('main').getBoundingClientRect(),logo=document.querySelector('.welcome-brand').getBoundingClientRect();return {centre:(text.top+text.bottom)/2,logoBottom:logo.bottom,textTop:text.top,textBottom:text.bottom,height:innerHeight,scrollHeight:document.documentElement.scrollHeight};});
+  assert.ok(layout.textTop>layout.logoBottom+30,'Text separate from logo');
+  if(height>=800)assert.ok(Math.abs(layout.centre-height/2)<2,'Text centred independently in viewport');
+  assert.ok(layout.textBottom<=layout.scrollHeight,'Short screens scroll naturally without cropped content');
+  if(path==='/bienvenido')await page.screenshot({path:out+'/'+language+'-'+width+'-'+height+'.png',fullPage:true});
   await context.close();cases++;
  }
  console.log('PASS '+cases+' local Pages cases: both URL variants, ES/EN, desktop/tablet/mobile, exact copy, logo/font, CSP, no overflow, no API/external requests.');

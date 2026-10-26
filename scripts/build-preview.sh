@@ -25,3 +25,4 @@ node scripts/prepare-legal.mjs
 node scripts/prepare-launch.mjs
 node scripts/build-subscription-welcome.mjs
 cp _redirects public/
+node scripts/prepare-editorial.mjs

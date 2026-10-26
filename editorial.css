@@ -1,0 +1,108 @@
+/* Approved visual layout from 462fe85; public form and modal CSS stays in styles.css. */
+/* Desktop coordinates are measured from the supplied 2480×7016 reference. */
+.page-shell{position:relative;isolation:isolate;container-type:inline-size;width:100%;max-width:2480px;min-height:calc(min(100vw,2480px) * 2.829032258);margin:0 auto;background:var(--page-background);display:flex;flex-direction:column;overflow:visible}
+.preview-notice{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.header{display:block;padding:0;height:48.99193548cqw;flex:none;position:relative;z-index:1}
+.brand{position:absolute;left:50%;top:12.45967742cqw;transform:translateX(-50%);display:block;width:12.62096774cqw;height:auto;text-decoration:none}
+.brand-image{display:block;width:100%;height:auto;object-fit:contain}
+.languages{padding-top:0;position:absolute;right:6.8%;top:2.8cqw;display:flex;align-items:center;gap:clamp(9px,.7cqw,17px);font-size:clamp(10px,.88709677cqw,22px)}
+.languages button{padding:5px 2px;color:#939189;min-height:30px}.languages button[aria-pressed=true]{color:var(--ink)}.languages span{color:#b3b0a7;font-size:.9em}
+.composition{margin:0 0 100px;padding:0;display:block;flex:none}
+.photographic-composition{display:block;position:relative;width:100%;height:139.07258065cqw;margin:0}
+.photograph-pair,.photograph-right{display:contents;width:auto;padding:0;margin:0}
+.photograph{position:absolute;margin:0;min-width:0;overflow:visible}
+.photograph-frame{position:relative;overflow:hidden;isolation:isolate}
+.photograph-motion{width:100%;height:100%}
+.photograph img{display:block;width:100%;height:100%;object-fit:cover;transform:scale(1);filter:saturate(0.2);transition:transform 700ms cubic-bezier(.22,1,.36,1),filter 700ms cubic-bezier(.22,1,.36,1)}
+.photograph-volcan{left:13.79354839%;top:0;width:36.20645161%}
+.photograph-volcan .photograph-frame{aspect-ratio:976/1067}
+.photograph-tramuntana{left:50%;top:37.01612903cqw;width:36.54032258%}
+.photograph-tramuntana .photograph-frame{aspect-ratio:985/1476}
+.photograph-soporte{left:20.32258065%;top:114.07258065cqw;width:29.71774194%}
+.photograph-soporte .photograph-frame{aspect-ratio:737/620}
+.photograph-pool{left:50.04032258%;top:114.07258065cqw;width:24.75806452%}
+.photograph-pool .photograph-frame{aspect-ratio:614/620}
+.photograph figcaption{position:absolute;box-sizing:border-box;font:300 clamp(10px,.88709677cqw,22px)/1.2 Montserrat,Arial,Helvetica,sans-serif;letter-spacing:0;color:#555550;pointer-events:none;white-space:nowrap}
+.photograph-volcan figcaption{left:100%;top:0;width:17.33870968cqw;border-top:1px solid #77766f;text-align:right;padding:1.00806452cqw 1.77419355cqw 0 0}
+.photograph-tramuntana figcaption{right:100%;bottom:0;width:17.37903226cqw;border-bottom:1px solid #77766f;padding:0 0 1.00806452cqw 1.33064516cqw}
+.photograph-pool figcaption{left:100%;top:0;width:15cqw;border-top:1px solid #77766f;text-align:right;padding:.88709677cqw 2.01612903cqw 0 0}
+.photograph-soporte figcaption{right:100%;bottom:0;width:9.43548387cqw;border-bottom:1px solid #77766f;padding:0 0 .88709677cqw 1.29032258cqw}
+.editorial-scroll{display:block;width:1.77419355cqw;height:6.73387097cqw;margin:14.07258065cqw auto 0;color:var(--ink);scroll-margin:0;position:relative}
+.editorial-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:.72;vector-effect:non-scaling-stroke}
+.invitation{position:relative;z-index:1;width:40.32258065%;max-width:1000px;margin:15.28225806cqw 0 0 30.24193548%;scroll-margin-top:36px}
+h1{font:normal clamp(43px,5.08064516cqw,126px)/1.05 var(--serif);letter-spacing:-1.8px;margin:0 0 2.90322581cqw}
+.intro{font-size:clamp(13px,.96774194cqw,24px);font-weight:400;line-height:1.9;letter-spacing:.01em;color:var(--ink);max-width:none;margin:0 0 3.06451613cqw}.intro:has(+ .intro){margin-bottom:1.4516129cqw}
+@media(hover:hover) and (pointer:fine){.photograph-frame:hover img{transform:scale(1.05);filter:saturate(1)}}
+@media(hover:none),(pointer:coarse){.photograph img{filter:saturate(1)}}
+@media(prefers-reduced-motion:reduce){.photograph img{transition:none}.photograph-frame:hover img{transform:none}}
+
+@media(max-width:1100px){.intro{font-size:13px}}
+@media(max-width:600px){
+ .page-shell{min-height:100svh}
+ .header{height:230px}
+ .brand{top:54px;width:104px}
+ .languages{top:14px;right:6%;font-size:10px;gap:9px}
+ .composition{margin-bottom:72px}
+ .photographic-composition{--binari-top:calc(46cqw * 1067 / 976 - 20px);--lower-top:calc(var(--binari-top) + 46cqw * 1476 / 985 + 72px);height:calc(var(--lower-top) + 46cqw * 620 / 737)}
+ .photograph-volcan{left:7.68%;width:42.32%;top:0}
+ .photograph-tramuntana{left:50%;width:42.32%;top:var(--binari-top)}
+ .photograph-soporte{left:10%;width:46%;top:var(--lower-top)}
+ .photograph-pool{left:56%;width:38.3229308%;top:var(--lower-top)}
+ .photograph figcaption{font-size:10px;padding:6px 0}
+ .photograph-tramuntana figcaption,.photograph-soporte figcaption{padding:0 0 6px}
+ .photograph-soporte figcaption{width:10cqw;padding-left:2px}
+ .photograph-pool figcaption{width:5cqw}
+ .editorial-scroll{width:16px;height:56px;margin-top:48px}
+ .invitation{width:84%;margin:72px auto 0;scroll-margin-top:24px}
+ h1{font-size:43px;line-height:1.08;margin-bottom:28px}
+ .intro{font-size:13px;line-height:1.7;margin-bottom:25px}.intro:has(+ .intro){margin-bottom:20px}
+}
+@media(max-width:350px){h1{font-size:37px}.photograph figcaption{font-size:9px}}
+
+footer{margin-top:auto}
+
+/* Reference proportions for the existing main action, not form submit buttons. */
+@media(min-width:601px){
+ .invitation .primary{width:19.67741935cqw;height:4.11290323cqw;min-height:46px;padding:0 20px;font-size:clamp(10px,.72580645cqw,18px)}
+ .invitation .professional{font-size:clamp(10px,.72580645cqw,18px);margin-top:2.58064516cqw;line-height:1.8}
+}
+
+.editorial-scroll::before{content:"";position:absolute;inset:-12px}
+.editorial-scroll path{vector-effect:non-scaling-stroke}
+
+/* Decorative refinements: absolute header cue and labels leave image geometry intact. */
+.header-scroll{position:absolute;left:50%;top:var(--header-scroll-top,50%);width:20px;height:76px;margin-left:-10px;color:var(--ink)}
+.header-scroll svg{display:block;width:100%;height:100%;stroke:currentColor;stroke-width:.72}
+.header-scroll path{vector-effect:non-scaling-stroke}
+.header-scroll::before{content:"";position:absolute;inset:-12px}
+.header-scroll,.editorial-scroll{animation:editorial-cue 3.6s ease-in-out infinite}
+@keyframes editorial-cue{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.product-label{display:flex;flex-direction:column;gap:5px}
+.product-category{font:300 9px/1.25 Montserrat,Arial,sans-serif;letter-spacing:.09em}
+.product-name{font:500 14px/1.2 Montserrat,Arial,sans-serif;letter-spacing:0}
+@media(max-width:1100px) and (min-width:601px){.photograph-soporte .product-category{white-space:normal}}
+@media(max-width:600px){
+ .header-scroll{width:14px;height:28px;margin-left:-7px}
+ .photograph-volcan .product-label{width:160px;max-width:46vw;text-align:left;padding-left:8px}
+ .photograph-tramuntana .product-label{padding-left:4px}
+ .photograph-pool .product-label{position:absolute;right:0;bottom:calc(100% + 8px);width:140px;text-align:right}
+ .photograph-soporte .product-label{position:absolute;left:24px;top:9px;width:160px;text-align:left}
+ .product-name{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){.header-scroll,.editorial-scroll{animation:none}}
+
+/* Mobile-only editorial gallery; desktop composition remains unchanged. */
+@media(max-width:600px){
+ .photographic-composition{display:flex;flex-direction:column;gap:56px;width:92%;height:auto;margin:0 auto}
+ .photograph{position:static;width:100%;margin:0}
+ .photograph-volcan{order:1}
+ .photograph-tramuntana{order:2}
+ .photograph-pool{order:3}
+ .photograph-soporte{order:4}
+ .photograph figcaption{position:static;width:100%;border:0;padding:0;margin-top:14px;text-align:left;white-space:normal}
+ .photograph .product-label{position:static;width:auto;max-width:none;padding:0;text-align:left;gap:5px}
+ .photograph .photograph-frame img{filter:saturate(1);transform:none}
+ .photograph-tramuntana .photograph-frame{aspect-ratio:1024/1536}
+ .photograph-soporte .photograph-frame{aspect-ratio:1367/1150}
+ .intro{font-size:12.35px;line-height:1.75}
+}
