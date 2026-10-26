@@ -113,13 +113,15 @@ footer{margin-top:auto}
  .invitation,.invitation h1,.invitation .intro,.invitation .professional{text-align:center}
 }
 @media(min-width:1101px) and (hover:hover) and (pointer:fine){
- .photograph-volcan,.photograph-tramuntana,.photograph-pool{--photo-label-color:#292a26;--photo-label-shadow:none}
- .photograph-volcan{--photo-label-shadow:0 0 1px rgb(247 246 244 / .6)}
- .photograph-soporte{--photo-label-color:#f7f6f4;--photo-label-shadow:0 1px 2px rgb(0 0 0 / .35)}
+ @font-face{font-family:Montserrat;font-style:normal;font-weight:600;font-display:swap;src:url("assets/fonts/montserrat-latin-600.9557c09a5982.woff2") format("woff2")}
+ .photograph-volcan{--photo-label-color:#ffffff;--photo-label-weight:300;--photo-label-shadow:none}
+ .photograph-tramuntana,.photograph-pool{--photo-label-color:#000000;--photo-label-weight:600;--photo-label-shadow:none}
+ .photograph-soporte{--photo-label-color:#ffffff;--photo-label-weight:300;--photo-label-shadow:0 1px 2px rgb(0 0 0 / .35)}
  .photograph figcaption{inset:auto 0 0 0;width:auto;margin:0;padding:18px;border:0;text-align:left;color:var(--photo-label-color);opacity:0;transition:opacity 350ms ease;z-index:2;text-shadow:var(--photo-label-shadow)}
- .photograph .product-category{display:block}
+ .photograph-volcan figcaption{top:0;bottom:auto}
+ .photograph .product-category{display:block;font-weight:var(--photo-label-weight);font-synthesis:none}
  .photograph .product-label{gap:5px}
- .photograph .product-name{font:300 12px/1.4 Montserrat,Arial,Helvetica,sans-serif;letter-spacing:.03em}
+ .photograph .product-name{font:var(--photo-label-weight) 12px/1.4 Montserrat,Arial,Helvetica,sans-serif;letter-spacing:.03em;font-synthesis:none}
  .photograph:hover figcaption,.photograph:focus-within figcaption{opacity:1}
  .photograph:focus-visible{outline:1px solid var(--ink);outline-offset:4px}
 }

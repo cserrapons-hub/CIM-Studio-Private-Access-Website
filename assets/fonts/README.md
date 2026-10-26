@@ -8,3 +8,5 @@ Filenames contain the SHA-256 prefix of the exact bytes. Initial Light/Regular f
 Georgia remains the system font used by the existing headings; it is not redistributed.
 
 Montserrat Medium 500 is also self-hosted for entered form values, from the same upstream source and OFL license. Its fingerprint is validated in tests. Unlike the existing 300/400 faces, it is not preloaded and is requested when needed.
+
+Montserrat SemiBold 600 is self-hosted for desktop Binari/Fita overlay labels only, from Montserrat-SemiBold.ttf at the same pinned upstream revision. The committed Latin WOFF2 subset is montserrat-latin-600.9557c09a5982.woff2. Its OS/2 usWeightClass is 600 (verified after WOFF2 generation); CSS disables synthetic weights for these labels. It is loaded on demand, not preloaded, and introduces no external font service or application dependency.

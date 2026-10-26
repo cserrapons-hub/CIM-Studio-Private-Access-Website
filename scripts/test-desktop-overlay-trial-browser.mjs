@@ -12,10 +12,12 @@ try{
  for(const profile of profiles)for(const lang of ['es','en']){
   let before,mobileImage;
   for(const version of ['before','after']){
+   let font600Requests=0;
    const context=await browser.newContext({viewport:{width:profile.width,height:900},hasTouch:Boolean(profile.touch),isMobile:profile.width<600,reducedMotion:profile.reduced?'reduce':'no-preference'}),errors=[];
    try{
     await context.route('**/*',route=>{const r=route.request(),u=new URL(r.url());assert.equal(r.method(),'GET');assert.equal(u.origin,'https://trial.example.test');
      if(u.pathname==='/api/config')return route.fulfill({json:{enabled:{subscribe:false,samples:false,careers:false},verified:false,siteKey:null}});
+     if(u.pathname.includes('montserrat-latin-600.'))font600Requests++;
      const relative=u.pathname==='/'?'index.html':u.pathname.slice(1),bytes=version==='before'&&baseline[relative]?baseline[relative]:readFileSync('public/'+relative);
      return route.fulfill({body:bytes,contentType:relative.endsWith('.js')?'application/javascript':relative.endsWith('.css')?'text/css':relative.endsWith('.html')?'text/html':'application/octet-stream'});
     });
@@ -35,11 +37,11 @@ try{
      if(overlay){
       assert.equal(await fig.locator('.product-category').isVisible(),true);const initial=await fig.locator('.photograph-frame').boundingBox(),initialScroll=await page.evaluate(()=>scrollY);
       await fig.locator('.photograph-frame').hover();await page.waitForTimeout(profile.reduced?30:400);assert.equal(await caption.evaluate(e=>getComputedStyle(e).opacity),'1');
-      const style=await caption.evaluate(e=>{const s=getComputedStyle(e);return {duration:s.transitionDuration,background:s.backgroundColor,color:s.color,shadow:s.textShadow};});assert.equal(style.duration,profile.reduced?'0s':'0.35s');assert.equal(style.background,'rgba(0, 0, 0, 0)');const light=await fig.evaluate(e=>e.classList.contains('photograph-soporte'));assert.equal(style.color,light?'rgb(247, 246, 244)':'rgb(41, 42, 38)');const subtleShadow=light||await fig.evaluate(e=>e.classList.contains('photograph-volcan'));if(subtleShadow)assert.notEqual(style.shadow,'none');else assert.equal(style.shadow,'none');
+      const style=await caption.evaluate(e=>{const s=getComputedStyle(e);return {duration:s.transitionDuration,background:s.backgroundColor,color:s.color,shadow:s.textShadow};});assert.equal(style.duration,profile.reduced?'0s':'0.35s');assert.equal(style.background,'rgba(0, 0, 0, 0)');const light=await fig.evaluate(e=>e.classList.contains('photograph-soporte')||e.classList.contains('photograph-volcan'));assert.equal(style.color,light?'rgb(255, 255, 255)':'rgb(0, 0, 0)');const subtleShadow=await fig.evaluate(e=>e.classList.contains('photograph-soporte'));if(subtleShadow)assert.notEqual(style.shadow,'none');else assert.equal(style.shadow,'none');
       const hovered=await fig.locator('.photograph-frame').boundingBox(),hoveredScroll=await page.evaluate(()=>scrollY);assert.deepEqual({...hovered,y:hovered.y+hoveredScroll},{...initial,y:initial.y+initialScroll},'Hover causes no layout shift');
-      const name=await fig.locator('.product-name').boundingBox();assert.ok(name.x>hovered.x&&name.x<hovered.x+30);assert.ok(name.y+name.height<hovered.y+hovered.height&&name.y>hovered.y+hovered.height-50,'Name inside lower-left image corner');
+      const name=await fig.locator('.product-name').boundingBox();assert.ok(name.x>hovered.x&&name.x<hovered.x+30);const topLeft=await fig.evaluate(e=>e.classList.contains('photograph-volcan'));if(topLeft)assert.ok(name.y>hovered.y&&name.y+name.height<hovered.y+65,'Tramuntana at upper-left');else assert.ok(name.y+name.height<hovered.y+hovered.height&&name.y>hovered.y+hovered.height-50,'Name inside lower-left image corner');
       const category=fig.locator('.product-category'),categoryBox=await category.boundingBox();assert.ok(categoryBox.y+categoryBox.height<name.y,'Classification above the product name');
-      const categoryStyle=await category.evaluate(e=>({size:getComputedStyle(e).fontSize,weight:getComputedStyle(e).fontWeight}));assert.deepEqual(categoryStyle,{size:'9px',weight:'300'});
+      const categoryStyle=await category.evaluate(e=>({size:getComputedStyle(e).fontSize,weight:getComputedStyle(e).fontWeight}));assert.deepEqual(categoryStyle,{size:'9px',weight:light?'300':'600'});assert.equal(await fig.locator('.product-name').evaluate(e=>getComputedStyle(e).fontWeight),light?'300':'600');if(!light){assert.equal(await fig.locator('.product-name').evaluate(e=>getComputedStyle(e).fontSynthesis),'none');assert.equal(await page.evaluate(()=>[...document.fonts].some(f=>f.family==='Montserrat'&&f.weight==='600'&&f.status==='loaded')),true,'Real SemiBold 600 is loaded');}
       const categories={Tramuntana:['PIEZA GASTRONÓMICA','CULINARY OBJECT'],Binari:['APLIQUE','WALL LIGHT'],Fita:['SEÑALÉTICA','SIGNAGE'],Cleda:['ACCESORIO DE BAÑO','BATHROOM ACCESSORY']};
       const product=await fig.locator('.product-name').innerText();assert.equal(await category.innerText(),categories[product][lang==='en'?1:0]);await fig.locator('.photograph-frame').screenshot({path:out+'/'+profile.name+'-'+lang+'-'+product+'.png'});
       await page.mouse.move(profile.width-1,1);await page.waitForTimeout(profile.reduced?30:400);assert.equal(await caption.evaluate(e=>getComputedStyle(e).opacity),'0');
@@ -56,10 +58,10 @@ try{
      const screenshot=await page.screenshot({path:out+'/'+profile.name+'-'+lang+'-'+version+'.png',fullPage:true,animations:'disabled'});
      if(version==='before')mobileImage=screenshot;else assert.deepEqual(screenshot,mobileImage,'Mobile remains pixel-for-pixel unchanged');
     }
-    if(version==='after'&&desktop){await page.locator('.invitation').screenshot({path:out+'/'+profile.name+'-'+lang+'-text.png'});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:out+'/'+profile.name+'-'+lang+'-page.png',fullPage:true});}
-    assert.deepEqual(errors,[]);cases++;
+    if(version==='after'&&desktop&&!profile.touch){await page.locator('.invitation').screenshot({path:out+'/'+profile.name+'-'+lang+'-text.png'});await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:out+'/'+profile.name+'-'+lang+'-page.png',fullPage:true});}
+    if(version==='after')assert.equal(font600Requests>0,overlay,'SemiBold loads only for desktop overlays, never on mobile/touch fallback');assert.deepEqual(errors,[]);cases++;
    }finally{await context.close();}
   }
  }
- console.log('PASS '+cases+' visual cases: ES/EN 1440/1920/390, identical mobile pixels, unchanged geometry/typography, centred desktop text, two-line hover/focus labels with per-photo contrast, touch fallback, reduced motion, no real requests. Screenshots: '+out);
+ console.log('PASS '+cases+' visual cases: ES/EN 1440/1920/390, identical mobile pixels, unchanged geometry/typography, centred desktop text, two-line hover/focus labels with exact per-photo colour, position and real SemiBold 600, touch fallback, reduced motion, no real requests. Screenshots: '+out);
 }finally{await browser.close();}
