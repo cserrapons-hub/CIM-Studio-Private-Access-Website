@@ -33,12 +33,15 @@ try{
     for(const fig of await page.locator('.photograph').all()){
      const caption=fig.locator('figcaption');assert.equal(await caption.evaluate(e=>getComputedStyle(e).opacity),overlay?'0':'1');assert.equal(await fig.getAttribute('tabindex'),overlay?'0':null);
      if(overlay){
-      assert.equal(await fig.locator('.product-category').isVisible(),false);const initial=await fig.locator('.photograph-frame').boundingBox(),initialScroll=await page.evaluate(()=>scrollY);
+      assert.equal(await fig.locator('.product-category').isVisible(),true);const initial=await fig.locator('.photograph-frame').boundingBox(),initialScroll=await page.evaluate(()=>scrollY);
       await fig.locator('.photograph-frame').hover();await page.waitForTimeout(profile.reduced?30:400);assert.equal(await caption.evaluate(e=>getComputedStyle(e).opacity),'1');
-      const style=await caption.evaluate(e=>{const s=getComputedStyle(e);return {duration:s.transitionDuration,background:s.backgroundColor,color:s.color,shadow:s.textShadow};});assert.equal(style.duration,profile.reduced?'0s':'0.35s');assert.equal(style.background,'rgba(0, 0, 0, 0)');assert.equal(style.color,'rgb(247, 246, 244)');assert.notEqual(style.shadow,'none');
+      const style=await caption.evaluate(e=>{const s=getComputedStyle(e);return {duration:s.transitionDuration,background:s.backgroundColor,color:s.color,shadow:s.textShadow};});assert.equal(style.duration,profile.reduced?'0s':'0.35s');assert.equal(style.background,'rgba(0, 0, 0, 0)');const light=await fig.evaluate(e=>e.classList.contains('photograph-soporte'));assert.equal(style.color,light?'rgb(247, 246, 244)':'rgb(41, 42, 38)');const subtleShadow=light||await fig.evaluate(e=>e.classList.contains('photograph-volcan'));if(subtleShadow)assert.notEqual(style.shadow,'none');else assert.equal(style.shadow,'none');
       const hovered=await fig.locator('.photograph-frame').boundingBox(),hoveredScroll=await page.evaluate(()=>scrollY);assert.deepEqual({...hovered,y:hovered.y+hoveredScroll},{...initial,y:initial.y+initialScroll},'Hover causes no layout shift');
       const name=await fig.locator('.product-name').boundingBox();assert.ok(name.x>hovered.x&&name.x<hovered.x+30);assert.ok(name.y+name.height<hovered.y+hovered.height&&name.y>hovered.y+hovered.height-50,'Name inside lower-left image corner');
-      const product=await fig.locator('.product-name').innerText();await fig.locator('.photograph-frame').screenshot({path:out+'/'+profile.name+'-'+lang+'-'+product+'.png'});
+      const category=fig.locator('.product-category'),categoryBox=await category.boundingBox();assert.ok(categoryBox.y+categoryBox.height<name.y,'Classification above the product name');
+      const categoryStyle=await category.evaluate(e=>({size:getComputedStyle(e).fontSize,weight:getComputedStyle(e).fontWeight}));assert.deepEqual(categoryStyle,{size:'9px',weight:'300'});
+      const categories={Tramuntana:['PIEZA GASTRONÓMICA','CULINARY OBJECT'],Binari:['APLIQUE','WALL LIGHT'],Fita:['SEÑALÉTICA','SIGNAGE'],Cleda:['ACCESORIO DE BAÑO','BATHROOM ACCESSORY']};
+      const product=await fig.locator('.product-name').innerText();assert.equal(await category.innerText(),categories[product][lang==='en'?1:0]);await fig.locator('.photograph-frame').screenshot({path:out+'/'+profile.name+'-'+lang+'-'+product+'.png'});
       await page.mouse.move(profile.width-1,1);await page.waitForTimeout(profile.reduced?30:400);assert.equal(await caption.evaluate(e=>getComputedStyle(e).opacity),'0');
      }
     }
@@ -58,5 +61,5 @@ try{
    }finally{await context.close();}
   }
  }
- console.log('PASS '+cases+' visual cases: ES/EN 1440/1920/390, identical mobile pixels, unchanged geometry/typography, centred desktop text, single hover/focus names, touch fallback, reduced motion, no real requests. Screenshots: '+out);
+ console.log('PASS '+cases+' visual cases: ES/EN 1440/1920/390, identical mobile pixels, unchanged geometry/typography, centred desktop text, two-line hover/focus labels with per-photo contrast, touch fallback, reduced motion, no real requests. Screenshots: '+out);
 }finally{await browser.close();}
