@@ -47,7 +47,7 @@ test('renewed career consent rotates link, preserves history and blocks an old w
  await handleRegistration(s.request({requestId:crypto.randomUUID(),language:'en'}),s.env,'careers',s.fetcher);
  await withdrawCareerConsent(s.preferences(first),s.env);assert.equal(s.careers.sqlite.prepare('SELECT state FROM registrations').get().state,'pending');assert.equal(s.careers.sqlite.prepare('SELECT COUNT(*) n FROM registrations').get().n,1);
  assert.equal(s.careers.sqlite.prepare("SELECT COUNT(*) n FROM registration_consent_events WHERE event='granted'").get().n,2);
- assert.match(JSON.parse(s.calls.filter(x=>x.url.includes('resend')).at(-1).options.body).text,/Confirm your email/);
+ assert.match(JSON.parse(s.calls.filter(x=>x.url.includes('resend')).at(-1).options.body).text,/Confirm my email address/);
 });
 test('samples persist all current fields and send separate admin/receipt emails exactly once',async()=>{
  const s=setup('samples');assert.equal((await handleRegistration(s.request(),s.env,'samples',s.fetcher)).status,202);

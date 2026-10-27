@@ -40,11 +40,11 @@ test('actual sample payload keeps MAIL_FROM and administrative Reply-To, adds ap
   }finally{s.close();}
  }
 });
-test('career acknowledgement is not given sample text, HTML or Reply-To',async()=>{
+test('career acknowledgement retains separate text, its own HTML and no sample Reply-To',async()=>{
  const s=await fixture();s.env.CONTROLLED_TEST_MODE='false';const mails=[];try{
   const response=await handleRegistration(s.request('/api/careers',{...s.data,legalVersion:legal.version}),s.env,'careers',async(url,options)=>{
    if(url.includes('siteverify'))return Response.json({success:true,hostname:new URL(s.env.REGISTRATION_ORIGIN).hostname,action:'careers'});mails.push(JSON.parse(options.body));return Response.json({id:'simulation-career'});
-  });assert.equal(response.status,202);assert.equal(mails.length,1);assert.equal(Object.hasOwn(mails[0],'reply_to'),false);assert.equal(Object.hasOwn(mails[0],'html'),false);assert.ok(!mails[0].text.includes('Datos correctos'));
+  });assert.equal(response.status,202);assert.equal(mails.length,1);assert.equal(Object.hasOwn(mails[0],'reply_to'),false);assert.equal(Object.hasOwn(mails[0],'html'),true);assert.ok(!mails[0].text.includes('Datos correctos'));assert.ok(!mails[0].html.includes('Dirección de envío'));
  }finally{s.close();}
 });
 
