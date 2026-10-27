@@ -27,6 +27,10 @@
   samplesResponseDialog.setAttribute('aria-describedby','samples-response-'+mode+(mode==='accepted'?' samples-delivery-help':''));
   form.closest('dialog').close();samplesResponseDialog.showModal();
  }
+ const careersResponseDialog=document.getElementById('careers-response-dialog');
+ careersResponseDialog.querySelector('[data-careers-response-close]').addEventListener('click',()=>careersResponseDialog.close());
+ careersResponseDialog.addEventListener('close',()=>document.querySelector('[data-open="careers-dialog"]').focus({preventScroll:true}));
+ function showCareersResponse(form){form.closest('dialog').close();careersResponseDialog.showModal();}
  function status(form,key,error=false){const el=form.querySelector('.status');delete el.dataset.security;el.dataset.message=key;el.dataset.error=String(error);el.textContent=copy[language][key];}
  function refresh(){
   // Public availability follows per-form runtime gates; internal trials have separate pages.
@@ -127,6 +131,14 @@
     if(result.recorded!==true){status(form,'unavailable',true);return;}
     const previousStatus=form.querySelector('.status');previousStatus.textContent='';delete previousStatus.dataset.message;delete previousStatus.dataset.error;
     form.reset();requests.delete(form);showSamplesResponse(form,result);return;
+   }
+   if(kind==='careers'){
+    if(result.recorded!==true){status(form,'unavailable',true);return;}
+    if(result.confirmationRequired===true){
+     if(response.status!==202||result.mail!=='accepted'||result.mailState!=='accepted'){status(form,'recordedPendingMail',true);return;}
+     const previousStatus=form.querySelector('.status');previousStatus.textContent='';delete previousStatus.dataset.message;delete previousStatus.dataset.error;delete previousStatus.dataset.security;
+     form.reset();requests.delete(form);showCareersResponse(form);return;
+    }
    }
    status(form,result.mail==='pending'?'recordedPendingMail':kind==='subscribe'?'receivedSubscribe':kind==='careers'?'receivedCareers':'receivedSamples',result.mail==='pending');form.reset();requests.delete(form);
    // A queued API request is not a confirmed subscriber or a Founders entitlement.

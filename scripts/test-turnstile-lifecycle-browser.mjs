@@ -19,7 +19,7 @@ try{
    if(u.pathname==='/api/config')return route.fulfill({json:{enabled:{subscribe:true,samples:true,careers:true},siteKey:'simulation',verified:true,siteLive:true,legalVersion:'simulation'}});
    if(u.pathname.startsWith('/api/')){posts++;assert.equal(u.pathname,'/api/'+kind);const data=r.postDataJSON();assert.equal(data.token,'simulation-token');
     if(kind==='subscribe')return route.fulfill({status:scenario==='pending'?409:202,json:scenario==='pending'?{error:'pending'}:{ok:true,subscription:'confirmation_required'}});
-    return route.fulfill({status:202,json:{ok:true,recorded:true,receiptMailState:scenario==='pending'?'pending':'accepted',mailState:'accepted',confirmationRequired:kind==='careers'}});
+    return route.fulfill({status:202,json:{ok:true,recorded:true,receiptMailState:scenario==='pending'?'pending':'accepted',mail:scenario==='pending'?'pending':'accepted',mailState:scenario==='pending'?'pending':'accepted',confirmationRequired:kind==='careers'}});
    }
    const file=u.pathname==='/'?'index.html':u.pathname.slice(1);
    return route.fulfill({body:readFileSync('public/'+file),contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.html')?'text/html':'application/octet-stream'});
@@ -58,7 +58,8 @@ try{
     await page.setViewportSize({width:width===390?400:1420,height:900});await page.evaluate(()=>{for(let i=0;i<5;i++)window.dispatchEvent(new Event('cim:language'));});await page.waitForFunction(id=>!document.querySelector('#'+id+' [type=submit]').disabled,dialog);assert.equal(await page.evaluate(kind=>[...sim.widgets.values()].filter(w=>w.options.action===kind).length,kind),1,'one live widget per form after concurrent events');
    }
    await button.click();
-   if(kind==='careers')await page.waitForFunction(()=>document.querySelector('form[data-form-kind=careers] .status').dataset.message==='receivedCareers');
+   if(kind==='careers'&&scenario==='pending')await page.waitForFunction(()=>document.querySelector('form[data-form-kind=careers] .status').dataset.message==='recordedPendingMail');
+   else if(kind==='careers')await page.waitForFunction(()=>document.getElementById('careers-response-dialog').open);
    else await page.waitForFunction(id=>document.getElementById(id).open,kind==='subscribe'?'subscription-pending-dialog':'samples-response-dialog');
    if(kind==='subscribe')assert.equal(await page.locator('[data-newsletter-response='+(scenario==='pending'?'generic':'confirmation')+']').getAttribute('aria-hidden'),'false');
    if(kind==='samples')assert.equal(await page.locator('[data-samples-response='+(scenario==='pending'?'pending':'accepted')+']').getAttribute('aria-hidden'),'false');

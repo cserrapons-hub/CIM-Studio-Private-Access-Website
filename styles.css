@@ -93,7 +93,7 @@ button,input,select,textarea,form label,.languages,.overline,footer,.demo,.statu
 #subscription-pending-dialog [data-newsletter-response][aria-hidden="true"]{visibility:hidden}
 
 /* Samples use the same native dialog and controls as newsletter responses. */
-#samples-response-dialog .samples-response-panels{display:grid}
+:is(#samples-response-dialog,#careers-response-dialog) .samples-response-panels{display:grid}
 #samples-response-dialog [data-samples-response]{grid-area:1/1;min-width:0}
 #samples-response-dialog [data-samples-response][aria-hidden="true"]{visibility:hidden}
 
@@ -108,7 +108,7 @@ select:required:invalid{font-weight:400;color:#6b6c65}
 select option{font-weight:500;color:var(--ink)}
 select option[value=""]{font-weight:400;color:#6b6c65}
 
-#samples-response-dialog .samples-delivery-help{font-size:11px;line-height:1.7;font-weight:400;overflow-wrap:anywhere;margin:20px 0 0;text-align:center}
+:is(#samples-response-dialog,#careers-response-dialog) .samples-delivery-help{font-size:11px;line-height:1.7;font-weight:400;overflow-wrap:anywhere;margin:20px 0 0;text-align:center}
 
 /* Paragraph legibility: use the existing, self-hosted Montserrat Regular face. */
 p,.intro,.dialog-intro,#legal-body{font-weight:400}

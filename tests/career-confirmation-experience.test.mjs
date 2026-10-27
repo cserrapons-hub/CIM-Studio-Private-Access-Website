@@ -12,7 +12,7 @@ const copy={es:['Hola,','Muchas gracias por tu interés en formar parte de nuest
 test('career receipt has the approved bilingual paragraphs, token link and unchanged sample email shell',()=>{
  for(const lang of ['es','en']){
   const url='https://cimstudio.es/careers/preferences/'+(lang==='en'?'?lang=en':'')+'#'+'a'.repeat(64),r=careerReceipt(url,lang);
-  assert.equal(r.subject,lang==='es'?'CIM Studio — Gracias por tu interés':'CIM Studio — Thank you for your interest');
+  assert.equal(r.subject,lang==='es'?'CIM Studio — Confirma para recibir avisos':'CIM Studio — Confirm to receive updates');
   for(const body of [r.text,r.html.replace(/<[^>]*>/g,'')]){let at=-1;for(const paragraph of copy[lang]){at=body.indexOf(paragraph,at+1);assert.ok(at>=0,paragraph);}}
   assert.equal((r.html.match(/<a /g)||[]).length,1);assert.ok(r.html.includes('href="'+url+'"'));assert.ok(r.text.includes(url));
   const shell=receiptEmail(r.subject,lang==='en','MARKER');assert.equal(r.html.slice(0,r.html.indexOf(receiptParagraph(copy[lang][0]))),shell.split('MARKER')[0]);
