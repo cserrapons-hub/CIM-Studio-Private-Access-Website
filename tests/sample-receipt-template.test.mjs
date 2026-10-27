@@ -13,7 +13,7 @@ test('sample acknowledgement has faithful ES/EN subjects, address and plain-text
   assert.ok(result.text.includes(lang==='es'?'«Datos correctos»':'“Details correct”'));assert.ok(result.text.includes('Mallorca'));
   assert.match(result.html,/<strong>Si estás en Mallorca<\/strong>|<strong>If you are in Mallorca<\/strong>/);
   assert.ok(result.html.includes('lang="'+lang+'"'));assert.match(result.html,/width:100%;max-width:600px/);assert.match(result.html,/href="https:\/\/cimstudio.es\/"/);
-  assert.equal((result.html.match(/<a /g)||[]).length,1);assert.doesNotMatch(result.html,/<script|<img|<iframe|<form|<link|@import|onload=/i);assert.doesNotMatch(result.text,/<html|\[Dirección\]|\[Código postal\]/);
+  assert.equal((result.html.match(/<a /g)||[]).length,2);assert.doesNotMatch(result.html,/<script|<img|<iframe|<form|<link|@import|onload=/i);assert.doesNotMatch(result.text,/<html|\[Dirección\]|\[Código postal\]/);
  }
 });
 test('all five user address fields are escaped in HTML; missing fields never become invented values or placeholders',()=>{
@@ -55,5 +55,43 @@ test('sample email uses a single cream background and removes only the word just
   const backgrounds=[...result.html.matchAll(/background:([^;"}]+)/g)].map(m=>m[1]);assert.ok(backgrounds.length>=5);assert.deepEqual([...new Set(backgrounds)],['#faf9f6']);
   assert.doesNotMatch(result.html,/background:#ffffff|background:#f7f6f2|border:|box-shadow:/);
   assert.ok(result.html.includes('margin:0 0 24px;padding:20px;'));assert.ok(result.html.includes('padding:32px 24px;'));assert.ok(result.html.includes('padding:24px 16px'));
+ }
+});
+
+
+test('sample newsletter invitation preserves approved copy and ES/EN HTML/plain-text order before the sign-off',()=>{
+ const copy={
+  es:[
+   '¿Aún no estás en nuestra newsletter?',
+   'Durante nuestro primer año no vamos a tener tienda online.',
+   'Queremos presentar cada nueva pieza de una forma más personal, compartiéndola primero con quienes nos acompañáis desde el principio.',
+   'Además, si te unes antes del 31 de diciembre de 2026, disfrutarás de nuestra Tarifa Fundadores: un 15 % de descuento de por vida, aplicable también sobre el precio profesional, tanto en piezas de nuestra colección como en piezas hechas a medida.',
+   'Para unirte, solo tienes que entrar en cimstudio.es, seleccionar «Acceder a la colección privada» y después «Solicitar acceso».'
+  ],
+  en:[
+   'Haven’t joined our newsletter yet?',
+   'During our first year, we won’t have an online shop.',
+   'We want to introduce each new piece in a more personal way, sharing it first with those who have been with us from the beginning.',
+   'Also, if you join before December 31, 2026, you’ll enjoy our Founders Rate: a lifetime 15% discount, also applicable to professional pricing, on both pieces from our collection and bespoke pieces.',
+   'To join, simply visit cimstudio.es, select “Access the private collection” and then “Request access”.'
+  ]
+ };
+ for(const lang of ['es','en']){
+  const r=sampleReceipt(address,lang),plain=r.text.replace('cimstudio.es (https://cimstudio.es/)','cimstudio.es'),html=r.html.replace(/<[^>]+>/g,'');
+  for(const content of [plain,html]){
+   let previous=content.indexOf(lang==='es'?'Si prefieres nuestra visita':'If you would prefer a visit');assert.ok(previous>=0);
+   for(const paragraph of copy[lang]){const position=content.indexOf(paragraph);assert.ok(position>previous);previous=position;}
+   assert.ok(content.indexOf(lang==='es'?'Muchas gracias,':'Thank you very much,')>previous);
+  }
+  assert.match(r.html,/<strong>[^<]*lifetime 15% discount<\/strong>|<strong>[^<]*15 % de descuento de por vida<\/strong>/);
+  assert.ok(r.text.includes('https://cimstudio.es/'));
+ }
+});
+test('sample invitation has only homepage links and never includes automatic or direct-subscription URLs',()=>{
+ for(const lang of ['es','en']){
+  const r=sampleReceipt(address,lang),links=[...r.html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/g)];
+  assert.deepEqual(links.map(m=>m[1]),['https://cimstudio.es/','https://cimstudio.es/']);
+  assert.deepEqual(links.map(m=>m[2]),['cimstudio.es','www.cimstudio.es']);
+  assert.doesNotMatch(r.html+r.text,/api\/subscribe|add_subscriber|unsubscribe|requestId=|token=|<form|<img|<script/i);
  }
 });
