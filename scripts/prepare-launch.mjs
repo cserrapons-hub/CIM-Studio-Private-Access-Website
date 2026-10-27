@@ -11,7 +11,7 @@ html=versionStylesheet(html,stylesheet);
 html=versionNewsletterScripts(html,{'script.js':await readFile('public/script.js'),'integrations.js':await readFile('public/integrations.js')});
 const preferences=await readFile('public/careers/preferences/index.html','utf8');
 await writeFile('public/careers/preferences/index.html',preferences.replace('/styles.css"','/styles.css?v='+createHash('sha256').update(stylesheet).digest('hex').slice(0,12)+'"'));
-if(live){html=html.replace('<title>CIM Studio — Versión de prueba</title>','<title>CIM Studio — Private Access</title>').replace('content="noindex, nofollow, noarchive"','content="index, follow"').replace('</head>','<link rel="canonical" href="https://cimstudio.es/"></head>');}
+if(live){html=html.replace('content="noindex, nofollow, noarchive"','content="index, follow"').replace('</head>','<link rel="canonical" href="https://cimstudio.es/"></head>');}
 await writeFile('public/index.html',html);
 await writeFile('public/robots.txt',live?'User-agent: *\nAllow: /\nSitemap: https://cimstudio.es/sitemap.xml\n':'User-agent: *\nDisallow: /\n');
 await writeFile('public/sitemap.xml',live?'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://cimstudio.es/</loc></url></urlset>':'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');

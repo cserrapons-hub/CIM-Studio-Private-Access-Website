@@ -41,7 +41,7 @@
   // Public availability follows per-form runtime gates; internal trials have separate pages.
   document.querySelectorAll('[data-privacy-read]').forEach(e=>e.textContent=copy[language].privacyRead);
   for(const form of forms){const enabled=settings?.enabled[form.dataset.formKind]===true;form.querySelector('button[type=submit]').disabled=!enabled||form.getAttribute('aria-busy')==='true'||!challengeState(form).ready;const note=form.querySelector('.demo');note.hidden=enabled;note.textContent=enabled?'':copy[language].demo;}
-  if(settings?.siteLive){document.querySelector('.preview-notice').hidden=true;document.title='CIM Studio — Private Access';}
+  if(settings?.siteLive){document.querySelector('.preview-notice').hidden=true;}
  }
  // Widget state and errors belong only to the form that owns the challenge.
  function challengeState(form){
