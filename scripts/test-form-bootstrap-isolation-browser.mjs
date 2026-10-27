@@ -1,7 +1,8 @@
 // Mixed-version DOM regression only. All API traffic is intercepted; no provider or D1 access.
 import {createRequire} from 'node:module';import {readFileSync} from 'node:fs';import assert from 'node:assert/strict';
 const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
+const csp=readFileSync('_headers','utf8').match(/^  Content-Security-Policy: (.+)$/m)?.[1];assert.ok(csp,'Published CSP must be present');
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
 try{for(const variant of ['complete','missing-dialog','missing-close'])for(const kind of ['subscribe','samples','careers'])for(const width of [1440,390])for(const lang of ['es','en']){
  const context=await browser.newContext({viewport:{width,height:900},hasTouch:width<600,isMobile:width<600}),page=await context.newPage(),errors=[];let configs=0,posts=0,SDK=0;
  page.on('pageerror',e=>errors.push(e.message));
@@ -19,7 +20,7 @@ try{for(const variant of ['complete','missing-dialog','missing-close'])for(const
    let html=body.toString();if(variant==='missing-dialog')html=html.replace(/<dialog id="careers-response-dialog"[\s\S]*?<\/dialog>/,'');
    if(variant==='missing-close')html=html.replace(/<button type="button" class="primary" data-careers-response-close>[\s\S]*?<\/button>/,'');body=Buffer.from(html);
   }
-  return route.fulfill({body,contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':name.endsWith('.html')?'text/html':'application/octet-stream'});
+  return route.fulfill({body,headers:name==='index.html'?{'Content-Security-Policy':csp}:{},contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':name.endsWith('.html')?'text/html':'application/octet-stream'});
  });
  await page.goto('https://local.test/');await page.waitForFunction(()=>window.cimFormSettings);assert.equal(configs,1);
  await page.locator(`[data-lang=${lang}]`).click();const id=kind==='subscribe'?'subscribe-dialog':kind+'-dialog';await page.locator(`[data-open=${id}]`).click();const form=page.locator(`form[data-form-kind=${kind}]`);

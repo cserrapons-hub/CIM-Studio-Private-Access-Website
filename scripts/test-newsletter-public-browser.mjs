@@ -88,6 +88,7 @@ try{
     const expected=scenario==='network'?'pending':scenario==='challenge'?'challenge':scenario==='rate'?'rate':'unavailable';
     await page.waitForFunction(key=>document.querySelector('#subscribe-dialog .status').dataset.message===key,expected);
     assert.equal(await responseDialog.evaluate(e=>e.open),false);
+    assert.equal(await page.locator('#email').inputValue(),'owner@example.test');assert.equal(await page.locator('#subscriber-type').inputValue(),lang==='en'?'profesional':'particular');assert.equal(await page.locator('[name=marketing_consent]').isChecked(),true);
    }
    assert.equal(posts,1);assert.equal(sends,['accepted','unknown','rejected'].includes(scenario)?1:0,'no duplicate sends');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);assert.deepEqual([legal.approved,newsletterRelease.approved],approvals);count++;

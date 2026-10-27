@@ -2,7 +2,7 @@
 import {onRequest as middleware} from "../functions/_middleware.js";
 import {createRequire} from 'node:module';import {readFileSync} from 'node:fs';import assert from 'node:assert/strict';
 const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
 try{for(const origin of ['https://cimstudio.es','https://www.cimstudio.es'])for(const kind of ['subscribe','samples','careers'])for(const width of [1440,390])for(const lang of ['es','en']){
  const variant='complete';
  const context=await browser.newContext({viewport:{width,height:900},hasTouch:width<600,isMobile:width<600}),page=await context.newPage(),errors=[];let configs=0,posts=0,SDK=0;

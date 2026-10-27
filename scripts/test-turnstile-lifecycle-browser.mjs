@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});
 let count=0;
 try{
  for(const width of [1440,390])for(const lang of ['es','en'])for(const kind of ['subscribe','samples','careers'])for(const scenario of (process.env.CIM_TURNSTILE_SCENARIOS?.split(',')||['accepted','pending','load_recovery','render_recovery','empty','expired','getter_error','reopen_language','error_callback','timeout_callback','config_delayed','load_delayed'])){

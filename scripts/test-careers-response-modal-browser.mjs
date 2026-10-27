@@ -6,7 +6,7 @@ import {fixture} from '../tests/helpers/launch-fixture.mjs';
 import {handleRegistration} from '../server/registrations.js';
 import legal from '../legal/content.js';
 const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});
 const out=process.env.CIM_CAREERS_MODAL_SCREENSHOTS||'/tmp/cim-careers-response-modal';mkdirSync(out,{recursive:true});let cases=0;
 const scenarios=['accepted','rejected','uncertain','pending','missing_mail_state','contradictory_mail','not_required','missing_record','http_error','network','bad_json','validation','challenge','storage_error','rate','unexpected_200'];
 try{for(const width of [1440,390])for(const lang of ['es','en'])for(const scenario of scenarios){
@@ -47,7 +47,10 @@ try{for(const width of [1440,390])for(const lang of ['es','en'])for(const scenar
  });
  await page.goto('https://cimstudio.es/');await page.waitForFunction(()=>window.cimFormSettings);await page.locator(`[data-lang=${lang}]`).click();await page.locator('[data-open=careers-dialog]').click();
  const form=page.locator('[data-form-kind=careers]'),dialog=page.locator('#careers-response-dialog');
- await form.locator('[name=email]').fill('candidate@example.test');await form.locator('[name=careers_consent]').check();
+ await page.waitForFunction(()=>!document.querySelector('[data-form-kind=careers] [type=submit]').disabled);
+ await form.locator('[type=submit]').click();assert.equal(posts,0,'email and consent are mandatory');
+ await form.locator('[name=email]').fill('invalid-email');await form.locator('[name=careers_consent]').check();await form.locator('[type=submit]').click();assert.equal(posts,0,'invalid email must not be submitted');
+ await form.locator('[name=email]').fill('candidate@example.test');await form.locator('[name=careers_consent]').uncheck();await form.locator('[type=submit]').click();assert.equal(posts,0,'independent careers consent is mandatory');await form.locator('[name=careers_consent]').check();
  await page.waitForFunction(()=>!document.querySelector('[data-form-kind=careers] [type=submit]').disabled);
  if(scenario==='accepted')await form.evaluate(e=>{e.requestSubmit();e.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));});else await form.locator('[type=submit]').click();
  if(scenario==='accepted'){

@@ -7,7 +7,7 @@ import {handleRegistration} from '../server/registrations.js';
 import legal from '../legal/content.js';
 const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const out=process.env.CIM_SCREENSHOT_DIR||'/tmp/cim-samples-response';mkdirSync(out,{recursive:true});
-const origin='https://cimstudio.es',browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
+const origin='https://cimstudio.es',browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
 try{
  for(const width of [1440,390])for(const lang of ['es','en'])for(const scenario of ['accepted','receipt_rejected','admin_rejected','both_rejected','receipt_timeout','pending','unavailable','network','challenge','unrecorded_success']){
   const s=await fixture(),context=await browser.newContext({viewport:{width,height:900},hasTouch:width<500,isMobile:width<500}),errors=[];let posts=0;const destinations=[];
@@ -38,7 +38,9 @@ try{
    });
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));await page.goto(origin);await page.waitForFunction(()=>window.cimFormSettings);await page.locator('[data-lang='+lang+']').click();await page.locator('[data-open=samples-dialog]').click();await page.waitForFunction(()=>window.turnstile);
    const form=page.locator('form[data-form-kind=samples]');
-   for(const [field,value] of Object.entries({name:'Fictional professional',email:'sample@example.test',company:'Fictional studio',shippingAddress:'Test street 1',postalCode:'00000',city:'Test city',province:'Test region',country:'Test country'}))await form.locator('[name='+field+']').fill(value);
+   await form.locator('[type=submit]').click();assert.equal(posts,0,'empty required fields must prevent requests');
+   const filledFields={name:'Fictional professional',email:'sample@example.test',company:'Fictional studio',shippingAddress:'Test street 1',postalCode:'00000',city:'Test city',province:'Test region',country:'Test country'};
+   for(const [field,value] of Object.entries(filledFields))await form.locator('[name='+field+']').fill(value);
    await form.locator('[name=discipline]').selectOption('architecture');await form.locator('[type=submit]').click();assert.equal(posts,0,'consent is mandatory and unchecked');await form.locator('[name=contact_consent]').check();await form.locator('[type=submit]').click();
    const dialog=page.locator('#samples-response-dialog'),recorded=!['network','unavailable','challenge','unrecorded_success'].includes(scenario);
    if(recorded){
@@ -56,7 +58,7 @@ try{
     if(scenario==='accepted')await dialog.locator('[data-samples-response-close]').click();else if(scenario==='admin_rejected')await page.keyboard.press('Escape');else await dialog.locator('[data-close]').click();
     assert.equal(await dialog.evaluate(e=>e.open),false);assert.equal(await page.evaluate(()=>document.activeElement.dataset.open),'samples-dialog');
    }else{
-    await page.waitForFunction(key=>document.querySelector('form[data-form-kind=samples] .status').dataset.message===key,scenario==='challenge'?'challenge':'unavailable');assert.equal(await dialog.evaluate(e=>e.open),false);assert.equal(await form.locator('[name=email]').inputValue(),'sample@example.test');
+    await page.waitForFunction(key=>document.querySelector('form[data-form-kind=samples] .status').dataset.message===key,scenario==='challenge'?'challenge':'unavailable');assert.equal(await dialog.evaluate(e=>e.open),false);for(const [name,value] of Object.entries(filledFields))assert.equal(await form.locator(`[name=${name}]`).inputValue(),value,'preserve '+name+' on error');assert.equal(await form.locator('[name=discipline]').inputValue(),'architecture');assert.equal(await form.locator('[name=contact_consent]').isChecked(),true);
    }
    assert.equal(posts,1);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);cases++;
   }finally{await context.close();s.close();}
