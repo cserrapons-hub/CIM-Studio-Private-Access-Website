@@ -5,6 +5,7 @@ import {registrationTestBoundary,registrationTestReady,validateRegistrationTestD
 import {auditStatement} from './registration-audit.js';
 import {registrationReady} from './registration-settings.js';
 import {sampleReceipt} from './sample-receipt.js';
+import {careerReceipt} from './career-receipt.js';
 const encoder=new TextEncoder(),decoder=new TextDecoder();
 const sectorNames={'interior-design':'Interiorismo',architecture:'Arquitectura',hospitality:'Hotelería',gastronomy:'Gastronomía y restauración',other:'Otros'};
 const bytes=value=>Uint8Array.from(atob(value),c=>c.charCodeAt(0));
@@ -26,8 +27,8 @@ async function checkStore(db,kind){await db.prepare('INSERT OR IGNORE INTO regis
 async function rate(request,env,db,now,limit=8){const ip=request.headers.get('CF-Connecting-IP');if(!ip)throw new Rejection('unavailable',503);const bucket=Math.floor(now.getTime()/3600000),id=await hash(env.AUDIT_HASH_SECRET,'registration-rate:'+ip+':'+bucket);const row=await db.prepare('INSERT INTO form_rate_limits(id,count,expires_at) VALUES(?,1,?) ON CONFLICT(id) DO UPDATE SET count=count+1 RETURNING count').bind(id,(bucket+1)*3600000).first();if(row.count>limit)throw new Rejection('rate',429);await db.prepare('DELETE FROM form_rate_limits WHERE expires_at<?').bind(now.getTime()).run();}
 function sameOrigin(request,env){const url=new URL(request.url);if(url.origin!==new URL(env.REGISTRATION_ORIGIN).origin||request.headers.get('Origin')!==url.origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403);}
 function messages(kind,lang,origin,token,privateTest=false,data={}){
- const preferences=origin+(privateTest?'/controlled/registrations/#':'/careers/preferences/#')+token;
- if(kind==='careers')return lang==='en'?{subject:'CIM Studio — Thank you for your interest',text:"Your interest in career opportunities at CIM Studio has been recorded. Confirm your email to activate these updates. This is not a job application or a subscription to our commercial newsletter, and it does not grant the Founders Rate.\n\nConfirm or withdraw these updates: "+preferences+'\n\nCIM STUDIO ESPJ · admin@cimstudio.es'}:{subject:'CIM Studio — Gracias por tu interés',text:'Hemos registrado tu interés en las oportunidades profesionales de CIM Studio. Confirma tu correo para activar estos avisos. No constituye una candidatura ni una suscripción a la newsletter comercial, y no concede la Tarifa Fundadores.\n\nConfirma o retira estos avisos: '+preferences+'\n\nCIM STUDIO ESPJ · admin@cimstudio.es'};
+ const preferences=origin+(privateTest?'/controlled/registrations/#':'/careers/preferences/'+(lang==='en'?'?lang=en':'')+'#')+token;
+ if(kind==='careers')return careerReceipt(preferences,lang);
  return sampleReceipt(data,lang);
 }
 export async function handleRegistration(request,env,kind,fetcher=fetch,now=new Date(),testPolicy=null){
@@ -68,7 +69,7 @@ export async function handleRegistration(request,env,kind,fetcher=fetch,now=new 
   const unsubscribeHash=token?await hash(env.AUDIT_HASH_SECRET,'career-unsubscribe:'+token):null;
   const encrypted=await encryptRegistration(env,kind,id,kind==='careers'?{email:data.email}:{version:2,email:data.email,name:data.name,company:data.company,discipline:data.discipline,shippingAddress:data.shippingAddress,postalCode:data.postalCode,city:data.city,province:data.province,country:data.country});
   const origin=new URL(env.REGISTRATION_ORIGIN).origin,receipt=messages(kind,data.language,origin,token,Boolean(testPolicy),data);
-  const jobs=[{suffix:'receipt',payload:{from:env.MAIL_FROM,to:[data.email],subject:receipt.subject,text:receipt.text,...(kind==='samples'?{html:receipt.html,reply_to:'admin@cimstudio.es'}:{})}}];
+  const jobs=[{suffix:'receipt',payload:{from:env.MAIL_FROM,to:[data.email],subject:receipt.subject,text:receipt.text,html:receipt.html,...(kind==='samples'?{reply_to:'admin@cimstudio.es'}:{})}}];
   if(kind==='samples')jobs.unshift({suffix:'admin',payload:{from:env.MAIL_FROM,to:['admin@cimstudio.es'],reply_to:data.email,subject:data.language==='en'?'CIM Studio — Ceramic sample request':'CIM Studio — Solicitud de muestras',text:`Nombre: ${data.name}\nEmail: ${data.email}\nEstudio: ${data.company}\nSector profesional: ${sectorNames[data.discipline]}\nIdioma: ${data.language}\nDirección de envío: ${data.shippingAddress}\nCódigo postal: ${data.postalCode}\nPoblación: ${data.city}\nProvincia: ${data.province}\nPaís: ${data.country}\n\nConsentimiento: ${policyConsent[data.language].samples}\nFecha: ${at}\nVersión: ${policyVersion}\nReferencia: ${id}`}});
   const statements=[db.prepare("INSERT INTO registrations(id,kind,subject_hash,fingerprint,encrypted_data,state,consent_request,consent_at,consent_version,consent_text,language,unsubscribe_hash,review_due,updated_at) VALUES(?,?,?,?,?,?, ?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET encrypted_data=excluded.encrypted_data,state=excluded.state,fingerprint=excluded.fingerprint,confirmed_at=NULL,consent_request=excluded.consent_request,consent_at=excluded.consent_at,consent_version=excluded.consent_version,consent_text=excluded.consent_text,language=excluded.language,unsubscribe_hash=excluded.unsubscribe_hash,review_due=excluded.review_due,updated_at=excluded.updated_at WHERE registrations.state='withdrawn'").bind(id,kind,subject,fingerprint,encrypted,kind==='careers'?'pending':'active',raw.requestId,at,policyVersion,policyConsent[data.language][kind],data.language,unsubscribeHash,review,at),
    db.prepare("INSERT OR IGNORE INTO registration_consent_events SELECT ?,id,'granted',?,?,?,? FROM registrations WHERE id=? AND consent_request=?").bind(id+':'+raw.requestId,at,policyVersion,policyConsent[data.language][kind],data.language,id,raw.requestId)];
@@ -137,7 +138,9 @@ export async function withdrawCareerConsent(request,env,now=new Date(),testPolic
     try{await drainRegistrationMail(env,'careers',fetcher,now,contact.id,testPolicy,jobId);}catch{/* The confirmation and notification remain durable; no blind resend. */}
    }
 
-   return json({ok:true},200);
+   const saved=contact?await db.prepare('SELECT state,confirmed_at FROM registrations WHERE id=? AND unsubscribe_hash=?').bind(contact.id,tokenHash).first():null;
+   const confirmed=saved?.state==='active'&&typeof saved.confirmed_at==='string'&&saved.confirmed_at.length>0;
+   return json({ok:true,confirmation:confirmed?(contact.state==='pending'?'confirmed':'already_confirmed'):'not_confirmed'},200);
   }
   if(raw.action!=='unsubscribe')throw new Rejection('invalid');
   if(['active','pending'].includes(contact?.state))await db.batch([

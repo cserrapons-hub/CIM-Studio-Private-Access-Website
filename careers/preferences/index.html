@@ -1,1 +1,36 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>CIM Studio — Avisos profesionales</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="preferences.css"><script src="preferences.js" defer></script></head><body><main class="preference-page"><nav aria-label="Idioma"><button type="button" data-lang="es">ES</button> / <button type="button" data-lang="en">EN</button></nav><p>CIM STUDIO</p><h1 data-copy="title">Tus avisos profesionales.</h1><p data-copy="intro">Confirma tu correo para activar los avisos laborales o retira tu solicitud. No afecta a la newsletter comercial ni a Fundadores.</p><button class="primary" type="button" data-action="confirm" data-copy="confirm" disabled>Confirmar avisos</button><button type="button" data-action="unsubscribe" data-copy="unsubscribe" disabled>No quiero recibir estos avisos</button><p role="status" aria-live="polite"></p><a href="/" data-copy="home">Volver a CIM Studio</a></main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+<title>CIM Studio — Avisos profesionales</title>
+<link rel="icon" href="/favicon.png">
+<link rel="stylesheet" href="/assets/subscription-welcome.css">
+<link rel="stylesheet" href="/careers/preferences/preferences.css">
+<script src="/careers/preferences/preferences.js" defer></script>
+</head>
+<body>
+<div class="welcome-page career-page">
+<nav class="languages" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><span aria-hidden="true">/</span><button type="button" data-lang="en" aria-pressed="false">EN</button></nav>
+<div class="welcome-top"><header class="welcome-brand"><img src="/assets/cim-studio-logo-ink.png" width="313" height="238" alt="CIM Studio"></header><span class="welcome-rule" aria-hidden="true"></span></div>
+<main aria-busy="false">
+<section data-panel="checking" role="status"><h1 data-copy="checkingTitle">Estamos confirmando tu correo electrónico.</h1><p data-copy="checking">Espera un momento, por favor.</p></section>
+<section data-panel="confirmed" hidden>
+<h1 data-copy="title">¡Gracias por querer formar parte de nuestro equipo!</h1>
+<p data-copy="confirmed">Tu correo electrónico se ha confirmado correctamente.</p>
+<p data-copy="updates">A partir de ahora, te avisaremos cuando surjan nuevas oportunidades para trabajar con nosotras.</p>
+<div class="career-explore">
+<h2 data-copy="explore">Mientras tanto, descubre nuestro universo.</h2>
+<p data-copy="invitation">Si te apetece conocer un poquito más nuestro proyecto y descubrir las nuevas piezas y colecciones que vamos creando, te invitamos a suscribirte a nuestra newsletter.</p>
+<p><span data-copy="join">Para unirte, solo tienes que entrar en </span><a href="https://cimstudio.es/">cimstudio.es</a><span data-copy="steps">, seleccionar «Acceder a la colección privada» y después «Solicitar acceso».</span></p>
+<a class="career-home" href="https://cimstudio.es/" data-copy="discover">Descubrir CIM Studio</a>
+<p class="career-signoff"><span data-copy="thanks">Gracias por acompañarnos.</span><br><span data-copy="names">Magda y Cati</span></p>
+</div>
+</section>
+<section data-panel="problem" hidden><h1 data-copy="problemTitle">No hemos podido confirmar tu correo.</h1><p data-message role="status"></p><p><span data-copy="contact">Si necesitas ayuda, escribe a </span><a href="mailto:admin@cimstudio.es">admin@cimstudio.es</a>.</p></section>
+<div class="career-actions"><button type="button" data-action="retry" data-copy="retry" hidden>Volver a comprobar</button><button type="button" data-action="unsubscribe" data-copy="unsubscribe" hidden>No quiero recibir estos avisos</button></div>
+<noscript><p>Activa JavaScript para confirmar tu correo. / Enable JavaScript to confirm your email.</p></noscript>
+</main>
+</div>
+</body>
+</html>
