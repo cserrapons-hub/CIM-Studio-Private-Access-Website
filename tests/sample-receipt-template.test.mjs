@@ -100,9 +100,9 @@ test('sample invitation has only homepage links and never includes automatic or 
 test('sample section spacing adds only 30px before Mallorca and 40px before the newsletter, equally in ES/EN',()=>{
  for(const lang of ['es','en']){
   const r=sampleReceipt(address,lang),mallorca=lang==='es'?'Si estás en Mallorca':'If you are in Mallorca',newsletter=lang==='es'?'¿Aún no estás en nuestra newsletter?':'Haven’t joined our newsletter yet?';
-  assert.ok(r.html.includes('<p style="margin:0 0 22px;padding-top:30px"><strong>'+mallorca+'</strong>'));
-  assert.ok(r.html.includes('<p style="margin:0 0 22px;padding-top:40px"><strong>'+newsletter+'</strong>'));
-  assert.deepEqual([...r.html.matchAll(/padding-top:(\d+)px/g)].map(m=>Number(m[1])),[30,40]);
+  assert.ok(r.html.includes('height="30" style="height:30px;line-height:30px;font-size:1px">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+mallorca+'</strong>'));
+  assert.ok(r.html.includes('height="40" style="height:40px;line-height:40px;font-size:1px">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+newsletter+'</strong>'));
+  assert.deepEqual([...r.html.matchAll(/<td height="(\d+)" style="height:\d+px;line-height:\d+px;font-size:1px">/g)].map(m=>Number(m[1])),[30,40]);
   assert.ok(r.text.includes('\n\n\n\n'+mallorca));assert.ok(r.text.includes('\n\n\n\n\n'+newsletter));
   assert.ok(!r.text.includes('\n\n\n\n\n'+mallorca));assert.ok(!r.text.includes('\n\n\n\n\n\n'+newsletter));
  }
