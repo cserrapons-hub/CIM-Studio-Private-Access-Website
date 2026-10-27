@@ -6,7 +6,7 @@ import {fixture} from '../tests/helpers/launch-fixture.mjs';
 import {handleRegistration,withdrawCareerConsent} from '../server/registrations.js';
 import legal from '../legal/content.js';
 const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});
 const origin='https://cimstudio.es',out=process.env.CIM_CAREER_SCREENSHOTS||'/tmp/cim-career-confirmation';mkdirSync(out,{recursive:true});let count=0;
 const scenarios=['confirmed','already','invalid','missing','malformed','withdrawn','db_error','http_error','network','malformed_response','disabled','withdraw_error'];
 try{for(const width of [1440,390])for(const lang of ['es','en'])for(const scenario of scenarios){
