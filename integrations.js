@@ -28,9 +28,14 @@
   form.closest('dialog').close();samplesResponseDialog.showModal();
  }
  const careersResponseDialog=document.getElementById('careers-response-dialog');
- careersResponseDialog.querySelector('[data-careers-response-close]').addEventListener('click',()=>careersResponseDialog.close());
- careersResponseDialog.addEventListener('close',()=>document.querySelector('[data-open="careers-dialog"]').focus({preventScroll:true}));
- function showCareersResponse(form){form.closest('dialog').close();careersResponseDialog.showModal();}
+ const careersResponseClose=careersResponseDialog?.querySelector('[data-careers-response-close]');
+ // A missing optional response component must not stop configuration, Turnstile or other forms.
+ careersResponseClose?.addEventListener('click',()=>careersResponseDialog.close());
+ careersResponseDialog?.addEventListener('close',()=>document.querySelector('[data-open="careers-dialog"]').focus({preventScroll:true}));
+ function showCareersResponse(form){
+  if(!careersResponseDialog||!careersResponseClose||typeof careersResponseDialog.showModal!=='function'){status(form,'receivedCareers');return;}
+  form.closest('dialog').close();careersResponseDialog.showModal();
+ }
  function status(form,key,error=false){const el=form.querySelector('.status');delete el.dataset.security;el.dataset.message=key;el.dataset.error=String(error);el.textContent=copy[language][key];}
  function refresh(){
   // Public availability follows per-form runtime gates; internal trials have separate pages.
