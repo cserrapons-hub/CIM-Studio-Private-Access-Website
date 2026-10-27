@@ -100,10 +100,27 @@ test('sample invitation has only homepage links and never includes automatic or 
 test('sample section spacing adds only 30px before Mallorca and 40px before the newsletter, equally in ES/EN',()=>{
  for(const lang of ['es','en']){
   const r=sampleReceipt(address,lang),mallorca=lang==='es'?'Si estás en Mallorca':'If you are in Mallorca',newsletter=lang==='es'?'¿Aún no estás en nuestra newsletter?':'Haven’t joined our newsletter yet?';
-  assert.ok(r.html.includes('height="30" style="height:30px;line-height:30px;font-size:1px">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+mallorca+'</strong>'));
-  assert.ok(r.html.includes('height="40" style="height:40px;line-height:40px;font-size:1px">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+newsletter+'</strong>'));
-  assert.deepEqual([...r.html.matchAll(/<td height="(\d+)" style="height:\d+px;line-height:\d+px;font-size:1px">/g)].map(m=>Number(m[1])),[30,40]);
+  assert.ok(r.html.includes('height="30" style="height:30px;line-height:30px;font-size:1px;padding:0;mso-line-height-rule:exactly">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+mallorca+'</strong>'));
+  assert.ok(r.html.includes('height="40" style="height:40px;line-height:40px;font-size:1px;padding:0;mso-line-height-rule:exactly">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+newsletter+'</strong>'));
+  assert.deepEqual([...r.html.matchAll(/<td height="(\d+)" style="height:\d+px;line-height:\d+px;font-size:1px;padding:0;mso-line-height-rule:exactly">/g)].map(m=>Number(m[1])),[30,40]);
   assert.ok(r.text.includes('\n\n\n\n'+mallorca));assert.ok(r.text.includes('\n\n\n\n\n'+newsletter));
   assert.ok(!r.text.includes('\n\n\n\n\n'+mallorca));assert.ok(!r.text.includes('\n\n\n\n\n\n'+newsletter));
+ }
+});
+
+
+test('decorative email spacers retain height attributes and Outlook exact line-height without altering other sections',()=>{
+ for(const lang of ['es','en']){
+  const html=sampleReceipt(address,lang).html;
+  const spacers=[...html.matchAll(/<table role="presentation" aria-hidden="true"[^>]*><tr><td height="(\d+)"[^>]*>&nbsp;<\/td><\/tr><\/table>/g)];
+  assert.deepEqual(spacers.map(m=>Number(m[1])),[30,40]);
+  for(const [markup,height] of spacers){
+   assert.match(markup,/width="100%" cellpadding="0" cellspacing="0" border="0"/);
+   assert.match(markup,/mso-table-lspace:0pt;mso-table-rspace:0pt/);
+   assert.ok(markup.includes('height:'+height+'px;line-height:'+height+'px;font-size:1px;padding:0;mso-line-height-rule:exactly'));
+   const attributesOnly=markup.replace(/ style="[^"]*"/g,'');
+   assert.ok(attributesOnly.includes('height="'+height+'"'));assert.ok(attributesOnly.includes('&nbsp;'));
+  }
+  assert.doesNotMatch(html,/padding-top:/);
  }
 });
