@@ -95,3 +95,15 @@ test('sample invitation has only homepage links and never includes automatic or 
   assert.doesNotMatch(r.html+r.text,/api\/subscribe|add_subscriber|unsubscribe|requestId=|token=|<form|<img|<script/i);
  }
 });
+
+
+test('sample section spacing adds only 30px before Mallorca and 40px before the newsletter, equally in ES/EN',()=>{
+ for(const lang of ['es','en']){
+  const r=sampleReceipt(address,lang),mallorca=lang==='es'?'Si estás en Mallorca':'If you are in Mallorca',newsletter=lang==='es'?'¿Aún no estás en nuestra newsletter?':'Haven’t joined our newsletter yet?';
+  assert.ok(r.html.includes('<p style="margin:0 0 22px;padding-top:30px"><strong>'+mallorca+'</strong>'));
+  assert.ok(r.html.includes('<p style="margin:0 0 22px;padding-top:40px"><strong>'+newsletter+'</strong>'));
+  assert.deepEqual([...r.html.matchAll(/padding-top:(\d+)px/g)].map(m=>Number(m[1])),[30,40]);
+  assert.ok(r.text.includes('\n\n\n\n'+mallorca));assert.ok(r.text.includes('\n\n\n\n\n'+newsletter));
+  assert.ok(!r.text.includes('\n\n\n\n\n'+mallorca));assert.ok(!r.text.includes('\n\n\n\n\n\n'+newsletter));
+ }
+});
