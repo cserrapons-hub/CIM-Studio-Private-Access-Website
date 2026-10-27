@@ -34,7 +34,7 @@ Object.assign(copy.en,{subscriberType:'I am subscribing as',subscriberTypeChoose
 Object.assign(copy.es,{shippingLegend:'Datos de envío',shippingAddress:'Dirección de envío',postalCode:'Código postal',city:'Población',province:'Provincia',country:'País',gastronomy:'Gastronomía y restauración'});
 Object.assign(copy.en,{shippingLegend:'Shipping details',shippingAddress:'Shipping address',postalCode:'Postal code',city:'Town / city',province:'Province / region',country:'Country',gastronomy:'Gastronomy and restaurants'});
 Object.assign(copy.es,{
- samplesResponseTitle:'Hemos recibido tu solicitud.',
+ samplesResponseTitle:'Solo falta un paso', samplesResponseConfirm:'Para poder proceder al envío de las muestras, necesitamos que confirmes la dirección que has introducido.', samplesResponseCheck:'Revisa tu bandeja de entrada y ', samplesResponseReply:'responde al correo que te hemos enviado desde ',
  samplesResponseThanks:'Gracias por tu interés en nuestras muestras cerámicas.',
  samplesResponseInbox:'Revisa tu bandeja de entrada.',
  samplesResponseSent:'Te hemos enviado un correo con información sobre tu solicitud desde ',
@@ -44,7 +44,7 @@ Object.assign(copy.es,{
  samplesResponseContact:'Para cualquier consulta, puedes escribirnos a '
 });
 Object.assign(copy.en,{
- samplesResponseTitle:'We have received your request.',
+ samplesResponseTitle:'Just one more step', samplesResponseConfirm:'Before we can send your samples, we need you to confirm the address you entered.', samplesResponseCheck:'Check your inbox and ', samplesResponseReply:'reply to the email we sent you from ',
  samplesResponseThanks:'Thank you for your interest in our ceramic samples.',
  samplesResponseInbox:'Check your inbox.',
  samplesResponseSent:'We have sent you an email with information about your request from ',
