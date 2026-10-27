@@ -53,6 +53,18 @@ Object.assign(copy.en,{
  samplesResponseMissingEmail:"Haven't received the email? Contact us at ",
  samplesResponseContact:'For any enquiries, you can email '
 });
+Object.assign(copy.es,{
+ careersResponseTitle:'Solo falta un paso.',
+ careersResponseSent:'Te hemos enviado un correo electrónico desde ',
+ careersResponseConfirm:'Revisa tu bandeja de entrada y haz clic en el enlace de confirmación para que podamos avisarte cuando surjan nuevas oportunidades.',
+ careersResponseSpam:'Si no encuentras el correo, comprueba también la carpeta de spam.'
+});
+Object.assign(copy.en,{
+ careersResponseTitle:'Just one more step.',
+ careersResponseSent:'We have sent you an email from ',
+ careersResponseConfirm:'Check your inbox and click the confirmation link so we can let you know when new opportunities arise.',
+ careersResponseSpam:'If you cannot find the email, please also check your spam folder.'
+});
 let language='es';let legal='notice';
 const legalLabels={es:{notice:'Aviso legal',privacy:'Privacidad',cookies:'Cookies y tecnologías',terms:'Tarifa Fundadores',draft:'Borrador pendiente de revisión y aprobación legal. Los formularios todavía no están disponibles.',navigation:'Documentos legales'},en:{notice:'Legal notice',privacy:'Privacy',cookies:'Cookies and technologies',terms:'Founders Rate',draft:'Draft awaiting legal review and approval. Forms are not available yet.',navigation:'Legal documents'}};
 function updateLegal(){

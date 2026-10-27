@@ -39,8 +39,8 @@ try{for(const width of [1440,390])for(const lang of ['es','en'])for(const scenar
   await page.goto(origin+'/');await page.locator(`[data-lang=${lang}]`).click();await page.locator('[data-open=careers-dialog]').click();
   assert.equal(await page.locator('#careers-title').innerText(),lang==='es'?'Forma parte de nuestro equipo.':'Join our team.');
   assert.equal(await page.locator('#careers-dialog [data-i18n=careersDetails]').innerText(),lang==='es'?'Si te gustaría trabajar con nosotras, déjanos tu email. Cuando tengamos una nueva oportunidad en el estudio, serás de las primeras personas en saberlo.':"If you'd like to work with us, leave us your email. When a new opportunity opens up at the studio, you'll be among the first to hear about it.");
-  await page.locator('#careers-email').fill(s.data.email);await page.locator('[name=careers_consent]').check();await page.locator('#careers-dialog [type=submit]').click();await page.waitForResponse(r=>new URL(r.url()).pathname==='/api/careers');
-  assert.equal(mails.length,1);await page.locator('#careers-dialog').screenshot({path:`${out}/${width}-${lang}-form.png`});
+  await page.locator('#careers-email').fill(s.data.email);await page.locator('[name=careers_consent]').check();await page.locator('#careers-dialog [type=submit]').click();await page.waitForFunction(()=>document.getElementById('careers-response-dialog').open);
+  assert.equal(mails.length,1);await page.locator('#careers-response-dialog').screenshot({path:`${out}/${width}-${lang}-form.png`});
  }else assert.equal((await create()).status,202);
  const email=mails[0];assert.ok(email.html);writeFileSync(`${out}/${lang}-email.html`,email.html);
  const link=email.text.match(/https:\/\/[^\s]+/)[0],token=new URL(link).hash.slice(1);assert.match(token,/^[a-f0-9]{64}$/);
