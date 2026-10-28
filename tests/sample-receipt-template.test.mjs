@@ -65,14 +65,14 @@ test('sample newsletter invitation preserves approved copy and ES/EN HTML/plain-
    '¿Aún no estás en nuestra newsletter?',
    'Durante nuestro primer año no vamos a tener tienda online.',
    'Queremos presentar cada nueva pieza de una forma más personal, compartiéndola primero con quienes nos acompañáis desde el principio.',
-   'Además, si te unes antes del 31 de diciembre de 2026, disfrutarás de nuestra Tarifa Fundadores: un 15 % de descuento de por vida, aplicable también sobre el precio profesional, tanto en piezas de nuestra colección como en piezas hechas a medida.',
+   'Además, si te unes antes del 31 de diciembre de 2026, recibirás un vale de 25 € para descontar de tu primera compra, sin importe mínimo. Un solo uso por miembro fundador.',
    'Para unirte, solo tienes que entrar en cimstudio.es, seleccionar «Acceder a la colección privada» y después «Solicitar acceso».'
   ],
   en:[
    'Haven’t joined our newsletter yet?',
    'During our first year, we won’t have an online shop.',
    'We want to introduce each new piece in a more personal way, sharing it first with those who have been with us from the beginning.',
-   'Also, if you join before December 31, 2026, you’ll enjoy our Founders Rate: a lifetime 15% discount, also applicable to professional pricing, on both pieces from our collection and bespoke pieces.',
+   'Also, if you join before 31 December 2026, you’ll receive a €25 voucher towards your first purchase, with no minimum spend. One use per founding member.',
    'To join, simply visit cimstudio.es, select “Access the private collection” and then “Request access”.'
   ]
  };
@@ -83,7 +83,7 @@ test('sample newsletter invitation preserves approved copy and ES/EN HTML/plain-
    for(const paragraph of copy[lang]){const position=content.indexOf(paragraph);assert.ok(position>previous);previous=position;}
    assert.ok(content.indexOf(lang==='es'?'Muchas gracias,':'Thank you very much,')>previous);
   }
-  assert.match(r.html,/<strong>[^<]*lifetime 15% discount<\/strong>|<strong>[^<]*15 % de descuento de por vida<\/strong>/);
+  assert.match(r.html,/<strong>[^<]*€25 voucher[^<]*no minimum spend<\/strong>|<strong>[^<]*vale de 25 €[^<]*sin importe mínimo<\/strong>/);
   assert.ok(r.text.includes('https://cimstudio.es/'));
  }
 });

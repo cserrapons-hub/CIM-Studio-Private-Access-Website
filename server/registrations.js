@@ -126,7 +126,7 @@ export async function withdrawCareerConsent(request,env,now=new Date(),testPolic
    if(contact?.state==='pending'){
     const at=now.toISOString(),jobId=contact.id+':'+contact.consent_request+':confirmed-admin';
     const owner=await decryptRegistration(env,'careers',contact.id,contact.encrypted_data);
-    const payload={from:env.MAIL_FROM,to:['admin@cimstudio.es'],subject:'CIM Studio — Interés profesional confirmado',text:'Una persona ha confirmado su interés en recibir avisos de oportunidades profesionales.\n\nEmail: '+owner.email+'\nIdioma: '+contact.language+'\nConfirmación UTC: '+at+'\nVersión de consentimiento: '+contact.consent_version+'\n\nNo implica suscripción comercial ni Tarifa Fundadores.'};
+    const payload={from:env.MAIL_FROM,to:['admin@cimstudio.es'],subject:'CIM Studio — Interés profesional confirmado',text:'Una persona ha confirmado su interés en recibir avisos de oportunidades profesionales.\n\nEmail: '+owner.email+'\nIdioma: '+contact.language+'\nConfirmación UTC: '+at+'\nVersión de consentimiento: '+contact.consent_version+'\n\nNo implica suscripción comercial ni derecho al vale de miembros fundadores.'};
     const encryptedPayload=await encryptRegistration(env,'careers',jobId,payload);
     await db.batch([
     db.prepare("UPDATE registrations SET state='active',confirmed_at=?,updated_at=? WHERE id=? AND state='pending' AND unsubscribe_hash=?").bind(now.toISOString(),now.toISOString(),contact.id,tokenHash),
