@@ -1,4 +1,4 @@
-import {receiptParagraph as p,receiptSpacer as spacer,receiptEmail} from './receipt-email-layout.js';
+import {receiptParagraph as p,receiptEmail} from './receipt-email-layout.js';
 // Sample acknowledgement only. No network, persistence or external assets.
 const website='https://cimstudio.es/';
 const clean=value=>typeof value==='string'?value.trim():'';
@@ -25,9 +25,9 @@ export function sampleReceipt(data={},language='es'){
   join:'Para unirte, solo tienes que entrar en ',steps:', seleccionar «Acceder a la colección privada» y después «Solicitar acceso».'
  };
  const newsletterText=[newsletter.title,newsletter.first,newsletter.story,newsletter.lead+newsletter.offer+newsletter.scope,newsletter.join+'cimstudio.es ('+website+')'+newsletter.steps].join('\n\n');
- const text=[c.hello,c.thanks+'\n'+c.received,c.process,[c.address,...(address.length?['',...address]:[])].join('\n'),c.confirm,'\n\n'+c.mallorca+', '+c.visit,c.prefer,'\n\n\n'+newsletterText,c.thankyou,c.signoff+'\nCIM Studio\nwww.cimstudio.es'].join('\n\n');
- const newsletterHtml=spacer(40)+p('<strong>'+newsletter.title+'</strong>')+p(newsletter.first)+p(newsletter.story)+p(newsletter.lead+'<strong>'+newsletter.offer+'</strong>'+newsletter.scope)+p(newsletter.join+'<strong><a href="'+website+'" style="color:#292923;text-decoration:underline">cimstudio.es</a></strong>'+newsletter.steps);
- const addressHtml=address.length?'<div style="margin:0 0 24px;padding:20px;background:#faf9f6"><p style="margin:0 0 10px;font-weight:600">'+c.address+'</p>'+address.map(escape).join('<br>')+'</div>':'';
- const html=receiptEmail(c.subject,en,p(c.hello)+p(c.thanks+'<br>'+c.received)+p(c.process)+addressHtml+p(c.confirm)+spacer(30)+p('<strong>'+c.mallorca+'</strong>, '+c.visit)+p(c.prefer)+newsletterHtml+p(c.thankyou)+'<p style="margin:0">'+c.signoff+'<br><strong>CIM Studio</strong><br><a href="'+website+'" style="color:#292923;text-decoration:underline">www.cimstudio.es</a></p>');
+ const text=[c.hello,c.thanks+'\n'+c.received,c.process,[c.address,...(address.length?['',...address]:[])].join('\n'),c.confirm,c.mallorca+', '+c.visit,c.prefer,newsletterText,c.thankyou,c.signoff+'\nCIM Studio\nwww.cimstudio.es'].join('\n\n');
+ const newsletterHtml=p('<strong>'+newsletter.title+'</strong>')+p(newsletter.first)+p(newsletter.story)+p(newsletter.lead+'<strong>'+newsletter.offer+'</strong>'+newsletter.scope)+p(newsletter.join+'<strong><a href="'+website+'" style="color:#292923;text-decoration:underline">cimstudio.es</a></strong>'+newsletter.steps);
+ const addressHtml=address.length?p('<strong>'+c.address+'</strong>')+p(address.map(escape).join('<br>')):'';
+ const html=receiptEmail(c.subject,en,p(c.hello)+p(c.thanks+'<br>'+c.received)+p(c.process)+addressHtml+p(c.confirm)+p('<strong>'+c.mallorca+'</strong>, '+c.visit)+p(c.prefer)+newsletterHtml+p(c.thankyou)+'<p style="margin:0">'+c.signoff+'<br><strong>CIM Studio</strong><br><a href="'+website+'" style="color:#292923;text-decoration:underline">www.cimstudio.es</a></p>');
  return {subject:c.subject,text,html};
 }
