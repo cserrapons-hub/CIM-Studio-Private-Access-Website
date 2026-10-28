@@ -4,6 +4,8 @@ Versión: public-legal-2026-10-22-v1. Aprobación expresa de CIM Studio el 22/10
 
 Actualización comercial solicitada por CIM Studio el 28/10/2026: vale de 25 € para la primera compra, sin mínimo y de un solo uso. No cambia los consentimientos ni autoriza despliegues. La aprobación jurídica anterior se conserva como antecedente.
 
+Actualización de comunicación solicitada el 28/10/2026: se eliminan las tarifas profesionales y su verificación documental; Particular/Profesional se conserva para conocer el perfil y adaptar las comunicaciones, sin precios distintos. El vale y los consentimientos no cambian.
+
 # ESPAÑOL
 
 ## 1. Aviso legal
@@ -16,7 +18,7 @@ Actualización comercial solicitada por CIM Studio el 28/10/2026: vale de 25 €
 
 CIM Studio presenta su trabajo de diseño y cerámica artesanal y ofrece formularios para solicitar comunicaciones de su colección, muestras para proyectos profesionales y avisos sobre oportunidades laborales.
 
-El envío de un formulario no constituye una compra, no formaliza un encargo y no garantiza disponibilidad de muestras, acceso al Precio Profesional ni una oferta de empleo.
+El envío de un formulario no constituye una compra, no formaliza un encargo y no garantiza disponibilidad de muestras ni una oferta de empleo.
 
 Los contenidos, fotografías, identidad visual y diseños están sujetos a los derechos de sus respectivos titulares. Su publicación no concede una licencia de explotación. Cualquier utilización deberá contar con autorización o estar amparada por la legislación aplicable.
 
@@ -42,7 +44,7 @@ Esta política explica el tratamiento de datos al utilizar los formularios habil
 
 ### Newsletter y acceso a la colección privada
 
-Tratamos su correo electrónico, idioma y clasificación autodeclarada como Particular o Profesional para gestionar la suscripción, adaptar las comunicaciones y enviar novedades de la colección y acceso anticipado a nuevas piezas.
+Tratamos su correo electrónico, idioma y clasificación autodeclarada como Particular o Profesional para gestionar la suscripción, adaptar las comunicaciones y enviar novedades de la colección y acceso anticipado a nuevas piezas. Esta clasificación no se utiliza para establecer precios diferentes.
 
 La base jurídica es su consentimiento, prestado mediante una casilla específica inicialmente desmarcada, conforme al artículo 6.1.a del RGPD.
 
@@ -66,7 +68,7 @@ La casilla del formulario se refiere al contacto relativo a esa solicitud. No au
 
 Los campos obligatorios permiten tramitar la petición. No incluya datos sensibles, documentación fiscal ni información innecesaria de otras personas.
 
-La solicitud se conserva cifrada en Cloudflare D1. Resend tramita el aviso administrativo y el acuse al solicitante; Google Workspace gestiona el correo administrativo. El acuse no confirma disponibilidad, despacho de muestras ni concesión de Precio Profesional.
+La solicitud se conserva cifrada en Cloudflare D1. Resend tramita el aviso administrativo y el acuse al solicitante; Google Workspace gestiona el correo administrativo. El acuse no confirma disponibilidad ni despacho de muestras.
 
 ### Avisos sobre oportunidades laborales
 
@@ -81,16 +83,6 @@ Este registro se mantiene separado de la newsletter comercial y no concede vale 
 No se solicitan CV, teléfono ni información adicional de candidatura. Inscribirse no constituye una candidatura a una vacante ni garantiza una oferta de empleo.
 
 Puede retirar su consentimiento mediante el mecanismo de baja facilitado o escribiendo a admin@cimstudio.es. La retirada afecta únicamente a estos avisos.
-
-### Verificación profesional
-
-Para comprobar el acceso al Precio Profesional, CIM Studio revisará primero la web del estudio, su presencia pública o información de la empresa.
-
-Solo cuando esos medios sean insuficientes podrá solicitar un certificado de situación censal, un modelo 036 con información innecesaria oculta o un documento equivalente. No deben enviarse documentos completos si contienen información ajena a la comprobación.
-
-El tratamiento se limita a verificar la actividad y la relación profesional con la entidad. Se basa en las medidas precontractuales solicitadas por la propia persona o, cuando actúa por una entidad, en el interés legítimo en verificar la condición profesional declarada.
-
-El acceso quedará limitado al personal encargado de la comprobación. Se conservarán el resultado y la evidencia mínima necesaria. Las copias completas se eliminarán cuando termine la verificación y dejen de ser necesarias para resolver una incidencia o atender una obligación aplicable. No se incorporarán estos documentos a las listas de marketing.
 
 ### Acreditación y gestión del vale de miembros fundadores
 
@@ -150,8 +142,6 @@ Puede solicitar información sobre las garantías aplicables en admin@cimstudio.
 
 **Fundadores:** únicamente la acreditación mínima necesaria mientras sea preciso gestionar el beneficio, separada del consentimiento comercial y respetando los derechos de protección de datos. El vale es de un solo uso; no justifica conservar información innecesaria.
 
-**Documentación profesional:** conforme al criterio de minimización y eliminación descrito en el apartado de verificación.
-
 **Facturas y operaciones posteriores:** durante los plazos exigidos por las obligaciones legales aplicables, sin extender automáticamente esos plazos a todo el expediente.
 
 La revisión y supresión abarcarán, según corresponda, D1, proveedores y buzones. Cuando una obligación aplicable exija conservar información, se limitará a la estrictamente necesaria y se restringirá su uso. Si una restauración recupera información previamente suprimida, deberán reaplicarse las supresiones.
@@ -204,8 +194,6 @@ La organización de las listas y el contenido de las comunicaciones no determina
 
 La suscripción es voluntaria. Retirar el consentimiento o darse de baja de la newsletter no elimina el vale pendiente de uso. La acreditación del beneficio y de su utilización se mantiene separada de la autorización para recibir comunicaciones comerciales.
 
-El acceso al Precio Profesional está dirigido a interioristas, arquitectos, hoteles, hostelería, tiendas, distribuidores y profesionales relacionados. CIM Studio comprobará primero la web del estudio, su presencia pública o información de la empresa. Solo si esos medios no bastan podrá solicitar documentación acreditativa pertinente, con los datos innecesarios ocultos. Declararse Profesional en el formulario no equivale a haber obtenido esa verificación.
-
 CIM Studio revisará los correos y evidencias que acrediten la confirmación y su fecha, y mantendrá únicamente el registro mínimo necesario para gestionar el beneficio y comprobar su único uso. El correo que invita a confirmar, una etiqueta comercial, la solicitud inicial o una respuesta de aceptación de la API no sustituyen la acreditación de la confirmación efectiva.
 
 Los formularios de esta web no constituyen una compra ni formalizan un encargo. Antes de contratar se facilitarán el presupuesto y las condiciones aplicables, incluidos impuestos, gastos, pago, entrega y derechos legalmente exigibles. Estas condiciones no limitan los derechos imperativos de las personas consumidoras.
@@ -240,7 +228,7 @@ Los tres formularios mantendrán accesible el enlace a la Política de Privacida
 
 CIM Studio presents its design and handcrafted ceramics and provides forms for requesting collection updates, samples for professional projects and information about career opportunities.
 
-Submitting a form does not constitute a purchase, conclude a commission or guarantee sample availability, Professional Pricing or an offer of employment.
+Submitting a form does not constitute a purchase, conclude a commission or guarantee sample availability or an offer of employment.
 
 The content, photographs, visual identity and designs are subject to their respective holders’ rights. Publication does not grant a licence to exploit them. Any use must be authorised or permitted by applicable law.
 
@@ -266,7 +254,7 @@ This policy explains data processing when you use enabled forms on cimstudio.es.
 
 ### Newsletter and private collection access
 
-We process your email address, language and self-declared classification as a Private individual or Professional to manage your subscription, tailor communications and send collection news and early access to new pieces.
+We process your email address, language and self-declared classification as a Private individual or Professional to manage your subscription, tailor communications and send collection news and early access to new pieces. This classification is not used to set different prices.
 
 The lawful basis is your consent, given through a specific, initially unchecked checkbox, under Article 6(1)(a) GDPR.
 
@@ -290,7 +278,7 @@ The form’s checkbox concerns contact about that request. It does not authorise
 
 Required fields enable us to handle the request. Please do not include sensitive data, tax documentation or unnecessary information about other people.
 
-The request is stored encrypted in Cloudflare D1. Resend handles the administrative notification and acknowledgement to the applicant; Google Workspace manages administrative email. An acknowledgement does not confirm availability, sample dispatch or access to Professional Pricing.
+The request is stored encrypted in Cloudflare D1. Resend handles the administrative notification and acknowledgement to the applicant; Google Workspace manages administrative email. An acknowledgement does not confirm availability or sample dispatch.
 
 ### Career opportunity updates
 
@@ -305,16 +293,6 @@ This register is separate from the commercial newsletter and does not confer the
 We do not request a CV, telephone number or additional application information. Joining the register is not an application for a vacancy and does not guarantee an offer of employment.
 
 You may withdraw consent through the unsubscribe mechanism provided or by emailing admin@cimstudio.es. Withdrawal affects only these updates.
-
-### Professional verification
-
-To assess access to Professional Pricing, CIM Studio will first review the studio’s website, public presence or company information.
-
-Only where these sources are insufficient may we request a certificate of tax registration status, a Spanish Modelo 036 form with unnecessary information concealed, or an equivalent document. Complete documents should not be sent where they contain information unrelated to verification.
-
-Processing is limited to verifying professional activity and the person’s connection to the organisation. It relies on precontractual steps requested by the individual or, where acting for an organisation, the legitimate interest in verifying the declared professional status.
-
-Access will be limited to personnel responsible for verification. We will retain the outcome and minimum necessary evidence. Full copies will be deleted once verification is complete and they are no longer necessary to resolve an issue or meet an applicable obligation. These documents will not be added to marketing lists.
 
 ### Evidence and administration of the founding member voucher
 
@@ -374,8 +352,6 @@ You may request information about applicable safeguards at admin@cimstudio.es.
 
 **Founders:** only the minimum evidence needed while administering the benefit remains necessary, separately from marketing consent and subject to data protection rights. The single-use voucher does not justify retaining unnecessary information.
 
-**Professional documentation:** according to the minimisation and deletion approach described under professional verification.
-
 **Invoices and subsequent transactions:** for the periods required by applicable legal obligations, without automatically extending those periods to the entire file.
 
 Review and deletion will cover D1, providers and mailboxes as appropriate. Where an applicable obligation requires retention, information will be limited to what is strictly necessary and its use restricted. If a restoration recovers information previously deleted, the deletions must be reapplied.
@@ -427,8 +403,6 @@ Subscriptions confirmed outside this period do not confer this benefit. Their in
 The organisation of mailing lists and the content of communications do not determine voucher entitlement. Founding members retain their status and unused voucher even if they receive the same communications as general subscribers.
 
 Subscription is voluntary. Withdrawing consent or unsubscribing from the newsletter does not remove the unused voucher. Evidence of entitlement and use is kept separately from permission to receive marketing communications.
-
-Professional Pricing is intended for interior designers, architects, hotels, hospitality businesses, shops, distributors and related professionals. CIM Studio will first review the studio website, public presence or company information. Only where these are insufficient may relevant supporting documentation be requested, with unnecessary details concealed. Selecting Professional on the form is not equivalent to completing this verification.
 
 CIM Studio will review emails and evidence establishing confirmation and its date, and keep only the minimum record needed to administer the benefit and verify its single use. An invitation to confirm, a marketing tag, the initial request or an API acceptance response does not replace evidence of effective confirmation.
 
