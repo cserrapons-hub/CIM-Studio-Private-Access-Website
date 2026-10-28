@@ -12,7 +12,7 @@ test('sample acknowledgement has faithful ES/EN subjects, address and plain-text
   assert.ok(result.text.includes('07000 Ciudad de ejemplo\nIlles Balears · España'));
   assert.ok(result.text.includes(lang==='es'?'«Datos correctos»':'“Details correct”'));assert.ok(result.text.includes('Mallorca'));
   assert.match(result.html,/<strong>Si estás en Mallorca<\/strong>|<strong>If you are in Mallorca<\/strong>/);
-  assert.ok(result.html.includes('lang="'+lang+'"'));assert.match(result.html,/width:100%;max-width:600px/);assert.match(result.html,/href="https:\/\/cimstudio.es\/"/);
+  assert.ok(result.html.includes('lang="'+lang+'"'));assert.match(result.html,/padding:10px;font-family:Arial,Helvetica,sans-serif;font-size:14px/);assert.match(result.html,/href="https:\/\/cimstudio.es\/"/);
   assert.equal((result.html.match(/<a /g)||[]).length,2);assert.doesNotMatch(result.html,/<script|<img|<iframe|<form|<link|@import|onload=/i);assert.doesNotMatch(result.text,/<html|\[Dirección\]|\[Código postal\]/);
  }
 });
@@ -48,13 +48,13 @@ test('career acknowledgement retains separate text, its own HTML and no sample R
  }finally{s.close();}
 });
 
-test('sample email uses a single cream background and removes only the word just/solo in both alternatives',()=>{
+test('sample email uses transparent personal styling and preserves the processing sentence',()=>{
  for(const lang of ['es','en']){
   const result=sampleReceipt(address,lang),sentence=lang==='es'?'Para procesar tu solicitud necesitamos que nos confirmes tus datos de envío:':'To process your request, we need you to confirm your shipping details:';
   assert.ok(result.text.includes(sentence));assert.ok(result.html.includes(sentence));assert.doesNotMatch(result.html+result.text,/sol[o] necesitamos|we just need/);
-  const backgrounds=[...result.html.matchAll(/background:([^;"}]+)/g)].map(m=>m[1]);assert.ok(backgrounds.length>=5);assert.deepEqual([...new Set(backgrounds)],['#faf9f6']);
-  assert.doesNotMatch(result.html,/background:#ffffff|background:#f7f6f2|border:|box-shadow:/);
-  assert.ok(result.html.includes('margin:0 0 24px;padding:20px;'));assert.ok(result.html.includes('padding:32px 24px;'));assert.ok(result.html.includes('padding:24px 16px'));
+  const backgrounds=[...result.html.matchAll(/background:([^;"}]+)/g)].map(m=>m[1]);assert.deepEqual([...new Set(backgrounds)],['transparent']);
+  assert.doesNotMatch(result.html,/bgcolor|max-width|Montserrat|box-shadow|<img|<header|<button|<hr/i);
+  assert.match(result.html,/padding:10px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;text-align:left/);
  }
 });
 
@@ -97,30 +97,21 @@ test('sample invitation has only homepage links and never includes automatic or 
 });
 
 
-test('sample section spacing adds only 30px before Mallorca and 40px before the newsletter, equally in ES/EN',()=>{
+test('sample sections use natural paragraph gaps without decorative spacers in both alternatives',()=>{
  for(const lang of ['es','en']){
   const r=sampleReceipt(address,lang),mallorca=lang==='es'?'Si estás en Mallorca':'If you are in Mallorca',newsletter=lang==='es'?'¿Aún no estás en nuestra newsletter?':'Haven’t joined our newsletter yet?';
-  assert.ok(r.html.includes('height="30" style="height:30px;line-height:30px;font-size:1px;padding:0;mso-line-height-rule:exactly">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+mallorca+'</strong>'));
-  assert.ok(r.html.includes('height="40" style="height:40px;line-height:40px;font-size:1px;padding:0;mso-line-height-rule:exactly">&nbsp;</td></tr></table><p style="margin:0 0 22px"><strong>'+newsletter+'</strong>'));
-  assert.deepEqual([...r.html.matchAll(/<td height="(\d+)" style="height:\d+px;line-height:\d+px;font-size:1px;padding:0;mso-line-height-rule:exactly">/g)].map(m=>Number(m[1])),[30,40]);
-  assert.ok(r.text.includes('\n\n\n\n'+mallorca));assert.ok(r.text.includes('\n\n\n\n\n'+newsletter));
-  assert.ok(!r.text.includes('\n\n\n\n\n'+mallorca));assert.ok(!r.text.includes('\n\n\n\n\n\n'+newsletter));
+  assert.ok(r.html.includes('<p style="margin:0 0 14px"><strong>'+mallorca+'</strong>'));
+  assert.ok(r.html.includes('<p style="margin:0 0 14px"><strong>'+newsletter+'</strong>'));
+  assert.doesNotMatch(r.html,/aria-hidden="true"|height="30"|height="40"|&nbsp;/);
+  assert.ok(r.text.includes('\n\n'+mallorca));assert.ok(r.text.includes('\n\n'+newsletter));assert.doesNotMatch(r.text,/\n{3,}/);
  }
 });
 
-
-test('decorative email spacers retain height attributes and Outlook exact line-height without altering other sections',()=>{
+test('simple receipt uses one unbordered presentation table for robust email padding, not editorial boxes',()=>{
  for(const lang of ['es','en']){
   const html=sampleReceipt(address,lang).html;
-  const spacers=[...html.matchAll(/<table role="presentation" aria-hidden="true"[^>]*><tr><td height="(\d+)"[^>]*>&nbsp;<\/td><\/tr><\/table>/g)];
-  assert.deepEqual(spacers.map(m=>Number(m[1])),[30,40]);
-  for(const [markup,height] of spacers){
-   assert.match(markup,/width="100%" cellpadding="0" cellspacing="0" border="0"/);
-   assert.match(markup,/mso-table-lspace:0pt;mso-table-rspace:0pt/);
-   assert.ok(markup.includes('height:'+height+'px;line-height:'+height+'px;font-size:1px;padding:0;mso-line-height-rule:exactly'));
-   const attributesOnly=markup.replace(/ style="[^"]*"/g,'');
-   assert.ok(attributesOnly.includes('height="'+height+'"'));assert.ok(attributesOnly.includes('&nbsp;'));
-  }
-  assert.doesNotMatch(html,/padding-top:/);
+  assert.equal((html.match(/<table /g)||[]).length,1);assert.match(html,/width="100%" cellpadding="0" cellspacing="0" border="0"/);
+  assert.match(html,/mso-table-lspace:0pt;mso-table-rspace:0pt/);assert.match(html,/<td style="padding:10px;/);
+  assert.doesNotMatch(html,/(?:^|[;" ])height:|padding-top:|background:#|margin:0 auto/);
  }
 });

@@ -9,7 +9,7 @@ import {fixture} from './helpers/launch-fixture.mjs';
 import {handleRegistration,withdrawCareerConsent} from '../server/registrations.js';
 import legal from '../legal/content.js';
 const copy={es:['Hola,','Muchas gracias por tu interés en formar parte de nuestro equipo.','Hemos recibido tu correo electrónico y nos hace mucha ilusión que quieras trabajar con nosotras.','Para que podamos avisarte cuando surjan nuevas oportunidades en CIM Studio, solo tienes que confirmar tu correo electrónico a través del siguiente enlace:','Confirmar mi correo electrónico','Gracias por querer formar parte de nuestro proyecto.','Un abrazo,','Magda y Cati','CIM Studio'],en:['Hello,','Thank you so much for your interest in joining our team.','We have received your email address, and we’re delighted that you would like to work with us.','To hear from us when new opportunities arise at CIM Studio, simply confirm your email address using the following link:','Confirm my email address','Thank you for wanting to be part of our project.','Warm regards,','Magda and Cati','CIM Studio']};
-test('career receipt has the approved bilingual paragraphs, token link and unchanged sample email shell',()=>{
+test('career receipt has the approved bilingual paragraphs, token link and shared simple sample email shell',()=>{
  for(const lang of ['es','en']){
   const url='https://cimstudio.es/careers/preferences/'+(lang==='en'?'?lang=en':'')+'#'+'a'.repeat(64),r=careerReceipt(url,lang);
   assert.equal(r.subject,lang==='es'?'CIM Studio — Confirma para recibir avisos':'CIM Studio — Confirm to receive updates');
@@ -17,7 +17,7 @@ test('career receipt has the approved bilingual paragraphs, token link and uncha
   assert.equal((r.html.match(/<a /g)||[]).length,1);assert.ok(r.html.includes('href="'+url+'"'));assert.ok(r.text.includes(url));
   const shell=receiptEmail(r.subject,lang==='en','MARKER');assert.equal(r.html.slice(0,r.html.indexOf(receiptParagraph(copy[lang][0]))),shell.split('MARKER')[0]);
   assert.ok(r.html.endsWith(shell.split('MARKER')[1]));assert.doesNotMatch(r.html,/<img|<script|<form|@import/i);
-  assert.match(r.html,/background:#faf9f6/);assert.match(r.html,/font-family:Montserrat,Arial,Helvetica,sans-serif;font-size:16px;line-height:1.7/);
+  assert.match(r.html,/background:transparent/);assert.match(r.html,/font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5/);
  }
  assert.ok(careerReceipt('https://cimstudio.es/" onmouseover="unsafe').html.includes('&quot;'));assert.ok(!careerReceipt('https://cimstudio.es/" onmouseover="unsafe').html.includes('href="https://cimstudio.es/" onmouseover='));
 });

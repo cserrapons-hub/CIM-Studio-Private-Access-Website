@@ -6,7 +6,7 @@ const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'
 const origin=process.env.CIM_WELCOME_ORIGIN||'http://127.0.0.1:8795';
 assert.ok(['127.0.0.1','localhost'].includes(new URL(origin).hostname),'Use a local Pages runtime only');
 const out=process.env.CIM_WELCOME_SCREENSHOTS||'/tmp/cim-subscription-welcome';mkdirSync(out,{recursive:true});
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let cases=0;
 try{
  for(const [width,height] of [[1440,900],[768,900],[390,844],[390,360]])for(const language of ['es','en'])for(const path of ['/bienvenido','/bienvenido/']){
   const context=await browser.newContext({viewport:{width,height}}),errors=[];
@@ -26,10 +26,11 @@ try{
   const layout=await page.evaluate(()=>{const text=document.querySelector('main').getBoundingClientRect(),logo=document.querySelector('.welcome-brand').getBoundingClientRect();return {centre:(text.top+text.bottom)/2,logoBottom:logo.bottom,textTop:text.top,textBottom:text.bottom,height:innerHeight,scrollHeight:document.documentElement.scrollHeight};});
   assert.ok(layout.textTop>layout.logoBottom+30,'Text separate from logo');
   const refinement=await page.evaluate(()=>{const logo=document.querySelector('.welcome-brand img').getBoundingClientRect(),title=document.querySelector('h1').getBoundingClientRect(),rule=document.querySelector('.welcome-rule').getBoundingClientRect(),style=getComputedStyle(document.querySelector('main p'));return {lineCentre:(rule.top+rule.bottom)/2,gapCentre:(logo.bottom+title.top)/2,lineX:(rule.left+rule.right)/2,logoTop:logo.top,weight:style.fontWeight,size:parseFloat(style.fontSize),regular:[...document.fonts].some(f=>f.family==='Montserrat'&&f.weight==='400'&&f.status==='loaded')};});
-  assert.ok(Math.abs(refinement.lineCentre-refinement.gapCentre)<1,'Rule at exact midpoint of actual logo/title gap');
+  assert.ok(refinement.lineCentre>layout.logoBottom&&refinement.lineCentre<layout.textTop,'Rule remains between logo and title');
   assert.ok(Math.abs(refinement.lineX-width/2)<1,'Rule horizontally centred');
-  assert.equal(refinement.logoTop,width<=600?66:30,'Logo position retained');assert.equal(refinement.weight,'400');assert.equal(refinement.size,13);assert.equal(refinement.regular,true,'Real self-hosted Montserrat Regular');
-  if(height>=800)assert.ok(Math.abs(layout.centre-height/2)<2,'Text centred independently in viewport');
+  assert.equal(refinement.weight,'400');assert.equal(refinement.size,13);assert.equal(refinement.regular,true,'Real self-hosted Montserrat Regular');
+  const group=await page.locator('.welcome-content').boundingBox();if(height>=800)assert.ok(Math.abs(group.y+group.height/2-height/2)<1,'Entire logo/rule/text group vertically centred');
+  const gaps=await page.evaluate(()=>{const logo=document.querySelector('.welcome-brand img').getBoundingClientRect(),rule=document.querySelector('.welcome-rule').getBoundingClientRect(),main=document.querySelector('main').getBoundingClientRect();return [rule.top-logo.bottom,main.top-rule.bottom];});assert.ok(Math.abs(gaps[0]-52)<1);assert.ok(Math.abs(gaps[1]-40)<1,'Internal spacing remains independent of viewport');
   assert.ok(layout.textBottom<=layout.scrollHeight,'Short screens scroll naturally without cropped content');
   if(path==='/bienvenido')await page.screenshot({path:out+'/'+language+'-'+width+'-'+height+'.png',fullPage:true});
   await context.close();cases++;

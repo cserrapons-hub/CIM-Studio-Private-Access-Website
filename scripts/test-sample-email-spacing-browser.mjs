@@ -1,37 +1,17 @@
-// Render generated email locally; no Resend, mailboxes or external services are contacted.
-import {createRequire} from 'node:module';
-import {mkdirSync,writeFileSync} from 'node:fs';
-import assert from 'node:assert/strict';
-import {sampleReceipt} from '../server/sample-receipt.js';
+// Simple email layout regression; every network request is blocked, no real sends.
+import {createRequire} from 'node:module';import {mkdirSync,writeFileSync} from 'node:fs';import assert from 'node:assert/strict';
+import {sampleReceipt} from '../server/sample-receipt.js';import {careerReceipt} from '../server/career-receipt.js';
 const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
-const out=process.env.CIM_EMAIL_SCREENSHOTS||'/tmp/cim-sample-email-spacers';mkdirSync(out,{recursive:true});
-const spacerPattern=/<table role="presentation" aria-hidden="true"[^>]*><tr><td[^>]*>&nbsp;<\/td><\/tr><\/table>/g;
+const out=process.env.CIM_EMAIL_SCREENSHOTS||'/tmp/cim-simple-emails';mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',args:['--no-sandbox']});let count=0;
-try{for(const language of ['es','en'])for(const width of [390,800])for(const profile of ['normal','spacer-styles-stripped']){
- const receipt=sampleReceipt({shippingAddress:'Example Street 12',postalCode:'07000',city:'Example City',province:'Illes Balears',country:'Spain'},language);
- const spacers=[...receipt.html.matchAll(spacerPattern)];assert.equal(spacers.length,2);
- const baseline=receipt.html.replace(spacerPattern,'');
- const html=profile==='normal'?receipt.html:receipt.html.replace(spacerPattern,table=>table.replace(/ style="[^"]*"/g,''));
- const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',()=>{throw Error('No external requests permitted');});let previous;
- for(const [version,content] of [['without-spacers',baseline],['with-spacers',html]]){
-  await page.setContent(content);
-  const metrics=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,paragraphs:[...document.querySelectorAll('p')].map(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {text:e.textContent,y:r.y,x:r.x,width:r.width,height:r.height,margin:s.margin,font:s.fontFamily,size:s.fontSize,line:s.lineHeight,weight:s.fontWeight,color:s.color};}),links:[...document.querySelectorAll('a')].map(e=>[e.getAttribute('href'),e.textContent]),spacers:[...document.querySelectorAll('table[aria-hidden="true"] td')].map(e=>e.getBoundingClientRect().height)}));
-  assert.equal(metrics.overflow,false);
-  if(version==='without-spacers')previous=metrics;
-  else{
-   assert.deepEqual(metrics.spacers,[30,40]);assert.deepEqual(metrics.links,previous.links);
-   assert.equal(metrics.paragraphs.length,previous.paragraphs.length);
-   const mallorca=language==='es'?'Si estás en Mallorca':'If you are in Mallorca',newsletter=language==='es'?'¿Aún no estás en nuestra newsletter?':'Haven’t joined our newsletter yet?';let shift=0;
-   for(let i=0;i<metrics.paragraphs.length;i++){
-    const actual=metrics.paragraphs[i],before=previous.paragraphs[i];
-    if(actual.text.startsWith(mallorca))shift+=30;if(actual.text===newsletter)shift+=40;
-    assert.ok(Math.abs(actual.y-before.y-shift)<.01,'Only the two requested gaps move subsequent paragraphs');
-    const {y,...rest}=actual,{y:oldY,...oldRest}=before;assert.deepEqual(rest,oldRest,'All paragraph content, styles and dimensions stay unchanged');
-   }
-   assert.equal(shift,70);assert.deepEqual(errors,[]);
-  }
-  if(profile==='normal')await page.screenshot({path:`${out}/${language}-${width}-${version}.png`,fullPage:true});
- }
- writeFileSync(`${out}/${language}-${width}-${profile}.html`,html);
- await page.close();count++;
-}console.log(`PASS ${count} local ES/EN email cases: exact 30/40px table gaps, 390/800px, preserved paragraphs and links, HTML-height fallback, no external requests. Not a native Gmail/Outlook rendering test.`);}finally{await browser.close();}
+try{for(const language of ['es','en'])for(const width of [390,800])for(const kind of ['samples','careers']){
+ const tokenUrl='https://cimstudio.es/careers/preferences/'+(language==='en'?'?lang=en':'')+'#'+'a'.repeat(64);
+ const receipt=kind==='samples'?sampleReceipt({shippingAddress:'Example Street 12',postalCode:'07000',city:'Example City',province:'Illes Balears',country:'Spain'},language):careerReceipt(tokenUrl,language);
+ const page=await browser.newPage({viewport:{width,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',()=>{throw Error('No external requests permitted');});
+ await page.setContent(receipt.html);
+ const metrics=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth,body:getComputedStyle(document.body).backgroundColor,td:[...document.querySelectorAll('td')].map(e=>{const s=getComputedStyle(e);return {padding:s.padding,font:s.fontFamily,size:s.fontSize,align:s.textAlign,x:e.getBoundingClientRect().left};}),paragraphs:[...document.querySelectorAll('p')].map(e=>{const s=getComputedStyle(e);return {font:s.fontFamily,size:s.fontSize,align:s.textAlign,margin:s.marginBottom};}),links:[...document.querySelectorAll('a')].map(e=>e.getAttribute('href')),decorations:document.querySelectorAll('img,button,header,hr,table[aria-hidden]').length}));
+ assert.equal(metrics.overflow,false);assert.equal(metrics.body,'rgba(0, 0, 0, 0)');assert.equal(metrics.decorations,0);assert.equal(metrics.td.length,1);assert.equal(metrics.td[0].padding,'10px');assert.equal(metrics.td[0].size,'14px');assert.match(metrics.td[0].font,/^Arial/);assert.equal(metrics.td[0].align,'left');assert.equal(metrics.td[0].x,0);
+ for(const p of metrics.paragraphs){assert.match(p.font,/^Arial/);assert.equal(p.size,'14px');assert.equal(p.align,'left');assert.ok(['14px','0px'].includes(p.margin));}
+ assert.deepEqual(metrics.links,kind==='samples'?['https://cimstudio.es/','https://cimstudio.es/']:[tokenUrl]);assert.ok(receipt.text.length>100);assert.doesNotMatch(receipt.text,/\n{3,}/);assert.deepEqual(errors,[]);
+ await page.screenshot({path:`${out}/${kind}-${language}-${width}.png`,fullPage:true});writeFileSync(`${out}/${kind}-${language}-${width}.html`,receipt.html);await page.close();count++;
+}console.log(`PASS ${count} simple sample/career email layouts: ES/EN, 390/800px, Arial 14px, transparent, 10px padding, natural paragraphs and exact links. No real sends; not native Gmail/Outlook testing.`);}finally{await browser.close();}
