@@ -47,14 +47,14 @@ test('approved documents retain identity, purpose separation, manual Founders an
   assert.match(legal[lang].terms,/Europe\/Madrid/);
   assert.doesNotMatch(JSON.stringify(legal[lang]),/Microsoft|se aplicará automáticamente|will be applied automatically|CIM Production/);
  }
- assert.match(legal.es.terms,/15 % de descuento adicional sobre el Precio Profesional vigente/);
- assert.match(legal.en.terms,/additional 15% off the current Professional Price/);
+ assert.match(legal.es.terms,/25 € de descuento/);
+ assert.match(legal.en.terms,/€25 discount/);
  assert.match(legal.es.terms,/CIM Studio gestionará manualmente/);
- assert.match(legal.en.terms,/CIM Studio will administer Founders status manually/);
+ assert.match(legal.en.terms,/CIM Studio will administer founding member status/);
  assert.match(legal.es.terms,/aunque reciban las mismas comunicaciones que los suscriptores generales/);
  assert.match(legal.en.terms,/even if they receive the same communications as general subscribers/);
- assert.match(legal.es.terms,/darse de baja de la newsletter no elimina el beneficio/);
- assert.match(legal.en.terms,/unsubscribing from the newsletter does not remove the benefit/);
+ assert.match(legal.es.terms,/darse de baja de la newsletter no elimina el vale pendiente de uso/);
+ assert.match(legal.en.terms,/unsubscribing from the newsletter does not remove the unused voucher/);
  assert.match(legal.es.privacy,/12 meses desde la recepción/);assert.match(legal.en.privacy,/12 months from receipt/);
  assert.match(legal.es.privacy,/cada 12 meses/);assert.match(legal.en.privacy,/every 12 months/);
  assert.match(legal.es.privacy,/no constituye, por sí solo, evidencia/);

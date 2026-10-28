@@ -2,6 +2,8 @@
 
 Versión: public-legal-2026-10-22-v1. Aprobación expresa de CIM Studio el 22/10/2026, referida a los cuatro documentos y los tres consentimientos ES/EN presentados en la conversación inmediatamente anterior a la aprobación. Alcance exclusivamente documental: no autoriza activación, despliegue ni envíos. Verificaciones técnicas pendientes separadas en LEGAL-LAUNCH-DECISIONS.md. No se registra aprobación del contrato de lanzamiento técnico de newsletter.
 
+Actualización comercial solicitada por CIM Studio el 28/10/2026: vale de 25 € para la primera compra, sin mínimo y de un solo uso. No cambia los consentimientos ni autoriza despliegues. La aprobación jurídica anterior se conserva como antecedente.
+
 # ESPAÑOL
 
 ## 1. Aviso legal
@@ -20,7 +22,7 @@ Los contenidos, fotografías, identidad visual y diseños están sujetos a los d
 
 Las personas usuarias deberán utilizar el sitio de forma lícita, sin suplantar a terceros, facilitar información ajena innecesaria ni interferir en su seguridad o funcionamiento.
 
-La información comercial se concretará en el presupuesto y las condiciones aplicables a cada contratación. Las condiciones de la Tarifa Fundadores se encuentran disponibles en su apartado específico.
+La información comercial se concretará en el presupuesto y las condiciones aplicables a cada contratación. Las condiciones del vale de miembros fundadores se encuentran disponibles en su apartado específico.
 
 Los enlaces a servicios de terceros están sujetos también a la información y condiciones de esos servicios. Nada de este aviso limita responsabilidades o derechos que no puedan excluirse legalmente.
 
@@ -48,7 +50,7 @@ La suscripción se tramita mediante GetResponse con doble confirmación. Enviar 
 
 Conservamos evidencia de la aceptación, incluido el texto y su versión, la fecha UTC del servidor y los registros técnicos necesarios para acreditar y gestionar la solicitud. La fecha de aceptación del formulario se distingue de la confirmación posterior del correo.
 
-Puede retirar su consentimiento mediante el enlace de baja de las comunicaciones o escribiendo a admin@cimstudio.es. La retirada no afecta a la licitud del tratamiento anterior ni elimina el derecho a la Tarifa Fundadores que corresponda conforme a sus condiciones.
+Puede retirar su consentimiento mediante el enlace de baja de las comunicaciones o escribiendo a admin@cimstudio.es. La retirada no afecta a la licitud del tratamiento anterior ni elimina el derecho al vale de miembros fundadores que corresponda conforme a sus condiciones.
 
 Solicitar muestras o recibir avisos laborales no supone suscribirse a esta newsletter.
 
@@ -74,7 +76,7 @@ La base jurídica es el consentimiento específico de la casilla inicialmente de
 
 Resend envía un enlace individual para confirmar el correo. Abrir el enlace no activa por sí solo los avisos: debe realizarse la acción expresa de confirmación.
 
-Este registro se mantiene separado de la newsletter comercial y no concede Tarifa Fundadores.
+Este registro se mantiene separado de la newsletter comercial y no concede vale de miembros fundadores.
 
 No se solicitan CV, teléfono ni información adicional de candidatura. Inscribirse no constituye una candidatura a una vacante ni garantiza una oferta de empleo.
 
@@ -90,17 +92,17 @@ El tratamiento se limita a verificar la actividad y la relación profesional con
 
 El acceso quedará limitado al personal encargado de la comprobación. Se conservarán el resultado y la evidencia mínima necesaria. Las copias completas se eliminarán cuando termine la verificación y dejen de ser necesarias para resolver una incidencia o atender una obligación aplicable. No se incorporarán estos documentos a las listas de marketing.
 
-### Acreditación y gestión de la Tarifa Fundadores
+### Acreditación y gestión del vale de miembros fundadores
 
-La Tarifa Fundadores corresponde exclusivamente a quienes hayan confirmado efectivamente su suscripción hasta el 31 de diciembre de 2026 inclusive, en horario Europe/Madrid.
+El vale de miembros fundadores corresponde exclusivamente a quienes hayan confirmado efectivamente su suscripción antes del 31 de diciembre de 2026, en horario Europe/Madrid.
 
 CIM Studio gestionará manualmente esta condición, utilizando correos y evidencias que acrediten la confirmación efectiva de la suscripción y su fecha. El correo que solicita confirmar una suscripción no constituye, por sí solo, evidencia de que la confirmación se haya completado.
 
-Mantendremos un registro mínimo separado del consentimiento comercial. Podrá incluir el email normalizado, la condición de Fundador, el descuento aplicable, la fecha acreditada de confirmación y la referencia a la evidencia y revisión realizadas. No se inventarán fechas ni se sustituirá la fecha de confirmación por la de solicitud.
+Mantendremos un registro mínimo separado del consentimiento comercial. Podrá incluir el email normalizado, la condición de Fundador, el vale de 25 € y su estado de uso, la fecha acreditada de confirmación y la referencia a la evidencia y revisión realizadas. No se inventarán fechas ni se sustituirá la fecha de confirmación por la de solicitud.
 
-La finalidad es acreditar y administrar el compromiso de descuento y aplicarlo al preparar presupuestos. La base jurídica es la ejecución de ese compromiso, conforme al artículo 6.1.b del RGPD, de forma independiente del consentimiento para recibir publicidad.
+La finalidad es acreditar y administrar el compromiso del vale de un solo uso y aplicarlo al preparar presupuestos. La base jurídica es la ejecución de ese compromiso, conforme al artículo 6.1.b del RGPD, de forma independiente del consentimiento para recibir publicidad.
 
-Las suscripciones confirmadas desde el 1 de enero de 2027 no generan este beneficio. Su incorporación o clasificación en una lista general podrá gestionarse manualmente. La pertenencia a una determinada lista de comunicaciones no sustituye el registro que acredita el derecho al descuento.
+Las suscripciones confirmadas fuera del plazo indicado no generan este beneficio. Su incorporación o clasificación en una lista general podrá gestionarse manualmente. La pertenencia a una determinada lista de comunicaciones no sustituye el registro que acredita el derecho al vale.
 
 Los Fundadores conservarán su condición aunque reciban las mismas comunicaciones que los suscriptores generales o se den de baja de la newsletter.
 
@@ -146,7 +148,7 @@ Puede solicitar información sobre las garantías aplicables en admin@cimstudio.
 
 **Oportunidades laborales:** mientras exista una finalidad vigente y una base jurídica válida. Su necesidad se revisará cada 12 meses y se suprimirán los datos cuando deje de existir una finalidad válida. No se presume conservación indefinida.
 
-**Fundadores:** únicamente la acreditación mínima necesaria mientras sea preciso gestionar el beneficio, separada del consentimiento comercial y respetando los derechos de protección de datos. El carácter permanente del descuento no justifica conservar información innecesaria.
+**Fundadores:** únicamente la acreditación mínima necesaria mientras sea preciso gestionar el beneficio, separada del consentimiento comercial y respetando los derechos de protección de datos. El vale es de un solo uso; no justifica conservar información innecesaria.
 
 **Documentación profesional:** conforme al criterio de minimización y eliminación descrito en el apartado de verificación.
 
@@ -186,32 +188,25 @@ Puede consultar y eliminar el almacenamiento del sitio desde los ajustes de su n
 
 Para cuestiones de privacidad o asistencia, contacte con admin@cimstudio.es. La Política de Privacidad explica los tratamientos de datos personales y sus derechos.
 
-## 4. Condiciones de la Tarifa Fundadores
+## 4. Condiciones del vale de miembros fundadores
 
-La Tarifa Fundadores corresponde **exclusivamente a las personas que hayan confirmado efectivamente su suscripción a la newsletter hasta el 31 de diciembre de 2026 inclusive**. No existe límite de plazas.
+Hazte miembro fundador de CIM Studio. Suscríbete antes del 31 de diciembre de 2026 y recibe un vale de 25 € para descontar de tu primera compra, sin importe mínimo.
 
-El plazo se computa en la zona horaria Europe/Madrid y finaliza al comenzar el 1 de enero de 2027, a las 00:00. La fecha determinante es la confirmación efectiva de la suscripción, no el envío del formulario ni la aceptación de una solicitud por la API de GetResponse.
+El vale es de un solo uso por miembro fundador. No se requiere una compra previa para obtenerlo.
 
-El beneficio consiste en un **15 % de descuento de por vida desde la confirmación**, sin permanencia mínima, aplicable a piezas de colección y proyectos personalizados:
+Para acreditar la suscripción es necesario confirmar el correo electrónico mediante el doble opt-in antes del 31 de diciembre de 2026, en horario Europe/Madrid. El envío del formulario o la aceptación de una solicitud por la API de GetResponse no acreditan por sí solos la confirmación.
 
-- Para particulares: 15 % sobre el PVP vigente.
-- Para profesionales acreditados: 15 % de descuento adicional sobre el Precio Profesional vigente.
+CIM Studio gestionará manualmente la condición de miembro fundador y el uso del vale, y aplicará los 25 € de descuento al preparar el presupuesto de la primera compra. No existe un sistema automático de emisión o canje.
 
-Es compatible con el Precio Profesional, pero no acumulable con otras promociones.
+Las suscripciones confirmadas fuera del plazo no generan este beneficio. Su incorporación o clasificación en una lista general podrá gestionarse manualmente.
 
-CIM Studio gestionará manualmente la condición de Fundador y aplicará el descuento al preparar el presupuesto. No se requiere una compra previa para ser elegible.
+La organización de las listas y el contenido de las comunicaciones no determinan el derecho al vale. Los miembros fundadores conservarán su condición y el vale pendiente de uso aunque reciban las mismas comunicaciones que los suscriptores generales.
 
-Las personas que confirmen su suscripción a partir del 1 de enero de 2027 no tendrán derecho a la Tarifa Fundadores por esa suscripción. CIM Studio podrá gestionar manualmente su incorporación o clasificación en una lista general.
+La suscripción es voluntaria. Retirar el consentimiento o darse de baja de la newsletter no elimina el vale pendiente de uso. La acreditación del beneficio y de su utilización se mantiene separada de la autorización para recibir comunicaciones comerciales.
 
-La organización de las listas y el contenido de las comunicaciones no determinan el derecho al descuento. Los Fundadores conservarán su condición y beneficio aunque reciban las mismas comunicaciones que los suscriptores generales.
+El acceso al Precio Profesional está dirigido a interioristas, arquitectos, hoteles, hostelería, tiendas, distribuidores y profesionales relacionados. CIM Studio comprobará primero la web del estudio, su presencia pública o información de la empresa. Solo si esos medios no bastan podrá solicitar documentación acreditativa pertinente, con los datos innecesarios ocultos. Declararse Profesional en el formulario no equivale a haber obtenido esa verificación.
 
-La suscripción es voluntaria. Retirar el consentimiento o darse de baja de la newsletter no elimina el beneficio. La acreditación del descuento se mantiene separada de la autorización para recibir comunicaciones comerciales.
-
-El acceso al Precio Profesional está dirigido a interioristas, arquitectos, hoteles, hostelería, tiendas, distribuidores y profesionales relacionados. CIM Studio comprobará primero la web del estudio, su presencia pública o información de la empresa. Solo si esos medios no bastan podrá solicitar documentación acreditativa pertinente, con los datos innecesarios ocultos.
-
-La verificación profesional puede completarse después del plazo de Fundadores, siempre que la suscripción se hubiera confirmado dentro de él. Declararse Profesional en el formulario no equivale a haber obtenido esa verificación.
-
-CIM Studio revisará los correos y evidencias que acrediten la confirmación y su fecha, y mantendrá únicamente el registro mínimo necesario para gestionar el beneficio. El correo que invita a confirmar, una etiqueta comercial, la solicitud inicial o una respuesta de aceptación de la API no sustituyen la acreditación de la confirmación efectiva.
+CIM Studio revisará los correos y evidencias que acrediten la confirmación y su fecha, y mantendrá únicamente el registro mínimo necesario para gestionar el beneficio y comprobar su único uso. El correo que invita a confirmar, una etiqueta comercial, la solicitud inicial o una respuesta de aceptación de la API no sustituyen la acreditación de la confirmación efectiva.
 
 Los formularios de esta web no constituyen una compra ni formalizan un encargo. Antes de contratar se facilitarán el presupuesto y las condiciones aplicables, incluidos impuestos, gastos, pago, entrega y derechos legalmente exigibles. Estas condiciones no limitan los derechos imperativos de las personas consumidoras.
 
@@ -251,7 +246,7 @@ The content, photographs, visual identity and designs are subject to their respe
 
 Visitors must use the website lawfully, without impersonating others, providing unnecessary information about third parties or interfering with its security or operation.
 
-Commercial information will be specified in the quotation and terms applicable to each transaction. The Founders Rate terms are available in their dedicated section.
+Commercial information will be specified in the quotation and terms applicable to each transaction. The founding member voucher terms are available in their dedicated section.
 
 Links to third-party services are also subject to those services’ own information and terms. Nothing in this notice limits liabilities or rights that cannot lawfully be excluded.
 
@@ -279,7 +274,7 @@ Subscriptions are processed through GetResponse with double opt-in. Submitting a
 
 We retain acceptance evidence, including the text and its version, the server’s UTC timestamp and the technical records needed to evidence and manage the request. Acceptance of the form is recorded separately from subsequent email confirmation.
 
-You may withdraw consent through the unsubscribe link in communications or by emailing admin@cimstudio.es. Withdrawal does not affect the lawfulness of earlier processing or remove a Founders Rate entitlement arising under its terms.
+You may withdraw consent through the unsubscribe link in communications or by emailing admin@cimstudio.es. Withdrawal does not affect the lawfulness of earlier processing or remove a founding member voucher entitlement arising under its terms.
 
 Requesting samples or receiving career updates does not subscribe you to this newsletter.
 
@@ -305,7 +300,7 @@ The lawful basis is the specific consent given through the initially unchecked c
 
 Resend sends an individual link to confirm the email address. Opening the link does not itself activate updates: an explicit confirmation action is required.
 
-This register is separate from the commercial newsletter and does not confer the Founders Rate.
+This register is separate from the commercial newsletter and does not confer the founding member voucher.
 
 We do not request a CV, telephone number or additional application information. Joining the register is not an application for a vacancy and does not guarantee an offer of employment.
 
@@ -321,17 +316,17 @@ Processing is limited to verifying professional activity and the person’s conn
 
 Access will be limited to personnel responsible for verification. We will retain the outcome and minimum necessary evidence. Full copies will be deleted once verification is complete and they are no longer necessary to resolve an issue or meet an applicable obligation. These documents will not be added to marketing lists.
 
-### Evidence and administration of the Founders Rate
+### Evidence and administration of the founding member voucher
 
-The Founders Rate is available exclusively to people who effectively confirm their subscription on or before December 31, 2026, in Europe/Madrid time.
+The founding member voucher is available exclusively to people who effectively confirm their subscription before 31 December 2026, in Europe/Madrid time.
 
 CIM Studio will administer this status manually, using emails and evidence establishing effective subscription confirmation and its date. An email asking a person to confirm a subscription does not, by itself, establish that confirmation has been completed.
 
-We will keep a minimal record separately from marketing consent. It may include the normalised email address, Founders status, applicable discount, evidenced confirmation date and a reference to the evidence and review performed. Dates will not be invented, and the request date will not replace the confirmation date.
+We will keep a minimal record separately from marketing consent. It may include the normalised email address, Founders status, €25 voucher and its usage status, evidenced confirmation date and a reference to the evidence and review performed. Dates will not be invented, and the request date will not replace the confirmation date.
 
-The purpose is to evidence and administer the promised discount and apply it when preparing quotations. The lawful basis is performance of that commitment under Article 6(1)(b) GDPR, independently of consent to advertising.
+The purpose is to evidence and administer the promised single-use voucher and apply it when preparing quotations. The lawful basis is performance of that commitment under Article 6(1)(b) GDPR, independently of consent to advertising.
 
-Subscriptions confirmed from January 1, 2027 do not confer this benefit. Their inclusion or classification in a general mailing list may be managed manually. Membership of a particular mailing list does not replace the record establishing discount entitlement.
+Subscriptions confirmed outside the stated period do not confer this benefit. Their inclusion or classification in a general mailing list may be managed manually. Membership of a particular mailing list does not replace the record establishing voucher entitlement.
 
 Founders will retain their status even if they receive the same communications as general subscribers or unsubscribe from the newsletter.
 
@@ -377,7 +372,7 @@ You may request information about applicable safeguards at admin@cimstudio.es.
 
 **Career opportunities:** while there is a current purpose and a valid lawful basis. Necessity will be reviewed every 12 months, and information will be deleted when there is no longer a valid purpose. Indefinite retention is not presumed.
 
-**Founders:** only the minimum evidence needed while administering the benefit remains necessary, separately from marketing consent and subject to data protection rights. The permanent discount does not justify retaining unnecessary information.
+**Founders:** only the minimum evidence needed while administering the benefit remains necessary, separately from marketing consent and subject to data protection rights. The single-use voucher does not justify retaining unnecessary information.
 
 **Professional documentation:** according to the minimisation and deletion approach described under professional verification.
 
@@ -417,34 +412,27 @@ You may inspect and remove site storage through your browser settings. Blocking 
 
 For privacy enquiries or assistance, contact admin@cimstudio.es. The Privacy Policy explains personal-data processing and your rights.
 
-## 4. Founders Rate terms
+## 4. Founding member voucher terms
 
-The Founders Rate is available **exclusively to people who effectively confirm their newsletter subscription on or before December 31, 2026**. There is no limit on places.
+Become a founding member of CIM Studio. Subscribe before 31 December 2026 and receive a €25 voucher towards your first purchase, with no minimum spend.
 
-The deadline is calculated in Europe/Madrid time and ends at 00:00 on January 1, 2027. Eligibility depends on effective subscription confirmation, not form submission or acceptance of a request by the GetResponse API.
+The voucher can be used once per founding member. A prior purchase is not required to obtain it.
 
-The benefit is a **lifetime 15% discount from confirmation**, with no minimum subscription period, applicable to collection pieces and bespoke projects:
+To establish eligibility, the email address must be confirmed through double opt-in before 31 December 2026, in Europe/Madrid time. Submitting the form or acceptance of a request by the GetResponse API does not, by itself, establish confirmation.
 
-- For private customers: 15% off the current retail price.
-- For accredited professionals: an additional 15% off the current Professional Price.
+CIM Studio will administer founding member status and voucher use manually, and apply the €25 discount when preparing the quotation for the first purchase. There is no automated voucher issuing or redemption system.
 
-It can be combined with Professional Pricing, but not with other promotions.
+Subscriptions confirmed outside this period do not confer this benefit. Their inclusion or classification in a general mailing list may be managed manually.
 
-CIM Studio will administer Founders status manually and apply the discount when preparing the quotation. A prior purchase is not required for eligibility.
+The organisation of mailing lists and the content of communications do not determine voucher entitlement. Founding members retain their status and unused voucher even if they receive the same communications as general subscribers.
 
-People who confirm their subscription from January 1, 2027 will not qualify for the Founders Rate through that subscription. CIM Studio may manually manage their inclusion or classification in a general mailing list.
+Subscription is voluntary. Withdrawing consent or unsubscribing from the newsletter does not remove the unused voucher. Evidence of entitlement and use is kept separately from permission to receive marketing communications.
 
-The organisation of mailing lists and the content of communications do not determine discount entitlement. Founders will retain their status and benefit even if they receive the same communications as general subscribers.
+Professional Pricing is intended for interior designers, architects, hotels, hospitality businesses, shops, distributors and related professionals. CIM Studio will first review the studio website, public presence or company information. Only where these are insufficient may relevant supporting documentation be requested, with unnecessary details concealed. Selecting Professional on the form is not equivalent to completing this verification.
 
-Subscription is voluntary. Withdrawing consent or unsubscribing from the newsletter does not remove the benefit. Evidence of discount entitlement is kept separately from permission to receive marketing communications.
+CIM Studio will review emails and evidence establishing confirmation and its date, and keep only the minimum record needed to administer the benefit and verify its single use. An invitation to confirm, a marketing tag, the initial request or an API acceptance response does not replace evidence of effective confirmation.
 
-Professional Pricing is intended for interior designers, architects, hotels, hospitality businesses, shops, distributors and related professionals. CIM Studio will first review the studio’s website, public presence or company information. Only where these sources are insufficient may relevant supporting documents be requested, with unnecessary information concealed.
-
-Professional verification may be completed after the Founders deadline, provided the subscription was confirmed within the qualifying period. Selecting Professional on the form does not mean that verification has been granted.
-
-CIM Studio will review emails and evidence establishing confirmation and its date, keeping only the minimum record needed to administer the benefit. An invitation to confirm, a marketing tag, the initial request or an API acceptance response does not replace evidence of effective confirmation.
-
-The website’s forms do not constitute a purchase or conclude a commission. Before a purchase, the quotation and applicable terms will be provided, including taxes, charges, payment, delivery and statutory rights. These terms do not restrict mandatory consumer rights.
+The forms on this website do not constitute a purchase or conclude a commission. Before contracting, the quotation and applicable terms will be provided, including taxes, charges, payment, delivery and legally required rights. These terms do not limit mandatory consumer rights.
 
 ## 5. Form consents
 

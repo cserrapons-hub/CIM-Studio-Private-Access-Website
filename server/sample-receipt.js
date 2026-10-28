@@ -15,13 +15,13 @@ export function sampleReceipt(data={},language='es'){
   title:"Haven’t joined our newsletter yet?",
   first:"During our first year, we won’t have an online shop.",
   story:"We want to introduce each new piece in a more personal way, sharing it first with those who have been with us from the beginning.",
-  lead:'Also, ',offer:'if you join before December 31, 2026, you’ll enjoy our Founders Rate: a lifetime 15% discount',scope:', also applicable to professional pricing, on both pieces from our collection and bespoke pieces.',
+  lead:'Also, ',offer:'if you join before 31 December 2026, you’ll receive a €25 voucher towards your first purchase, with no minimum spend',scope:'. One use per founding member.',
   join:'To join, simply visit ',steps:', select “Access the private collection” and then “Request access”.'
  }:{
   title:'¿Aún no estás en nuestra newsletter?',
   first:'Durante nuestro primer año no vamos a tener tienda online.',
   story:'Queremos presentar cada nueva pieza de una forma más personal, compartiéndola primero con quienes nos acompañáis desde el principio.',
-  lead:'Además, ',offer:'si te unes antes del 31 de diciembre de 2026, disfrutarás de nuestra Tarifa Fundadores: un 15 % de descuento de por vida',scope:', aplicable también sobre el precio profesional, tanto en piezas de nuestra colección como en piezas hechas a medida.',
+  lead:'Además, ',offer:'si te unes antes del 31 de diciembre de 2026, recibirás un vale de 25 € para descontar de tu primera compra, sin importe mínimo',scope:'. Un solo uso por miembro fundador.',
   join:'Para unirte, solo tienes que entrar en ',steps:', seleccionar «Acceder a la colección privada» y después «Solicitar acceso».'
  };
  const newsletterText=[newsletter.title,newsletter.first,newsletter.story,newsletter.lead+newsletter.offer+newsletter.scope,newsletter.join+'cimstudio.es ('+website+')'+newsletter.steps].join('\n\n');
