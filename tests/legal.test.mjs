@@ -44,17 +44,15 @@ test('approved documents retain identity, purpose separation, manual Founders an
   for(const key of ['notice','privacy','cookies','terms'])assert.ok(legal[lang][key].length>1000);
   for(const key of ['notice','privacy','cookies'])for(const token of ['CIM STUDIO ESPJ','E88749155','admin@cimstudio.es'])assert.ok(legal[lang][key].includes(token));
   for(const token of ['Cloudflare','GetResponse','Resend','Google Workspace','Turnstile','D1','https://www.aepd.es'])assert.ok(legal[lang].privacy.includes(token));
-  assert.match(legal[lang].terms,/Europe\/Madrid/);
+  assert.match(legal[lang].terms,/GetResponse/);
   assert.doesNotMatch(JSON.stringify(legal[lang]),/Microsoft|se aplicará automáticamente|will be applied automatically|CIM Production/);
  }
- assert.match(legal.es.terms,/25 € de descuento/);
- assert.match(legal.en.terms,/€25 discount/);
- assert.match(legal.es.terms,/CIM Studio gestionará manualmente/);
- assert.match(legal.en.terms,/CIM Studio will administer founding member status/);
- assert.match(legal.es.terms,/aunque reciban las mismas comunicaciones que los suscriptores generales/);
- assert.match(legal.en.terms,/even if they receive the same communications as general subscribers/);
- assert.match(legal.es.terms,/darse de baja de la newsletter no elimina el vale pendiente de uso/);
- assert.match(legal.en.terms,/unsubscribing from the newsletter does not remove the unused voucher/);
+ assert.match(legal.es.terms,/no los revoca ni modifica/);
+ assert.match(legal.en.terms,/does not revoke or amend them/);
+ assert.match(legal.es.terms,/La baja de la newsletter no altera por sí sola esos derechos/);
+ assert.match(legal.en.terms,/Newsletter withdrawal does not, in itself, alter those rights/);
+ assert.match(legal.es.privacy,/separada del consentimiento comercial/);
+ assert.match(legal.en.privacy,/separately from marketing consent/);
  assert.match(legal.es.privacy,/12 meses desde la recepción/);assert.match(legal.en.privacy,/12 months from receipt/);
  assert.match(legal.es.privacy,/cada 12 meses/);assert.match(legal.en.privacy,/every 12 months/);
  assert.match(legal.es.privacy,/no constituye, por sí solo, evidencia/);
