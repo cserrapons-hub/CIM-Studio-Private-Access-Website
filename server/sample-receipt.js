@@ -15,18 +15,16 @@ export function sampleReceipt(data={},language='es'){
   title:"Haven’t joined our newsletter yet?",
   first:"During our first year, we won’t have an online shop.",
   story:"We want to introduce each new piece in a more personal way, sharing it first with those who have been with us from the beginning.",
-  lead:'Also, ',offer:'if you join before 31 December 2026, you’ll receive a €25 voucher towards your first purchase, with no minimum spend',scope:'. One use per founding member.',
-  join:'To join, simply visit ',steps:', select “Access the private collection” and then “Request access”.'
+  join:'To join, simply visit ',steps:', select “Request access” and complete the subscription form.'
  }:{
   title:'¿Aún no estás en nuestra newsletter?',
   first:'Durante nuestro primer año no vamos a tener tienda online.',
   story:'Queremos presentar cada nueva pieza de una forma más personal, compartiéndola primero con quienes nos acompañáis desde el principio.',
-  lead:'Además, ',offer:'si te unes antes del 31 de diciembre de 2026, recibirás un vale de 25 € para descontar de tu primera compra, sin importe mínimo',scope:'. Un solo uso por miembro fundador.',
-  join:'Para unirte, solo tienes que entrar en ',steps:', seleccionar «Acceder a la colección privada» y después «Solicitar acceso».'
+  join:'Para unirte, solo tienes que entrar en ',steps:', pulsar «Solicitar acceso» y completar el formulario de suscripción.'
  };
- const newsletterText=[newsletter.title,newsletter.first,newsletter.story,newsletter.lead+newsletter.offer+newsletter.scope,newsletter.join+'cimstudio.es ('+website+')'+newsletter.steps].join('\n\n');
+ const newsletterText=[newsletter.title,newsletter.first,newsletter.story,newsletter.join+'cimstudio.es ('+website+')'+newsletter.steps].join('\n\n');
  const text=[c.hello,c.thanks+'\n'+c.received,c.process,[c.address,...(address.length?['',...address]:[])].join('\n'),c.confirm,c.mallorca+', '+c.visit,c.prefer,newsletterText,c.thankyou,c.signoff+'\nCIM Studio\nwww.cimstudio.es'].join('\n\n');
- const newsletterHtml=p('<strong>'+newsletter.title+'</strong>')+p(newsletter.first)+p(newsletter.story)+p(newsletter.lead+'<strong>'+newsletter.offer+'</strong>'+newsletter.scope)+p(newsletter.join+'<strong><a href="'+website+'" style="color:#292923;text-decoration:underline">cimstudio.es</a></strong>'+newsletter.steps);
+ const newsletterHtml=p('<strong>'+newsletter.title+'</strong>')+p(newsletter.first)+p(newsletter.story)+p(newsletter.join+'<strong><a href="'+website+'" style="color:#292923;text-decoration:underline">cimstudio.es</a></strong>'+newsletter.steps);
  const addressHtml=address.length?p('<strong>'+c.address+'</strong>')+p(address.map(escape).join('<br>')):'';
  const html=receiptEmail(c.subject,en,p(c.hello)+p(c.thanks+'<br>'+c.received)+p(c.process)+addressHtml+p(c.confirm)+p('<strong>'+c.mallorca+'</strong>, '+c.visit)+p(c.prefer)+newsletterHtml+p(c.thankyou)+'<p style="margin:0">'+c.signoff+'<br><strong>CIM Studio</strong><br><a href="'+website+'" style="color:#292923;text-decoration:underline">www.cimstudio.es</a></p>');
  return {subject:c.subject,text,html};

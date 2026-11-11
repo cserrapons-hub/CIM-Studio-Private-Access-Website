@@ -1,20 +1,16 @@
-# CIM Studio — Textos legales públicos ES/EN aprobados
+# CIM Studio — Textos legales públicos ES/EN
 
-Versión: public-legal-2026-10-22-v1. Aprobación expresa de CIM Studio el 22/10/2026, referida a los cuatro documentos y los tres consentimientos ES/EN presentados en la conversación inmediatamente anterior a la aprobación. Alcance exclusivamente documental: no autoriza activación, despliegue ni envíos. Verificaciones técnicas pendientes separadas en LEGAL-LAUNCH-DECISIONS.md. No se registra aprobación del contrato de lanzamiento técnico de newsletter.
-
-Actualización comercial solicitada por CIM Studio el 28/10/2026: vale de 25 € para la primera compra, sin mínimo y de un solo uso. No cambia los consentimientos ni autoriza despliegues. La aprobación jurídica anterior se conserva como antecedente.
-
-Actualización de comunicación solicitada el 28/10/2026: se eliminan las tarifas profesionales y su verificación documental; Particular/Profesional se conserva para conocer el perfil y adaptar las comunicaciones, sin precios distintos. El vale y los consentimientos no cambian.
+Versión de consentimiento sin cambios: public-legal-2026-10-22-v1. Retirada editorial solicitada por CIM Studio el 10/11/2026. Se conserva la aprobación anterior y se registra esta modificación sin autorizar despliegues. Las condiciones anteriores se conservan en legal/history/2026-11-10-before-promotion-withdrawal.js y en el historial Git; esta retirada no modifica compromisos previamente comunicados.
 
 # ESPAÑOL
 
 ## 1. Aviso legal
 
-**Titular:** CIM STUDIO ESPJ
-**NIF:** E88749155
-**Domicilio:** Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
-**Contacto:** admin@cimstudio.es
-**Dominio:** cimstudio.es
+Titular: CIM STUDIO ESPJ
+NIF: E88749155
+Domicilio: Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España.
+Contacto: admin@cimstudio.es
+Dominio: cimstudio.es
 
 CIM Studio presenta su trabajo de diseño y cerámica artesanal y ofrece formularios para solicitar comunicaciones de su colección, muestras para proyectos profesionales y avisos sobre oportunidades laborales.
 
@@ -24,7 +20,7 @@ Los contenidos, fotografías, identidad visual y diseños están sujetos a los d
 
 Las personas usuarias deberán utilizar el sitio de forma lícita, sin suplantar a terceros, facilitar información ajena innecesaria ni interferir en su seguridad o funcionamiento.
 
-La información comercial se concretará en el presupuesto y las condiciones aplicables a cada contratación. Las condiciones del vale de miembros fundadores se encuentran disponibles en su apartado específico.
+La información comercial se concretará en el presupuesto y las condiciones aplicables a cada contratación. Las condiciones de acceso a la colección privada se encuentran disponibles en su apartado específico.
 
 Los enlaces a servicios de terceros están sujetos también a la información y condiciones de esos servicios. Nada de este aviso limita responsabilidades o derechos que no puedan excluirse legalmente.
 
@@ -34,7 +30,7 @@ Para consultas o reclamaciones, puede escribir a admin@cimstudio.es.
 
 ## 2. Política de privacidad
 
-### Responsable y alcance
+Responsable y alcance
 
 CIM STUDIO ESPJ, NIF E88749155, con domicilio en Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, España, es responsable de los tratamientos descritos en esta política.
 
@@ -42,7 +38,7 @@ Puede contactar con nosotras y ejercer sus derechos en admin@cimstudio.es.
 
 Esta política explica el tratamiento de datos al utilizar los formularios habilitados de cimstudio.es. Si un formulario figura como no disponible, no permite enviar la solicitud. El alojamiento puede tratar datos técnicos de navegación con independencia de la disponibilidad de los formularios.
 
-### Newsletter y acceso a la colección privada
+Newsletter y acceso a la colección privada
 
 Tratamos su correo electrónico, idioma y clasificación autodeclarada como Particular o Profesional para gestionar la suscripción, adaptar las comunicaciones y enviar novedades de la colección y acceso anticipado a nuevas piezas. Esta clasificación no se utiliza para establecer precios diferentes.
 
@@ -52,11 +48,11 @@ La suscripción se tramita mediante GetResponse con doble confirmación. Enviar 
 
 Conservamos evidencia de la aceptación, incluido el texto y su versión, la fecha UTC del servidor y los registros técnicos necesarios para acreditar y gestionar la solicitud. La fecha de aceptación del formulario se distingue de la confirmación posterior del correo.
 
-Puede retirar su consentimiento mediante el enlace de baja de las comunicaciones o escribiendo a admin@cimstudio.es. La retirada no afecta a la licitud del tratamiento anterior ni elimina el derecho al vale de miembros fundadores que corresponda conforme a sus condiciones.
+Puede retirar su consentimiento mediante el enlace de baja de las comunicaciones o escribiendo a admin@cimstudio.es. La retirada no afecta a la licitud del tratamiento anterior ni modifica los compromisos previamente reconocidos conforme a sus condiciones.
 
 Solicitar muestras o recibir avisos laborales no supone suscribirse a esta newsletter.
 
-### Solicitudes de muestras
+Solicitudes de muestras
 
 Tratamos nombre, correo electrónico, estudio o empresa, sector profesional y dirección de envío —dirección, código postal, población, provincia y país— para atender la petición, responder y organizar, cuando corresponda, el envío de muestras.
 
@@ -70,7 +66,7 @@ Los campos obligatorios permiten tramitar la petición. No incluya datos sensibl
 
 La solicitud se conserva cifrada en Cloudflare D1. Resend tramita el aviso administrativo y el acuse al solicitante; Google Workspace gestiona el correo administrativo. El acuse no confirma disponibilidad ni despacho de muestras.
 
-### Avisos sobre oportunidades laborales
+Avisos sobre oportunidades laborales
 
 El formulario permite facilitar únicamente un correo electrónico para recibir avisos sobre oportunidades profesionales de CIM Studio. También se registran el idioma y la evidencia de aceptación y confirmación.
 
@@ -78,29 +74,25 @@ La base jurídica es el consentimiento específico de la casilla inicialmente de
 
 Resend envía un enlace individual para confirmar el correo. Abrir el enlace no activa por sí solo los avisos: debe realizarse la acción expresa de confirmación.
 
-Este registro se mantiene separado de la newsletter comercial y no concede vale de miembros fundadores.
+Este registro se mantiene separado de la newsletter comercial.
 
 No se solicitan CV, teléfono ni información adicional de candidatura. Inscribirse no constituye una candidatura a una vacante ni garantiza una oferta de empleo.
 
 Puede retirar su consentimiento mediante el mecanismo de baja facilitado o escribiendo a admin@cimstudio.es. La retirada afecta únicamente a estos avisos.
 
-### Acreditación y gestión del vale de miembros fundadores
+Compromisos anteriormente comunicados
 
-El vale de miembros fundadores corresponde exclusivamente a quienes hayan confirmado efectivamente su suscripción antes del 31 de diciembre de 2026, en horario Europe/Madrid.
+Los compromisos que CIM Studio hubiera comunicado previamente a sus destinatarios se mantienen conforme a las condiciones con las que se reconocieron. Esta actualización de la comunicación no los revoca ni modifica.
 
-CIM Studio gestionará manualmente esta condición, utilizando correos y evidencias que acrediten la confirmación efectiva de la suscripción y su fecha. El correo que solicita confirmar una suscripción no constituye, por sí solo, evidencia de que la confirmación se haya completado.
+Para atender esos compromisos conservaremos únicamente la evidencia mínima necesaria, separada del consentimiento comercial: identificación del destinatario, condiciones comunicadas, referencia a su acreditación y estado de cumplimiento. No se inventarán fechas ni se sustituirá la evidencia que resulte exigible por una solicitud o una respuesta técnica de aceptación.
 
-Mantendremos un registro mínimo separado del consentimiento comercial. Podrá incluir el email normalizado, la condición de Fundador, el vale de 25 € y su estado de uso, la fecha acreditada de confirmación y la referencia a la evidencia y revisión realizadas. No se inventarán fechas ni se sustituirá la fecha de confirmación por la de solicitud.
+Cuando deba acreditarse la confirmación de una suscripción conforme a esas condiciones anteriores, el correo que solicita confirmarla no constituye, por sí solo, evidencia de que la confirmación se haya completado.
 
-La finalidad es acreditar y administrar el compromiso del vale de un solo uso y aplicarlo al preparar presupuestos. La base jurídica es la ejecución de ese compromiso, conforme al artículo 6.1.b del RGPD, de forma independiente del consentimiento para recibir publicidad.
+La finalidad es atender los compromisos previamente adquiridos. La base jurídica es su ejecución, conforme al artículo 6.1.b del RGPD, de forma independiente del consentimiento para recibir publicidad.
 
-Las suscripciones confirmadas fuera del plazo indicado no generan este beneficio. Su incorporación o clasificación en una lista general podrá gestionarse manualmente. La pertenencia a una determinada lista de comunicaciones no sustituye el registro que acredita el derecho al vale.
+La baja de la newsletter y la organización de las listas de comunicaciones no alteran por sí solas los derechos previamente reconocidos. Las solicitudes de supresión se examinarán individualmente conforme a las bases y obligaciones aplicables, sin denegarlas automáticamente por la existencia de un compromiso anterior.
 
-Los Fundadores conservarán su condición aunque reciban las mismas comunicaciones que los suscriptores generales o se den de baja de la newsletter.
-
-Las solicitudes de supresión se examinarán individualmente conforme a las bases y obligaciones aplicables, sin denegarlas automáticamente por la existencia del beneficio.
-
-### Seguridad y prevención del abuso
+Seguridad y prevención del abuso
 
 Cloudflare presta alojamiento, Pages Functions, D1 y Turnstile. Estos servicios pueden tratar datos técnicos de conexión y señales del navegador para prestar y proteger el servicio.
 
@@ -114,14 +106,14 @@ La verificación de seguridad puede impedir un envío cuando falle la comprobaci
 
 La base jurídica para proteger el servicio no sustituye al consentimiento para tecnologías del navegador cuando este sea exigible.
 
-### Destinatarios y transferencias internacionales
+Destinatarios y transferencias internacionales
 
 Intervienen, según la finalidad:
 
-- **Cloudflare:** alojamiento, ejecución de funciones, almacenamiento D1 y protección Turnstile.
-- **GetResponse:** suscripciones y comunicaciones de la colección.
-- **Resend:** correos transaccionales de recepción, confirmación y avisos administrativos.
-- **Google Workspace:** gestión del correo y de las respuestas.
+- Cloudflare: alojamiento, ejecución de funciones, almacenamiento D1 y protección Turnstile.
+- GetResponse: suscripciones y comunicaciones de la colección.
+- Resend: correos transaccionales de recepción, confirmación y avisos administrativos.
+- Google Workspace: gestión del correo y de las respuestas.
 - Personal autorizado de CIM Studio.
 
 Cada servicio recibe los datos necesarios para su función. También podrán comunicarse datos cuando exista una obligación legal aplicable.
@@ -132,21 +124,21 @@ Puede existir tratamiento fuera del Espacio Económico Europeo. La garantía apl
 
 Puede solicitar información sobre las garantías aplicables en admin@cimstudio.es.
 
-### Conservación
+Conservación
 
-**Newsletter:** mientras exista consentimiento válido. Tras la baja cesarán los envíos y solo se conservará la información mínima justificada para acreditar la baja, cumplir obligaciones aplicables o evitar comunicaciones no deseadas.
+Newsletter: mientras exista consentimiento válido. Tras la baja cesarán los envíos y solo se conservará la información mínima justificada para acreditar la baja, cumplir obligaciones aplicables o evitar comunicaciones no deseadas.
 
-**Muestras:** durante 12 meses desde la recepción de la solicitud, salvo relación comercial posterior u otra causa legal que justifique conservar los datos necesarios para esa finalidad.
+Muestras: durante 12 meses desde la recepción de la solicitud, salvo relación comercial posterior u otra causa legal que justifique conservar los datos necesarios para esa finalidad.
 
-**Oportunidades laborales:** mientras exista una finalidad vigente y una base jurídica válida. Su necesidad se revisará cada 12 meses y se suprimirán los datos cuando deje de existir una finalidad válida. No se presume conservación indefinida.
+Oportunidades laborales: mientras exista una finalidad vigente y una base jurídica válida. Su necesidad se revisará cada 12 meses y se suprimirán los datos cuando deje de existir una finalidad válida. No se presume conservación indefinida.
 
-**Fundadores:** únicamente la acreditación mínima necesaria mientras sea preciso gestionar el beneficio, separada del consentimiento comercial y respetando los derechos de protección de datos. El vale es de un solo uso; no justifica conservar información innecesaria.
+Compromisos previos: únicamente la evidencia mínima necesaria mientras sea preciso atenderlos, separada del consentimiento comercial y respetando los derechos de protección de datos. No se conservará información innecesaria.
 
-**Facturas y operaciones posteriores:** durante los plazos exigidos por las obligaciones legales aplicables, sin extender automáticamente esos plazos a todo el expediente.
+Facturas y operaciones posteriores: durante los plazos exigidos por las obligaciones legales aplicables, sin extender automáticamente esos plazos a todo el expediente.
 
 La revisión y supresión abarcarán, según corresponda, D1, proveedores y buzones. Cuando una obligación aplicable exija conservar información, se limitará a la estrictamente necesaria y se restringirá su uso. Si una restauración recupera información previamente suprimida, deberán reaplicarse las supresiones.
 
-### Derechos
+Derechos
 
 Puede solicitar acceso, rectificación, supresión, limitación, oposición y portabilidad cuando procedan, así como retirar su consentimiento, escribiendo a admin@cimstudio.es.
 
@@ -178,23 +170,17 @@ Puede consultar y eliminar el almacenamiento del sitio desde los ajustes de su n
 
 Para cuestiones de privacidad o asistencia, contacte con admin@cimstudio.es. La Política de Privacidad explica los tratamientos de datos personales y sus derechos.
 
-## 4. Condiciones del vale de miembros fundadores
+## 4. Condiciones de acceso a la colección privada
 
-Hazte miembro fundador de CIM Studio. Suscríbete antes del 31 de diciembre de 2026 y recibe un vale de 25 € para descontar de tu primera compra, sin importe mínimo.
+La newsletter de CIM Studio permite descubrir nuevas piezas y colecciones de cerámica artesanal, diseñadas y fabricadas en Mallorca. Durante nuestro primer año, las novedades y los enlaces de compra se compartirán a través de la newsletter.
 
-El vale es de un solo uso por miembro fundador. No se requiere una compra previa para obtenerlo.
+Para solicitar acceso, facilite su correo electrónico, seleccione Particular o Profesional y acepte el consentimiento específico. Esta clasificación permite conocer el perfil de los suscriptores y adaptar las comunicaciones; no se utiliza para establecer precios distintos.
 
-Para acreditar la suscripción es necesario confirmar el correo electrónico mediante el doble opt-in antes del 31 de diciembre de 2026, en horario Europe/Madrid. El envío del formulario o la aceptación de una solicitud por la API de GetResponse no acreditan por sí solos la confirmación.
+La suscripción requiere confirmar el correo mediante el enlace individual enviado por GetResponse. Enviar el formulario o recibir una respuesta técnica de aceptación no acredita por sí solo la confirmación. Si necesita ayuda, puede escribir a admin@cimstudio.es.
 
-CIM Studio gestionará manualmente la condición de miembro fundador y el uso del vale, y aplicará los 25 € de descuento al preparar el presupuesto de la primera compra. No existe un sistema automático de emisión o canje.
+La suscripción es voluntaria. Puede darse de baja mediante el enlace de las comunicaciones o escribiendo a admin@cimstudio.es. Solicitar muestras o recibir avisos laborales no suscribe automáticamente a esta newsletter.
 
-Las suscripciones confirmadas fuera del plazo no generan este beneficio. Su incorporación o clasificación en una lista general podrá gestionarse manualmente.
-
-La organización de las listas y el contenido de las comunicaciones no determinan el derecho al vale. Los miembros fundadores conservarán su condición y el vale pendiente de uso aunque reciban las mismas comunicaciones que los suscriptores generales.
-
-La suscripción es voluntaria. Retirar el consentimiento o darse de baja de la newsletter no elimina el vale pendiente de uso. La acreditación del beneficio y de su utilización se mantiene separada de la autorización para recibir comunicaciones comerciales.
-
-CIM Studio revisará los correos y evidencias que acrediten la confirmación y su fecha, y mantendrá únicamente el registro mínimo necesario para gestionar el beneficio y comprobar su único uso. El correo que invita a confirmar, una etiqueta comercial, la solicitud inicial o una respuesta de aceptación de la API no sustituyen la acreditación de la confirmación efectiva.
+Los compromisos que CIM Studio hubiera comunicado previamente a sus destinatarios se mantienen conforme a las condiciones con las que se reconocieron. Esta actualización no los revoca ni modifica. La baja de la newsletter no altera por sí sola esos derechos. Su acreditación y gestión se mantienen separadas del consentimiento comercial; las consultas sobre esos compromisos pueden dirigirse a admin@cimstudio.es.
 
 Los formularios de esta web no constituyen una compra ni formalizan un encargo. Antes de contratar se facilitarán el presupuesto y las condiciones aplicables, incluidos impuestos, gastos, pago, entrega y derechos legalmente exigibles. Estas condiciones no limitan los derechos imperativos de las personas consumidoras.
 
@@ -220,11 +206,11 @@ Los tres formularios mantendrán accesible el enlace a la Política de Privacida
 
 ## 1. Legal notice
 
-**Website operator:** CIM STUDIO ESPJ
-**Spanish tax identification number — NIF:** E88749155
-**Address:** Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, Spain.
-**Contact:** admin@cimstudio.es
-**Domain:** cimstudio.es
+Website operator: CIM STUDIO ESPJ
+Spanish tax identification number — NIF: E88749155
+Address: Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, Spain.
+Contact: admin@cimstudio.es
+Domain: cimstudio.es
 
 CIM Studio presents its design and handcrafted ceramics and provides forms for requesting collection updates, samples for professional projects and information about career opportunities.
 
@@ -234,7 +220,7 @@ The content, photographs, visual identity and designs are subject to their respe
 
 Visitors must use the website lawfully, without impersonating others, providing unnecessary information about third parties or interfering with its security or operation.
 
-Commercial information will be specified in the quotation and terms applicable to each transaction. The founding member voucher terms are available in their dedicated section.
+Commercial information will be specified in the quotation and terms applicable to each transaction. The private collection access terms are available in their dedicated section.
 
 Links to third-party services are also subject to those services’ own information and terms. Nothing in this notice limits liabilities or rights that cannot lawfully be excluded.
 
@@ -244,7 +230,7 @@ For enquiries or complaints, please contact admin@cimstudio.es.
 
 ## 2. Privacy policy
 
-### Controller and scope
+Controller and scope
 
 CIM STUDIO ESPJ, NIF E88749155, at Carrer Joan Sindic, 7, planta baja, 07420 Sa Pobla, Illes Balears, Spain, is the controller for the processing described in this policy.
 
@@ -252,7 +238,7 @@ You may contact us and exercise your rights at admin@cimstudio.es.
 
 This policy explains data processing when you use enabled forms on cimstudio.es. A form marked as unavailable does not allow a request to be submitted. Hosting may process technical browsing information regardless of form availability.
 
-### Newsletter and private collection access
+Newsletter and private collection access
 
 We process your email address, language and self-declared classification as a Private individual or Professional to manage your subscription, tailor communications and send collection news and early access to new pieces. This classification is not used to set different prices.
 
@@ -262,11 +248,11 @@ Subscriptions are processed through GetResponse with double opt-in. Submitting a
 
 We retain acceptance evidence, including the text and its version, the server’s UTC timestamp and the technical records needed to evidence and manage the request. Acceptance of the form is recorded separately from subsequent email confirmation.
 
-You may withdraw consent through the unsubscribe link in communications or by emailing admin@cimstudio.es. Withdrawal does not affect the lawfulness of earlier processing or remove a founding member voucher entitlement arising under its terms.
+You may withdraw consent through the unsubscribe link in communications or by emailing admin@cimstudio.es. Withdrawal does not affect the lawfulness of earlier processing or amend commitments previously recognised under their terms.
 
 Requesting samples or receiving career updates does not subscribe you to this newsletter.
 
-### Sample requests
+Sample requests
 
 We process your name, email address, studio or company, professional sector and shipping details —address, postal code, town or city, province or region and country— to handle your request, respond and arrange sample delivery where appropriate.
 
@@ -280,7 +266,7 @@ Required fields enable us to handle the request. Please do not include sensitive
 
 The request is stored encrypted in Cloudflare D1. Resend handles the administrative notification and acknowledgement to the applicant; Google Workspace manages administrative email. An acknowledgement does not confirm availability or sample dispatch.
 
-### Career opportunity updates
+Career opportunity updates
 
 The form allows you to provide only an email address to receive information about career opportunities at CIM Studio. We also record the language and evidence of acceptance and confirmation.
 
@@ -288,29 +274,25 @@ The lawful basis is the specific consent given through the initially unchecked c
 
 Resend sends an individual link to confirm the email address. Opening the link does not itself activate updates: an explicit confirmation action is required.
 
-This register is separate from the commercial newsletter and does not confer the founding member voucher.
+This register is separate from the commercial newsletter.
 
 We do not request a CV, telephone number or additional application information. Joining the register is not an application for a vacancy and does not guarantee an offer of employment.
 
 You may withdraw consent through the unsubscribe mechanism provided or by emailing admin@cimstudio.es. Withdrawal affects only these updates.
 
-### Evidence and administration of the founding member voucher
+Previously communicated commitments
 
-The founding member voucher is available exclusively to people who effectively confirm their subscription before 31 December 2026, in Europe/Madrid time.
+Commitments previously communicated by CIM Studio to their recipients remain subject to the terms under which they were recognised. This communication update does not revoke or amend them.
 
-CIM Studio will administer this status manually, using emails and evidence establishing effective subscription confirmation and its date. An email asking a person to confirm a subscription does not, by itself, establish that confirmation has been completed.
+To fulfil those commitments, we will retain only the minimum necessary evidence separately from marketing consent: recipient identification, communicated terms, evidence reference and fulfilment status. Dates will not be invented, and a request or technical acceptance response will not replace any required evidence.
 
-We will keep a minimal record separately from marketing consent. It may include the normalised email address, Founders status, €25 voucher and its usage status, evidenced confirmation date and a reference to the evidence and review performed. Dates will not be invented, and the request date will not replace the confirmation date.
+Where those earlier terms require proof of subscription confirmation, an email requesting confirmation does not, by itself, establish that confirmation has been completed.
 
-The purpose is to evidence and administer the promised single-use voucher and apply it when preparing quotations. The lawful basis is performance of that commitment under Article 6(1)(b) GDPR, independently of consent to advertising.
+The purpose is to fulfil previously acquired commitments. The lawful basis is their performance under Article 6(1)(b) GDPR, independently of consent to advertising.
 
-Subscriptions confirmed outside the stated period do not confer this benefit. Their inclusion or classification in a general mailing list may be managed manually. Membership of a particular mailing list does not replace the record establishing voucher entitlement.
+Newsletter withdrawal and the organisation of mailing lists do not, in themselves, alter previously recognised rights. Erasure requests will be assessed individually against applicable lawful bases and obligations, rather than automatically refused because an earlier commitment exists.
 
-Founders will retain their status even if they receive the same communications as general subscribers or unsubscribe from the newsletter.
-
-Erasure requests will be assessed individually against applicable lawful bases and obligations, rather than automatically refused because the benefit exists.
-
-### Security and abuse prevention
+Security and abuse prevention
 
 Cloudflare provides hosting, Pages Functions, D1 and Turnstile. These services may process technical connection information and browser signals to provide and protect the service.
 
@@ -324,14 +306,14 @@ Security verification may prevent submission if the check fails. For assistance,
 
 The lawful basis for protecting the service does not replace consent for browser technologies where such consent is required.
 
-### Recipients and international transfers
+Recipients and international transfers
 
 Depending on the purpose, services involved are:
 
-- **Cloudflare:** hosting, function execution, D1 storage and Turnstile protection.
-- **GetResponse:** collection subscriptions and communications.
-- **Resend:** transactional receipt, confirmation and administrative notification emails.
-- **Google Workspace:** email and reply management.
+- Cloudflare: hosting, function execution, D1 storage and Turnstile protection.
+- GetResponse: collection subscriptions and communications.
+- Resend: transactional receipt, confirmation and administrative notification emails.
+- Google Workspace: email and reply management.
 - Authorised CIM Studio personnel.
 
 Each service receives the information necessary for its role. Information may also be disclosed where required by an applicable legal obligation.
@@ -342,21 +324,21 @@ Processing outside the European Economic Area may occur. The applicable safeguar
 
 You may request information about applicable safeguards at admin@cimstudio.es.
 
-### Retention
+Retention
 
-**Newsletter:** while valid consent exists. After unsubscribe, communications will stop and only the minimum information justified to evidence withdrawal, meet applicable obligations or prevent unwanted communications will be retained.
+Newsletter: while valid consent exists. After unsubscribe, communications will stop and only the minimum information justified to evidence withdrawal, meet applicable obligations or prevent unwanted communications will be retained.
 
-**Samples:** for 12 months from receipt of the request, unless a subsequent commercial relationship or another lawful ground justifies retaining the information needed for that purpose.
+Samples: for 12 months from receipt of the request, unless a subsequent commercial relationship or another lawful ground justifies retaining the information needed for that purpose.
 
-**Career opportunities:** while there is a current purpose and a valid lawful basis. Necessity will be reviewed every 12 months, and information will be deleted when there is no longer a valid purpose. Indefinite retention is not presumed.
+Career opportunities: while there is a current purpose and a valid lawful basis. Necessity will be reviewed every 12 months, and information will be deleted when there is no longer a valid purpose. Indefinite retention is not presumed.
 
-**Founders:** only the minimum evidence needed while administering the benefit remains necessary, separately from marketing consent and subject to data protection rights. The single-use voucher does not justify retaining unnecessary information.
+Earlier commitments: only the minimum necessary evidence while it is needed to fulfil them, separately from marketing consent and subject to data protection rights. Unnecessary information will not be retained.
 
-**Invoices and subsequent transactions:** for the periods required by applicable legal obligations, without automatically extending those periods to the entire file.
+Invoices and subsequent transactions: for the periods required by applicable legal obligations, without automatically extending those periods to the entire file.
 
 Review and deletion will cover D1, providers and mailboxes as appropriate. Where an applicable obligation requires retention, information will be limited to what is strictly necessary and its use restricted. If a restoration recovers information previously deleted, the deletions must be reapplied.
 
-### Your rights
+Your rights
 
 You may request access, rectification, erasure, restriction, objection and portability where applicable, and withdraw consent, by emailing admin@cimstudio.es.
 
@@ -388,23 +370,17 @@ You may inspect and remove site storage through your browser settings. Blocking 
 
 For privacy enquiries or assistance, contact admin@cimstudio.es. The Privacy Policy explains personal-data processing and your rights.
 
-## 4. Founding member voucher terms
+## 4. Private collection access terms
 
-Become a founding member of CIM Studio. Subscribe before 31 December 2026 and receive a €25 voucher towards your first purchase, with no minimum spend.
+The CIM Studio newsletter introduces new pieces and collections of handcrafted ceramics, designed and made in Mallorca. During our first year, new releases and purchase links will be shared through the newsletter.
 
-The voucher can be used once per founding member. A prior purchase is not required to obtain it.
+To request access, provide your email address, select Private individual or Professional and accept the specific consent. This classification helps us understand subscriber profiles and tailor communications; it is not used to set different prices.
 
-To establish eligibility, the email address must be confirmed through double opt-in before 31 December 2026, in Europe/Madrid time. Submitting the form or acceptance of a request by the GetResponse API does not, by itself, establish confirmation.
+Subscription requires confirming your email through the personal link sent by GetResponse. Submitting the form or receiving a technical acceptance response does not, by itself, establish confirmation. For assistance, please email admin@cimstudio.es.
 
-CIM Studio will administer founding member status and voucher use manually, and apply the €25 discount when preparing the quotation for the first purchase. There is no automated voucher issuing or redemption system.
+Subscription is voluntary. You may unsubscribe through the link in communications or by emailing admin@cimstudio.es. Requesting samples or career updates does not automatically subscribe you to this newsletter.
 
-Subscriptions confirmed outside this period do not confer this benefit. Their inclusion or classification in a general mailing list may be managed manually.
-
-The organisation of mailing lists and the content of communications do not determine voucher entitlement. Founding members retain their status and unused voucher even if they receive the same communications as general subscribers.
-
-Subscription is voluntary. Withdrawing consent or unsubscribing from the newsletter does not remove the unused voucher. Evidence of entitlement and use is kept separately from permission to receive marketing communications.
-
-CIM Studio will review emails and evidence establishing confirmation and its date, and keep only the minimum record needed to administer the benefit and verify its single use. An invitation to confirm, a marketing tag, the initial request or an API acceptance response does not replace evidence of effective confirmation.
+Commitments previously communicated by CIM Studio to their recipients remain subject to the terms under which they were recognised. This update does not revoke or amend them. Newsletter withdrawal does not, in itself, alter those rights. Evidence and administration remain separate from marketing consent; enquiries about these commitments can be sent to admin@cimstudio.es.
 
 The forms on this website do not constitute a purchase or conclude a commission. Before contracting, the quotation and applicable terms will be provided, including taxes, charges, payment, delivery and legally required rights. These terms do not limit mandatory consumer rights.
 
