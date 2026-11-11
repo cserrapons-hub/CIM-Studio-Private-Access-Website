@@ -199,3 +199,58 @@ footer{margin-top:auto}
  .invitation h1{margin-bottom:27.3px}
  .invitation .intro:not(:has(+ .intro)){margin-bottom:24.7px}
 }
+
+/* Unify wider screens with the approved mobile layout; <=600px stays unchanged.
+   Owner chose the current mobile reference: 92% width, 56px gaps, external labels. */
+@media(min-width:601px){
+ .page-shell{max-width:none;min-height:100svh}
+ .header{height:230px}
+ .brand{top:54px;width:104px}
+ .languages{top:14px;right:6%;font-size:10px;gap:9px}
+ .composition{margin:0 0 72px}
+ .photographic-composition{width:100%;height:auto;margin:0}
+ .photograph-pair,.photograph-right{display:none}
+ .editorial-v2{display:flex;flex-direction:column;width:92%;margin:0 auto;gap:56px}
+ .editorial-v2 .photograph{position:relative;inset:auto;width:100%;margin:0;transform:none}
+ .editorial-v2 [data-piece=Tramuntana],.editorial-v2 [data-piece=Cova]{--single-frame-ratio:976/1067}
+ .editorial-v2 [data-piece=Binari]{--single-frame-ratio:1024/1536}
+ .editorial-v2 [data-piece=Fil],.editorial-v2 [data-piece=Talaia]{--single-frame-ratio:3/4}
+ .editorial-v2 [data-piece=Fita]{--single-frame-ratio:614/620}
+ .editorial-v2 [data-piece=Arrel]{--single-frame-ratio:1}
+ .editorial-v2 [data-piece="Racó"]{--single-frame-ratio:1367/1150}
+ .editorial-v2 [data-piece] .photograph-frame{aspect-ratio:var(--single-frame-ratio)}
+ .editorial-v2 .photograph-motion{position:absolute;inset:0;width:100%;height:100%}
+ .editorial-v2 .photograph-frame img{width:100%;height:100%;object-fit:cover;object-position:center;filter:saturate(.2);transform:scale(1);transition:transform 700ms cubic-bezier(.22,1,.36,1),filter 350ms ease,opacity 350ms ease}
+ .editorial-v2 [data-piece=Fil] img{object-position:center bottom}
+ .editorial-v2 [data-piece=Arrel] img{object-position:center top}
+ .editorial-v2 figcaption{position:static;inset:auto;width:100%;border:0;padding:0;margin:14px 0 0;text-align:left;white-space:normal;font:300 10px/1.2 Montserrat,Arial,Helvetica,sans-serif;color:#555550;opacity:1;transition:none;text-shadow:none;z-index:auto}
+ .editorial-v2 .product-label{position:static;width:auto;max-width:none;padding:0;text-align:left;gap:5px}
+ .editorial-v2 .product-category{font:300 9px/1.25 Montserrat,Arial,sans-serif;letter-spacing:.09em}
+ .editorial-v2 .product-name{font:500 13px/1.2 Montserrat,Arial,sans-serif;letter-spacing:0}
+ .editorial-v2 .talaia-on{position:absolute;inset:0}
+ .editorial-v2 [data-piece=Talaia] .talaia-on{opacity:0}
+ .editorial-v2 [data-piece=Talaia] img:first-child{opacity:1}
+ .editorial-v2 .photograph:focus-visible{outline:1px solid var(--ink);outline-offset:4px}
+ .header-scroll{width:14px;height:28px;margin-left:-7px}
+ .editorial-scroll{width:16px;height:56px;margin-top:48px}
+ .invitation{width:84%;max-width:620px;margin:72px auto 0;scroll-margin-top:24px;text-align:left}
+ .invitation h1{font-size:32.25px;line-height:1.12;margin-bottom:27.3px;text-align:center}
+ .invitation .intro{width:auto;font-size:12px;line-height:1.8;margin-left:0;margin-right:0;margin-bottom:19px;text-align:left}
+ .invitation .intro:has(+ .intro){margin-bottom:15px}
+ .invitation .intro:not(:has(+ .intro)){margin-bottom:24.7px}
+ .invitation > .primary{display:flex;width:fit-content;height:auto;min-height:46px;padding:15px 23px;font-size:10px;margin-left:auto;margin-right:auto}
+ .invitation .professional{font-size:10px;margin-top:18px;line-height:1.8;text-align:left}
+ footer{margin:auto 6% 0;padding-bottom:22px;font-size:8px;align-items:baseline;flex-wrap:wrap}
+ .legal-links{gap:14px}.legal-links button{font-size:8px}
+ footer .careers-link{position:static;transform:none;order:3;flex-basis:100%;width:100%;text-align:center;white-space:normal}
+}
+@media(min-width:601px) and (hover:hover) and (pointer:fine){
+ .editorial-v2 .photograph:is(:hover,:focus-within) img{filter:saturate(1);transform:scale(1.05)}
+ .editorial-v2 [data-piece=Talaia]:is(:hover,:focus-within) .talaia-on{opacity:1}
+ .editorial-v2 [data-piece=Talaia]:is(:hover,:focus-within) img:first-child{opacity:0}
+}
+@media(min-width:601px) and (hover:none),(min-width:601px) and (pointer:coarse){
+ .editorial-v2 .photograph-frame img{filter:saturate(1);transform:none!important}
+ .editorial-v2 [data-piece=Talaia] .talaia-on{opacity:0!important}
+ .editorial-v2 [data-piece=Talaia] img:first-child{opacity:1!important}
+}
