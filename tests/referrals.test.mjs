@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {handleReferralLink,handleReferralDashboard,recordReferralSignup} from '../server/referrals.js';
+const page=readFileSync(new URL('../recomienda/index.html',import.meta.url),'utf8');
+const client=readFileSync(new URL('../recomienda/recomienda.js',import.meta.url),'utf8');
+const migration=readFileSync(new URL('../referrals-migration.sql',import.meta.url),'utf8');
+test('referral landing includes a personal link request and dashboard',()=>{assert.match(page,/id="referral-form"/);assert.match(page,/id="dashboard"/);assert.match(page,/id="signup-form"/);assert.match(page,/id="video-frame"/)});
+test('attribution travels only as referral code',()=>{assert.match(client,/referralCode/);assert.match(client,/\/api\/subscribe/);assert.match(client,/\/api\/referrals\/link/);assert.match(client,/\/api\/referrals\/dashboard/)});
+test('D1 schema separates pending signups and unused coupons',()=>{assert.match(migration,/referral_signups/);assert.match(migration,/referral_coupons/);assert.match(migration,/redeemed_at/);assert.match(migration,/UNIQUE\(source_subject_hash,kind\)/)});
+test('disabled referral service fails closed',async()=>{const req=new Request('https://cimstudio.es/api/referrals/link',{method:'POST'});const result=await handleReferralLink(req,{});assert.equal(result.status,503);const dashboard=await handleReferralDashboard(new Request('https://cimstudio.es/api/referrals/dashboard'),{});assert.equal(dashboard.status,503);await recordReferralSignup({}, {email:'person@example.com',referralCode:'a'.repeat(24),requestId:'test'})});

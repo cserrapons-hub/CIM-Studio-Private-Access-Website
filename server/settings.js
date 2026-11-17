@@ -32,7 +32,7 @@ export function publicSettings(env, url) {
   const publicMode = env.CONTROLLED_TEST_MODE !== 'true';
   const enabled = { subscribe: publicMode && newsletterPublicReady(env,legalReady()), samples: publicMode && registrationReady(env,'samples',legalReady()), careers: publicMode && registrationReady(env,'careers',legalReady()) };
   const verified = env.FORMS_VERIFIED === 'true';
-  return { enabled, verified, newsletter:{provider:'getresponse-api-v3',reviewRequired:true}, siteKey: (enabled.subscribe||enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
+  return { enabled, referralsEnabled: enabled.subscribe && env.REFERRALS_ENABLED==='true' && Boolean(env.RESEND_API_KEY) && Boolean(env.MAIL_FROM), verified, newsletter:{provider:'getresponse-api-v3',reviewRequired:true}, siteKey: (enabled.subscribe||enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
     siteLive: env.CONTROLLED_TEST_MODE!=='true' && env.SITE_LIVE === 'true' && verified && env.SAMPLES_VERIFIED==='true' && env.CAREERS_VERIFIED==='true' && env.MAIL_RECEIPTS_VERIFIED==='true' && env.NEWSLETTER_EVIDENCE_REVIEWED==='true' && legalReady() && enabled.subscribe && enabled.samples && enabled.careers && url.hostname === 'cimstudio.es',
     legalVersion: legalReady() ? legal.version : null, legal: legalReady() ? { es: legal.es, en: legal.en } : null };
 }
