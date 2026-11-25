@@ -1,4 +1,5 @@
 // Optional HTTP Basic boundary for a dedicated HTTPS preview. No public activation.
+import {referralTest} from './referral-environment.js';
 const encoder=new TextEncoder();
 async function digest(text){return new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(text)));}
 async function equal(a,b){const x=await digest(a),y=await digest(b);let different=0;for(let n=0;n<x.length;n++)different|=x[n]^y[n];return different===0;}
@@ -12,7 +13,8 @@ export async function controlledTestBoundary(request,env){
  if(typeof user!=='string'||!user||/[\x00-\x20\x7f:]/.test(user)||typeof password!=='string'||password.length<32||/[\x00-\x1f\x7f]/.test(password))return denied(503);
  // Provider cannot perform browser login. ONLY the exact webhook route is exempt;
  // its own disabled-by-default authentication/verification remains mandatory.
- if(new URL(request.url).pathname==='/api/webhooks/getresponse'&&request.method==='POST')return null;
+ const path=new URL(request.url).pathname;
+ if(request.method==='POST'&&(path==='/api/webhooks/getresponse'||(path==='/api/webhooks/stripe'&&referralTest(env))))return null;
  const auth=request.headers.get('Authorization')||'';
  if(auth.length>2048||!auth.startsWith('Basic '))return denied(401,true);
  let supplied;

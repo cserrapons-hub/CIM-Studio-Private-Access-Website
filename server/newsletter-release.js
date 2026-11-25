@@ -1,4 +1,5 @@
 import {segmentationReady} from './newsletter-segmentation.js';
+import {ORIGIN,CAMPAIGN,referralTest} from './referral-environment.js';
 // Code-owned API response contract: express owner-reported private validation on 2026-10-22.
 // API acceptance is not DOI confirmation or Founders eligibility; runtime gates remain required.
 export const newsletterRelease=Object.freeze({
@@ -14,7 +15,8 @@ export function validRelease(profile){
 }
 export function newsletterBuildReady(env,approved,profile=newsletterRelease){
  if(!approved||!validRelease(profile)||env.FORMS_ENABLED!=='true'||env.NEWSLETTER_ENABLED!=='true'||env.NEWSLETTER_PUBLIC_ENABLED!=='true'||env.NEWSLETTER_PROVIDER!=='getresponse-api-v3'||env.NEWSLETTER_EVIDENCE_REVIEWED!=='true'||env.NEWSLETTER_VERIFIED!=='true')return false;
- return env.GETRESPONSE_CAMPAIGN_ID==='PL6jh'&&env.NEWSLETTER_ORIGIN==='https://cimstudio.es';
+ return env.REFERRALS_TEST_MODE==='true'?Boolean(referralTest(env)):
+  env.GETRESPONSE_CAMPAIGN_ID===CAMPAIGN&&env.NEWSLETTER_ORIGIN===ORIGIN;
 }
 export function newsletterPublicReady(env,approved,profile=newsletterRelease){
  if(!newsletterBuildReady(env,approved,profile)||!segmentationReady(env)||!env.FORMS_DB)return false;

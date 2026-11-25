@@ -32,3 +32,7 @@ CREATE TABLE IF NOT EXISTS cajita_reservations (
   order_id TEXT NOT NULL REFERENCES cajita_orders(id)
 );
 CREATE INDEX IF NOT EXISTS idx_cajita_reservations_order ON cajita_reservations(order_id);
+CREATE TABLE IF NOT EXISTS cajita_shipping_destinations (
+  order_id TEXT PRIMARY KEY REFERENCES cajita_orders(id),
+  address_hash TEXT NOT NULL
+);

@@ -1,5 +1,6 @@
 import {registrationReady} from './registration-settings.js';
 import {newsletterPublicReady} from './newsletter-release.js';
+import {referralTest} from './referral-environment.js';
 import legal from '../legal/content.js';
 export const consent = {
   es: { careers:'Acepto recibir comunicaciones sobre oportunidades profesionales de CIM Studio y he leído la Política de Privacidad.', subscribe: 'Acepto recibir novedades de la colección por email.', samples: 'Acepto que CIM Studio contacte conmigo sobre esta solicitud.' },
@@ -30,7 +31,7 @@ export function careersReady(env) {
 }
 export function publicSettings(env, url) {
   const publicMode = env.CONTROLLED_TEST_MODE !== 'true';
-  const enabled = { subscribe: publicMode && newsletterPublicReady(env,legalReady()), samples: publicMode && registrationReady(env,'samples',legalReady()), careers: publicMode && registrationReady(env,'careers',legalReady()) };
+  const enabled = { subscribe: (publicMode||referralTest(env)?.origin===url.origin) && newsletterPublicReady(env,legalReady()), samples: publicMode && registrationReady(env,'samples',legalReady()), careers: publicMode && registrationReady(env,'careers',legalReady()) };
   const verified = env.FORMS_VERIFIED === 'true';
   return { enabled, referralsEnabled: enabled.subscribe && env.REFERRALS_ENABLED==='true' && Boolean(env.RESEND_API_KEY) && Boolean(env.MAIL_FROM), verified, newsletter:{provider:'getresponse-api-v3',reviewRequired:true}, siteKey: (enabled.subscribe||enabled.samples||enabled.careers) ? env.TURNSTILE_SITE_KEY : null,
     siteLive: env.CONTROLLED_TEST_MODE!=='true' && env.SITE_LIVE === 'true' && verified && env.SAMPLES_VERIFIED==='true' && env.CAREERS_VERIFIED==='true' && env.MAIL_RECEIPTS_VERIFIED==='true' && env.NEWSLETTER_EVIDENCE_REVIEWED==='true' && legalReady() && enabled.subscribe && enabled.samples && enabled.careers && url.hostname === 'cimstudio.es',

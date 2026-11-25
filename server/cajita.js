@@ -1,15 +1,33 @@
-import {json,readJson,Rejection} from './forms.js';
+import {json,readJson,hash,Rejection} from './forms.js';
 import {ORIGIN,ownerForToken,throttle} from './referrals.js';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 const cutoff=Date.parse('2027-01-01T00:00:00+01:00');
-const price=()=>Date.now()<cutoff?4000:6000;
-const shippingPrice=env=>/^[1-9][0-9]{0,5}$/.test(env.CAJITA_SHIPPING_ES_CENTS||'')?Number(env.CAJITA_SHIPPING_ES_CENTS):null;
+export const cajitaPrice=(at=Date.now())=>at<cutoff?4000:6000;
+const SHIPPING_CENTS=1540;
+const COUPON_CENTS=500;
+const MAX_COUPONS=3;
+
+function shippingDetails(raw){
+ const postal=typeof raw?.postal_code==='string'?raw.postal_code.trim():'';
+ const province=Number(postal.slice(0,2));
+ if(raw?.country!=='ES'||!/^\d{5}$/.test(postal)||province<1||province>50||province===35||province===38)
+  throw new Rejection('shipping_zone',422);
+ const required=(value,max)=>{
+  if(typeof value!=='string'||!value.trim()||value.trim().length>max||/[\x00-\x1f\x7f]/.test(value))
+   throw new Rejection('shipping_address',422);
+  return value.trim();
+ };
+ return {
+  name:required(raw.name,100),
+  address:{country:'ES',postal_code:postal,city:required(raw.city,100),line1:required(raw.line1,200)},
+ };
+}
 const checkoutMode=(env,origin)=>{
  if(!env.FORMS_DB||!/^whsec_/.test(env.STRIPE_WEBHOOK_SECRET||'')||!(env.AUDIT_HASH_SECRET?.length>=32))return null;
  if(origin===ORIGIN){
   return env.CAJITA_LIVE_ENABLED==='true'&&env.CAJITA_LIVE_VERIFIED==='true'&&
-   /^(sk|rk)_live_/.test(env.STRIPE_SECRET_KEY||'')&&shippingPrice(env)!==null?'live':null;
+   /^(sk|rk)_live_/.test(env.STRIPE_SECRET_KEY||'')?'live':null;
  }
  return origin!=='https://www.cimstudio.es'&&origin===env.CAJITA_TEST_ORIGIN&&env.CAJITA_TEST_ENABLED==='true'&&
   /^(sk|rk)_test_/.test(env.STRIPE_SECRET_KEY||'')?'test':null;
@@ -19,31 +37,40 @@ export async function handleCajita(request,env){
  try{
   const origin=new URL(request.url).origin;
   const mode=checkoutMode(env,origin);
-  if(request.method==='GET')return json({available:mode!==null,test:mode==='test',price:price(),shipping:shippingPrice(env)});
+  const price=cajitaPrice();
+  if(request.method==='GET')return json({available:mode!==null,test:mode==='test',price,shipping:SHIPPING_CENTS,coupon:COUPON_CENTS,maxCoupons:MAX_COUPONS});
   if(request.method!=='POST')return json({error:'method'},405);
   if(!mode)throw new Rejection('unavailable',503);
   const live=Number(mode==='live');
   if(request.headers.get('Origin')!==origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403);
-  await throttle(request,env,'checkout');
-  const {id,count,delivery,access}=await readJson(request);
-  if(typeof id!=='string'||!UUID.test(id)||!Number.isInteger(count)||count<0||count>3||!['pickup','shipping'].includes(delivery))
+  const {id,count,delivery,access,shipTo,total}=await readJson(request);
+  if(typeof id!=='string'||!UUID.test(id)||!Number.isInteger(count)||count<0||count>MAX_COUPONS||
+   !['pickup','shipping'].includes(delivery)||!Number.isInteger(total))
    throw new Rejection('invalid');
-  const shipping=delivery==='pickup'?0:shippingPrice(env);
-  if(shipping===null)throw new Rejection('invalid');
+  const destination=delivery==='shipping'?shippingDetails(shipTo):null;
+  const shipping=destination?SHIPPING_CENTS:0;
+  const subtotal=price-COUPON_CENTS*count;
+  if(total!==subtotal+shipping)throw new Rejection('price_changed',409);
+  await throttle(request,env,'checkout');
   const owner=count?await ownerForToken(env,access):null;
+  const destinationHash=destination?await hash(env.AUDIT_HASH_SECRET,'cajita-shipping:'+id+':'+JSON.stringify(destination)):null;
   const db=env.FORMS_DB;
   const availableCoupons='SELECT c.coupon_id FROM referral_coupons c WHERE c.owner_hash=? AND c.redeemed_at IS NULL AND NOT EXISTS(SELECT 1 FROM cajita_reservations r WHERE r.coupon_id=c.coupon_id)';
   await db.batch([
    db.prepare('INSERT OR IGNORE INTO cajita_orders(id,owner_hash,coupon_count,subtotal,shipping,live,origin,created_at) '+
     'SELECT ?,?,?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM ('+availableCoupons+'))>=?')
-    .bind(id,owner,count,price()-500*count,shipping,live,origin,Date.now(),owner,count),
+    .bind(id,owner,count,subtotal,shipping,live,origin,Date.now(),owner,count),
+   ...(destination?[db.prepare('INSERT OR IGNORE INTO cajita_shipping_destinations(order_id,address_hash) '+
+    "SELECT id,? FROM cajita_orders WHERE id=? AND owner_hash IS ? AND coupon_count=? AND subtotal=? AND shipping=? AND origin=? AND live=? AND state='open' AND stripe_session IS NULL")
+    .bind(destinationHash,id,owner,count,subtotal,shipping,origin,live)]:[]),
    db.prepare('INSERT INTO cajita_reservations(coupon_id,order_id) SELECT coupon_id,? FROM ('+availableCoupons+') '+
     "WHERE EXISTS(SELECT 1 FROM cajita_orders o WHERE o.id=? AND o.owner_hash IS ? AND o.coupon_count=? AND o.state='open') "+
     'AND NOT EXISTS(SELECT 1 FROM cajita_reservations WHERE order_id=?) ORDER BY coupon_id LIMIT ?')
     .bind(id,owner,id,owner,count,id,count),
   ]);
-  const order=await db.prepare('SELECT * FROM cajita_orders WHERE id=?').bind(id).first();
-  if(!order||order.owner_hash!==owner||order.coupon_count!==count||order.shipping!==shipping||order.origin!==origin||order.live!==live||order.state!=='open')
+  const order=await db.prepare('SELECT o.*,d.address_hash FROM cajita_orders o LEFT JOIN cajita_shipping_destinations d ON d.order_id=o.id WHERE o.id=?').bind(id).first();
+  if(!order||order.owner_hash!==owner||order.coupon_count!==count||order.subtotal!==subtotal||order.shipping!==shipping||
+   order.address_hash!==destinationHash||order.origin!==origin||order.live!==live||order.state!=='open')
    throw new Rejection('conflict',409);
   if(Date.now()-order.created_at>=23*3600000)throw new Rejection('conflict',409);
   const params=new URLSearchParams({
@@ -51,16 +78,17 @@ export async function handleCajita(request,env){
    'line_items[0][price_data][currency]':'eur',
    'line_items[0][price_data][unit_amount]':String(order.subtotal),
    'line_items[0][price_data][product_data][name]':'Cajita CIM Studio · dos tazitas artesanales',
-   'line_items[0][quantity]':'1','metadata[order_id]':id,
+   'line_items[0][quantity]':'1','metadata[order_id]':id, 'metadata[delivery]':delivery,
    success_url:origin+'/cajita/?resultado=recibido',cancel_url:origin+'/cajita/?resultado=cancelado',
   });
-  if(shipping){
-   params.set('shipping_address_collection[allowed_countries][0]','ES');
-   const rate='shipping_options[0][shipping_rate_data]';
-   params.set(rate+'[display_name]','Envío a España');
-   params.set(rate+'[type]','fixed_amount');
-   params.set(rate+'[fixed_amount][amount]',String(shipping));
-   params.set(rate+'[fixed_amount][currency]','eur');
+  if(destination){
+   params.set('line_items[1][price_data][product_data][name]','Envío a Baleares o Península');
+   params.set('line_items[1][price_data][unit_amount]',String(shipping));
+   params.set('line_items[1][price_data][currency]','eur');
+   params.set('line_items[1][quantity]','1');
+   const prefix='payment_intent_data[shipping]';
+   params.set(prefix+'[name]',destination.name);
+   for(const [field,value] of Object.entries(destination.address))params.set(prefix+'[address]['+field+']',value);
   }
   const response=await fetch('https://api.stripe.com/v1/checkout/sessions',{
    method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),body:params,

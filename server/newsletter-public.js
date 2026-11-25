@@ -7,6 +7,7 @@ import {newsletterPublicReady,newsletterRelease,acceptedNewsletterResponse} from
 import {prepareNewsletterApi,NEWSLETTER_API_CONTRACT} from './getresponse-api-submission.js';
 import {verifyNewsletter,readGetResponse,NewsletterVerificationError} from './getresponse-newsletter.js';
 import {recordReferralSignup} from './referrals.js';
+import {referralTest} from './referral-environment.js';
 const verificationCodes=new Set(['campaign','contacts'].flatMap(prefix=>['request','timeout','network','redirect','http','response','configuration','identity','optin'].map(suffix=>prefix+'_'+suffix)));
 const rejectionCodes=new Set(['method','origin','invalid','consent','challenge','subscriber_type','rate','conflict','pending']);
 function publicPolicy(){return {approved:legalReady(),version:legal.version,es:{consent:consent.es.subscribe},en:{consent:consent.en.subscribe}};}
@@ -29,6 +30,8 @@ export async function handlePublicNewsletter(request,env,{fetcher=fetch,policy=p
   const url=new URL(request.url);
   if(url.origin!==env.NEWSLETTER_ORIGIN||request.headers.get('Origin')!==url.origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403);
   const raw=await readJson(request),data=validate(raw,'subscribe');data.subscriberType=subscriberType(raw.subscriberType);if(raw.legalVersion!==policy.version)throw new Rejection('consent');
+  const preview=referralTest(env),campaign=env.GETRESPONSE_CAMPAIGN_ID;
+  if(preview&&!preview.emails.has(data.email))throw new Rejection('invalid',403);
   step('d1_rate_limits','rate_limit_storage');
   const db=env.FORMS_DB,ip=request.headers.get('CF-Connecting-IP');code='client_ip_missing';if(!ip)throw new Rejection('unavailable',503);
   code='audit_hmac';
@@ -60,11 +63,11 @@ export async function handlePublicNewsletter(request,env,{fetcher=fetch,policy=p
   step('getresponse_prepare','request_configuration');
   const prepared=prepareNewsletterApi(env,data.email,data.subscriberType,{startTimeout:false});
   step('getresponse_campaign','campaign_verification');
-  await verifyNewsletter(env.GETRESPONSE_API_KEY,env.GETRESPONSE_CAMPAIGN_ID,fetcher);
+  await verifyNewsletter(env.GETRESPONSE_API_KEY,campaign,fetcher,preview?.campaignName);
   step('getresponse_contacts','contacts_verification');
-  const contacts=await readGetResponse(fetcher,env.GETRESPONSE_API_KEY,'/contacts?'+new URLSearchParams({'query[email]':data.email,'query[campaignId]':'PL6jh',perPage:'100'}),'contacts');
+  const contacts=await readGetResponse(fetcher,env.GETRESPONSE_API_KEY,'/contacts?'+new URLSearchParams({'query[email]':data.email,'query[campaignId]':campaign,perPage:'100'}),'contacts');
   if(!Array.isArray(contacts)||contacts.length>=100||contacts.some(c=>!c||typeof c.email!=='string'||!c.campaign?.campaignId))throw new Rejection('unavailable',503);
-  if(contacts.some(c=>c.email.trim().toLowerCase()===data.email&&c.campaign.campaignId==='PL6jh'))throw new Rejection('pending',409);
+  if(contacts.some(c=>c.email.trim().toLowerCase()===data.email&&c.campaign.campaignId===campaign))throw new Rejection('pending',409);
   step('consent_persistence','consent_storage');
   await recordNewsletterConsent(env,{...data,requestId:raw.requestId,legalVersion:raw.legalVersion},now,policy);
   step('d1_delivery_claim','delivery_claim_storage');
