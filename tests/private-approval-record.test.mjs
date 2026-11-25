@@ -22,7 +22,7 @@ test('express approval records exactly 372193d text without granting public appr
  }
  const s=await fixture();try{
   const closed={...s.env};
-  for(const file of ['.dev.vars.example','config/controlled-test.vars.example'])for(const line of readFileSync(file,'utf8').split('\n')){
+  for(const file of ['.dev.vars.example','config/controlled-test.vars.example'])for(const line of readFileSync(file,'utf8').split(/\r?\n/)){
    const match=line.match(/^([A-Z0-9_]+)=(true|false)$/);if(!match)continue;
    if(match[1]==='CONTROLLED_TEST_MODE'){assert.equal(match[2],'true');continue;}
    assert.equal(match[2],'false','No example gate may be enabled');closed[match[1]]='false';

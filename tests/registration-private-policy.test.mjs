@@ -113,7 +113,7 @@ test('private challenge failures cannot create records and prior approval eviden
 });
 test('consolidated document reproduces exact approved private texts independently of express public approval',async()=>{
  const {newsletterTestPolicy}=await import('../server/newsletter-test-policy.js');
- const text=readFileSync('PRIVATE-TEST-NOTICES.md','utf8');
+ const text=readFileSync('PRIVATE-TEST-NOTICES.md','utf8').replace(/\r\n/g,'\n');
  for(const p of [newsletterTestPolicy,...Object.values(registrationTestPolicies)]){assert.equal(p.approved,true);assert.ok(text.includes('`'+p.version+'`'));for(const lang of ['es','en'])for(const field of ['consent','privacy'])assert.ok(text.includes(p[lang][field]));
   for(const lang of ['es','en']){assert.match(p[lang].privacy,lang==='es'?/confirmados por CIM Studio/:/confirmed by CIM Studio/);assert.match(p[lang].privacy,/Carrer Joan Sindic, 7/);assert.ok(!p[lang].privacy.includes('Juan Sindic'));assert.match(p[lang].privacy,lang==='es'?/bajo la supervisión de su responsable/:/under the supervision of its responsible representative/);}}
  assert.equal(legal.approved,true);assert.equal(legal.approval.scope,'public-legal-documents-and-form-consents-only');
