@@ -7,6 +7,7 @@ import {handlePublicNewsletter} from '../server/newsletter-public.js';
 import {cajitaPrice,handleCajita,handleStripeWebhook} from '../server/cajita.js';
 import {fixture,policy} from './helpers/launch-fixture.mjs';
 import {controlledTestBoundary} from '../server/controlled-test.js';
+import {onRequest as reconcileTestRequest} from '../functions/api/referrals/reconcile-test.js';
 import {publicSettings} from '../server/settings.js';
 const page=readFileSync(new URL('../recomienda/index.html',import.meta.url),'utf8');
 const client=readFileSync(new URL('../recomienda/recomienda.js',import.meta.url),'utf8');
@@ -77,6 +78,15 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   const protectedRequest=await controlledTestBoundary(new Request(origin+'/recomienda/'),env);
   assert.equal(protectedRequest.status,401);
   assert.equal(await controlledTestBoundary(post(origin,'/api/webhooks/stripe',{}),env),null);
+  const cronRequest=secret=>new Request(origin+'/api/referrals/reconcile-test',{
+   method:'POST',headers:{Authorization:'Bearer '+secret},
+  });
+  const cronSecret='simulation-only-secret-at-least-32-characters';
+  env.REFERRALS_TEST_CRON_SECRET=cronSecret;
+  assert.equal(await controlledTestBoundary(cronRequest('wrong'),env),null);
+  assert.equal((await reconcileTestRequest({request:cronRequest('wrong'),env})).status,403);
+  assert.equal((await reconcileTestRequest({request:cronRequest(cronSecret),env})).status,204);
+  assert.equal((await reconcileTestRequest({request:cronRequest(cronSecret),env:{...env,REFERRALS_TEST_MODE:'false'}})).status,404);
   assert.equal(publicSettings(env,new URL(origin)).enabled.subscribe,true);
   assert.equal(publicSettings(env,new URL('https://cimstudio.es')).enabled.subscribe,false);
   const blocked=await handlePublicNewsletter(post(origin,'/api/subscribe',{...s.data,email:'excluded@example.test'}),env,{policy,fetcher,logger:()=>{}});

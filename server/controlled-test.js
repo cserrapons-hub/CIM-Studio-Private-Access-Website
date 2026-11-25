@@ -14,7 +14,8 @@ export async function controlledTestBoundary(request,env){
  // Provider cannot perform browser login. ONLY the exact webhook route is exempt;
  // its own disabled-by-default authentication/verification remains mandatory.
  const path=new URL(request.url).pathname;
- if(request.method==='POST'&&(path==='/api/webhooks/getresponse'||(path==='/api/webhooks/stripe'&&referralTest(env))))return null;
+ if(request.method==='POST'&&(path==='/api/webhooks/getresponse'||
+   (['/api/webhooks/stripe','/api/referrals/reconcile-test'].includes(path)&&referralTest(env))))return null;
  const auth=request.headers.get('Authorization')||'';
  if(auth.length>2048||!auth.startsWith('Basic '))return denied(401,true);
  let supplied;
