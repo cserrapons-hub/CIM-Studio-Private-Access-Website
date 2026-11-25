@@ -9,6 +9,7 @@ import {fixture,policy} from './helpers/launch-fixture.mjs';
 import {controlledTestBoundary} from '../server/controlled-test.js';
 import {onRequest as reconcileTestRequest} from '../functions/api/referrals/reconcile-test.js';
 import {publicSettings} from '../server/settings.js';
+import {referralTurnstileTest,validReferralTurnstileProof} from '../server/referral-turnstile.js';
 const page=readFileSync(new URL('../recomienda/index.html',import.meta.url),'utf8');
 const client=readFileSync(new URL('../recomienda/recomienda.js',import.meta.url),'utf8');
 const migration=readFileSync(new URL('../referrals-migration.sql',import.meta.url),'utf8');
@@ -39,14 +40,23 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   STRIPE_WEBHOOK_SECRET:'whsec_simulated',
  });
  if(preview)Object.assign(env,{REFERRALS_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:origin,
-  REFERRALS_TEST_EMAILS:[owner,referred,other].join(',')});
+  REFERRALS_TEST_EMAILS:[owner,referred,other].join(','),REFERRALS_TURNSTILE_TEST:'true'});
+ const siteverify=referralTurnstileTest(env,origin);
+ const token=action=>preview?'XXXX.DUMMY.TOKEN.XXXX':action;
  const post=(base,path,data)=>new Request(base+path,{
   method:'POST',headers:{Origin:base,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1'},
   body:JSON.stringify(data),
  });
  const mail=[],sessions=new Map(),confirmed=new Set(),stripeCalls=[];
  const fetcher=async(url,options)=>{
-  if(url.includes('siteverify'))return Response.json({success:true,hostname:new URL(origin).hostname,action:options.body.get('response')});
+  if(url.includes('siteverify')){
+   if(preview){
+    assert.equal(options.body.get('secret'),siteverify.secretKey);
+    assert.equal(options.body.get('response'),token());
+    return Response.json({success:true,hostname:'example.com'});
+   }
+   return Response.json({success:true,hostname:new URL(origin).hostname,action:options.body.get('response')});
+  }
   if(url.includes('/campaigns/'))return Response.json({campaignId:campaign,name:preview?'cim_studio_referral_test':'cim_studio_newsletter',optinTypes:{api:'double'}});
   if(url.includes('/contacts?')){
    const email=new URL(url).searchParams.get('query[email]');
@@ -88,17 +98,22 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   assert.equal((await reconcileTestRequest({request:cronRequest(cronSecret),env})).status,204);
   assert.equal((await reconcileTestRequest({request:cronRequest(cronSecret),env:{...env,REFERRALS_TEST_MODE:'false'}})).status,404);
   assert.equal(publicSettings(env,new URL(origin)).enabled.subscribe,true);
+  assert.equal(publicSettings(env,new URL(origin)).siteKey,siteverify.siteKey);
   assert.equal(publicSettings(env,new URL('https://cimstudio.es')).enabled.subscribe,false);
+  assert.equal(referralTurnstileTest(env,'https://cimstudio.es'),null);
+  assert.equal(referralTurnstileTest({...env,CONTROLLED_TEST_MODE:'false'},origin),null);
+  assert.equal(validReferralTurnstileProof({success:true,hostname:'example.com'},{test:null,token:token(),hostname:'cimstudio.es',action:'subscribe'}),false);
+  assert.equal(validReferralTurnstileProof({success:true,hostname:'example.com'},{test:siteverify,token:'different'}),false);
   const blocked=await handlePublicNewsletter(post(origin,'/api/subscribe',{...s.data,email:'excluded@example.test'}),env,{policy,fetcher,logger:()=>{}});
   assert.equal(blocked.status,403);
  }
- assert.equal((await handleReferralLink(post(origin,'/api/referrals/link',{email:owner,token:'referral'}),env)).status,202);
+ assert.equal((await handleReferralLink(post(origin,'/api/referrals/link',{email:owner,token:token('referral')}),env)).status,202);
  const access=mail[0].text.match(/#acceso=([a-f0-9]{48})/)[1];
  const dashboard=()=>handleReferralDashboard(new Request(origin+'/api/referrals/dashboard',{headers:{'X-Referral-Access':access}}),env);
  const {url}=await (await dashboard()).json();
  for(const [email,attribution] of [[referred,{referralCode:new URL(url).searchParams.get('r')}],[other,{referrerEmail:owner}]]){
   const signup=await handlePublicNewsletter(post(origin,'/api/subscribe',{
-   ...s.data,email,subscriberType:'profesional',token:'subscribe',requestId:crypto.randomUUID(),...attribution,
+   ...s.data,email,subscriberType:'profesional',token:token('subscribe'),requestId:crypto.randomUUID(),...attribution,
   }),env,{policy,fetcher});
   assert.equal(signup.status,202);
  }

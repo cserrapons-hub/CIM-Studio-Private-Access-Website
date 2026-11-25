@@ -8,6 +8,7 @@ import {prepareNewsletterApi,NEWSLETTER_API_CONTRACT} from './getresponse-api-su
 import {verifyNewsletter,readGetResponse,NewsletterVerificationError} from './getresponse-newsletter.js';
 import {recordReferralSignup} from './referrals.js';
 import {referralTest} from './referral-environment.js';
+import {referralTurnstileTest,validReferralTurnstileProof} from './referral-turnstile.js';
 const verificationCodes=new Set(['campaign','contacts'].flatMap(prefix=>['request','timeout','network','redirect','http','response','configuration','identity','optin'].map(suffix=>prefix+'_'+suffix)));
 const rejectionCodes=new Set(['method','origin','invalid','consent','challenge','subscriber_type','rate','conflict','pending']);
 function publicPolicy(){return {approved:legalReady(),version:legal.version,es:{consent:consent.es.subscribe},en:{consent:consent.en.subscribe}};}
@@ -43,11 +44,12 @@ export async function handlePublicNewsletter(request,env,{fetcher=fetch,policy=p
   }
   await db.prepare('DELETE FROM form_rate_limits WHERE expires_at<?').bind(now.getTime()).run();
   step('turnstile','provider_transport');
-  const verify=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:raw.token})});
+  const test=referralTurnstileTest(env,url.origin);
+  const verify=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),body:new URLSearchParams({secret:test?.secretKey??env.TURNSTILE_SECRET_KEY,response:raw.token})});
   code='provider_http';providerStatus=verify.status;
   if(!verify.ok)throw new Rejection('unavailable',503);code='provider_response';const proof=await verify.json();
   code='challenge_invalid';
-  if(proof.success!==true||proof.hostname!==url.hostname||proof.action!=='subscribe')throw new Rejection('challenge',403);
+  if(!validReferralTurnstileProof(proof,{test,token:raw.token,hostname:url.hostname,action:'subscribe'}))throw new Rejection('challenge',403);
   step('d1_deduplication','deduplication_storage');
   const byId=await db.prepare('SELECT * FROM newsletter_html_deliveries WHERE request_id=?').bind(raw.requestId).first();
   if(byId&&byId.subject_hash!==subject)throw new Rejection('conflict',409);
