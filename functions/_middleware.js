@@ -18,7 +18,12 @@ export async function onRequest({request,env,next}) {
   const url=new URL(request.url);
   if(!publicSettings(env,url).siteLive)result.headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
   result.headers.set('X-Content-Type-Options','nosniff');
-  result.headers.set('Referrer-Policy',privateTest?'no-referrer':'strict-origin-when-cross-origin');
+  const privateLink=['/recomienda','/recomienda/','/cajita','/cajita/'].includes(path);
+  result.headers.set('Referrer-Policy',privateTest||privateLink?'no-referrer':'strict-origin-when-cross-origin');
+  if(privateLink&&url.searchParams.has('acceso')){
+    result.headers.set('Cache-Control','no-store');
+    result.headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
+  }
   if(env.CONTROLLED_TEST_MODE==='true'){result.headers.set('Cache-Control','no-store');result.headers.set('X-Robots-Tag','noindex, nofollow, noarchive');}
   if(url.pathname.startsWith('/api/'))result.headers.set('Cache-Control','no-store');
   return result;

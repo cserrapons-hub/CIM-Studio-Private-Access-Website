@@ -6,6 +6,7 @@ import {recordNewsletterConsent,verifyConsentEvidence} from './getresponse-contr
 import {newsletterPublicReady,newsletterRelease,acceptedNewsletterResponse} from './newsletter-release.js';
 import {prepareNewsletterApi,NEWSLETTER_API_CONTRACT} from './getresponse-api-submission.js';
 import {verifyNewsletter,readGetResponse,NewsletterVerificationError} from './getresponse-newsletter.js';
+import {recordReferralSignup} from './referrals.js';
 const verificationCodes=new Set(['campaign','contacts'].flatMap(prefix=>['request','timeout','network','redirect','http','response','configuration','identity','optin'].map(suffix=>prefix+'_'+suffix)));
 const rejectionCodes=new Set(['method','origin','invalid','consent','challenge','subscriber_type','rate','conflict','pending']);
 function publicPolicy(){return {approved:legalReady(),version:legal.version,es:{consent:consent.es.subscribe},en:{consent:consent.en.subscribe}};}
@@ -69,6 +70,11 @@ export async function handlePublicNewsletter(request,env,{fetcher=fetch,policy=p
   step('d1_delivery_claim','delivery_claim_storage');
   const claim=await db.prepare("INSERT OR IGNORE INTO newsletter_html_deliveries(request_id,subject_hash,state,started_at,updated_at,lease_until) VALUES(?,?,'sending',?,?,?) RETURNING request_id").bind(raw.requestId,subject,now.toISOString(),now.toISOString(),Math.floor(now.getTime()/1000)+30).first();
   if(!claim)throw new Rejection('pending',409);owned=raw.requestId;
+  if(data.subscriberType==='profesional'&&(raw.referralCode||raw.referrerEmail)){
+   try{
+    await recordReferralSignup(env,{email:data.email,referralCode:raw.referralCode,referrerEmail:raw.referrerEmail,requestId:owned});
+   }catch{console.error('referral_attribution_storage');}
+  }
   step('d1_api_delivery','api_delivery_storage');
   await db.prepare("INSERT INTO newsletter_api_deliveries(request_id,contract_version,state,updated_at) VALUES(?,?,'sending',?)").bind(owned,NEWSLETTER_API_CONTRACT,now.toISOString()).run();
   step('getresponse_send','provider_transport');

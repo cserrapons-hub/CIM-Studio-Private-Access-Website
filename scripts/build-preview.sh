@@ -21,6 +21,9 @@ mkdir -p public/controlled/newsletter
 cp controlled/newsletter/index.html controlled/newsletter/test.css controlled/newsletter/test.js public/controlled/newsletter/
 mkdir -p public/controlled/registrations
 cp controlled/registrations/index.html controlled/registrations/test.css controlled/registrations/test.js public/controlled/registrations/
+mkdir -p public/recomienda public/cajita
+cp recomienda/index.html recomienda/recomienda.css recomienda/recomienda.js public/recomienda/
+cp cajita/index.html cajita/checkout.js public/cajita/
 node scripts/prepare-legal.mjs
 node scripts/prepare-launch.mjs
 node scripts/build-subscription-welcome.mjs

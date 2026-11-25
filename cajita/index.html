@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Cajita de dos tazitas · CIM Studio</title>
+<link rel="stylesheet" href="/recomienda/recomienda.css">
+<script src="/cajita/checkout.js" defer></script>
+</head>
+<body>
+<header class="site-header"><a href="/"><img src="/assets/cim-studio-logo-ink.png" alt="CIM Studio"></a><nav><a href="/recomienda/">Recomendaciones</a></nav></header>
+<main><section class="signup">
+<h1>Cajita de dos tazitas artesanales</h1>
+<p><strong id="price"></strong></p>
+<p>Recogida gratuita en el taller. El transporte se cobra aparte.</p>
+<p><a href="/recomienda/#mi-enlace">Solicita tu enlace privado para aplicar tus descuentos</a>.</p>
+<form id="checkout" hidden>
+<label for="delivery">Entrega</label>
+<select id="delivery" name="delivery"><option value="pickup">Recogida en el taller</option></select>
+<label for="count">Descuentos de 5 €</label>
+<select id="count" name="count"><option value="0">Sin descuentos</option></select>
+<p id="total"></p>
+<button type="submit">Continuar a Stripe</button>
+</form>
+<p id="status" role="status" aria-live="polite"></p>
+</section></main>
+</body>
+</html>

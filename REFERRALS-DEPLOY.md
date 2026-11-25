@@ -1,15 +1,17 @@
-# Recomendaciones CIM Studio — implementación pendiente de despliegue
-La rama añade /recomienda, enlaces personales enviados por Resend, atribución de altas profesionales y cupones en D1. No hay tienda ni canje aún.
-## Activación
-1. Aplicar `referrals-migration.sql` a la D1 vinculada como `FORMS_DB` en Cloudflare (primero preview, después producción).
-2. Configurar `REFERRALS_ENABLED=true` en Cloudflare Pages tras migración. Reutiliza los secretos existentes RESEND_API_KEY, MAIL_FROM, GETRESPONSE_API_KEY, AUDIT_HASH_SECRET, NEWSLETTER_DATA_KEY y TURNSTILE_SECRET_KEY.
-3. Probar correo de enlace, enlace con parámetro `r`, alta profesional, doble opt-in, visita al panel `?acceso=`, y confirmar que no se crean cupones antes del DOI.
-4. Ejecutar pruebas de regresión de los tres formularios y comprobar que Cloudflare publica desde la rama correcta.
-5. Reemplazar el marcador del vídeo por un reproductor real cuando se disponga del archivo o URL.
-## Alcance y límites
-- El código no crea cupones al enviar la solicitud: únicamente tras una comprobación del contacto activo profesional mediante API de GetResponse. La conciliación de pendientes ocurre al visitar el panel del recomendador (hasta 20 por visita), no en segundo plano.
-- La emisión y el canje de cupones no están conectados todavía a /cajita. No prometer un pago ni un descuento canjeable antes de esa fase.
-- Se almacena correo cifrado con NEWSLETTER_DATA_KEY, identificadores HMAC y tokens de acceso de 7 días. El panel no muestra direcciones de los recomendados.
-- No existe mecanismo automático de envío de cupones por correo al recomendado todavía. El descuento queda reservado en la base de datos.
-- Una recomendación se atribuye a un solo recomendador (primera solicitud válida) y no se admiten autorreferencias.
-- El vídeo todavía no está suministrado. No publicar la página como campaña terminada hasta sustituir el marcador o aceptar expresamente su ausencia.
+# Despliegue de recomendaciones y cajita
+
+## Condiciones comerciales
+
+El 25 de noviembre de 2026 se confirmó un precio de **40 € con IVA incluido** antes de cupones hasta el 31 de diciembre de 2026, hora de Mallorca. Ese importe resuelve la discrepancia con los 35 € del chat «Configurar Stripe empresarial». El PR #19 recoge 60 € desde el 1 de enero de 2027, una recompensa de 5 € para cada parte por alta profesional nueva y confirmada, hasta tres cupones por cajita, validez en 2027, recogida gratuita y envío aparte. Confirmar el precio y la zona de envío antes de activar Checkout en producción. La implementación admite una tarifa fija para España.
+
+## Cloudflare y proveedores
+
+1. Identifica el proyecto Pages `cim-studio-editorial-preview`, su rama de producción y las bases `FORMS_DB` de preview y producción. Conserva las vinculaciones y el resto de la configuración de los formularios. Valida que D1 tiene las migraciones de newsletter y aplica `referrals-migration.sql` primero a la D1 de prueba. El build sigue usando `sh scripts/build-preview.sh` con salida `public`.
+2. Copia `config/referral-cron.wrangler.jsonc.example` a un archivo de configuración sin secretos en la misma carpeta y rellena el nombre de Worker y la D1 correspondiente. El Worker y Pages deben compartir la D1 del mismo entorno y los valores `AUDIT_HASH_SECRET` y `NEWSLETTER_DATA_KEY`. Configura también `GETRESPONSE_API_KEY`, `GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID`, `RESEND_API_KEY`, `MAIL_FROM` y `TURNSTILE_SECRET_KEY`. Activa `REFERRALS_ENABLED=true` en Pages y Worker y `REFERRALS_AUTOMATION_ENABLED=true` en el Worker tras aplicar la migración. La newsletter pública conserva el origen canónico y su lista GetResponse aprobada con doble opt-in.
+3. Configura el webhook de Stripe de prueba en `/api/webhooks/stripe` para `checkout.session.completed` y `checkout.session.expired`. Guarda sus secretos y clave de prueba en Pages. Configura `CAJITA_TEST_ENABLED=true` y el origen exacto de preview en `CAJITA_TEST_ORIGIN`. Usa datos y cupones de prueba separados. `CAJITA_SHIPPING_ES_CENTS` permite probar el envío. El canje se confirma mediante el webhook firmado y la coincidencia de sesión, importe y moneda. Un cupón reservado se libera cuando Stripe confirma la expiración.
+4. En una ejecución controlada, comprueba mensaje de enlace personal, ambas formas de atribución, confirmación en GetResponse, correo para las dos partes, saldo del panel, redirección y compra con Stripe de prueba, canje y expiración. Confirma los tres formularios existentes. La simulación en Node verifica el código y SQL, pero los resultados de los proveedores, los remitentes y las vinculaciones necesitan esta comprobación.
+5. En producción, aplica la migración y despliega las rutas y el Worker con la D1 correspondiente. Habilita Checkout real con `CAJITA_LIVE_ENABLED=true` y `CAJITA_LIVE_VERIFIED=true` únicamente tras verificar lo anterior, almacenar la clave y el secreto live y fijar el envío. Mantén activo el webhook de producción si es necesario pausar nuevas compras, para poder liquidar las sesiones ya emitidas. Confirma el destino de pedidos de Stripe para que CIM Studio pueda preparar recogidas y envíos.
+
+Los enlaces de acceso al panel duran siete días. Los cupones se asocian al correo autenticado. La conciliación periódica conserva pendientes cuando falla la verificación y la cola de correo registra la aceptación de Resend. Si una creación de Checkout queda indeterminada, reintenta con el mismo identificador. Antes de liberar una reserva sin webhook, verifica en Stripe el estado de la sesión asociada.
+
+La página recuperada incluye un marcador de vídeo. El archivo o URL del vídeo sigue pendiente.
