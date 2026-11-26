@@ -12,6 +12,7 @@ const digest=(env,kind,v)=>hash(env.AUDIT_HASH_SECRET,'referral-v1:'+kind+':'+v)
 const now=()=>new Date().toISOString();
 const database=env=>env.FORMS_DB;
 const enabled=env=>env.REFERRALS_ENABLED==='true'&&env.FORMS_DB&&env.AUDIT_HASH_SECRET?.length>=32&&env.RESEND_API_KEY&&env.MAIL_FROM&&env.GETRESPONSE_API_KEY&&env.TURNSTILE_SECRET_KEY&&env.NEWSLETTER_DATA_KEY&&(env.REFERRALS_TEST_MODE==='true'?Boolean(referralTest(env)):env.GETRESPONSE_CAMPAIGN_ID===CAMPAIGN&&env.NEWSLETTER_ORIGIN===ORIGIN);
+export const referralAutomationReady=env=>Boolean(enabled(env)&&env.REFERRALS_AUTOMATION_ENABLED==='true'&&env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID);
 const checkOrigin=(request,origin)=>{const u=new URL(request.url);if(u.origin!==origin||request.headers.get('Origin')!==origin||request.headers.get('Sec-Fetch-Site')==='cross-site')throw new Rejection('origin',403)};
 async function challenge(request,env,token,action){if(typeof token!=='string'||token.length>2048)throw new Rejection('challenge');const url=new URL(request.url),test=referralTurnstileTest(env,url.origin);const r=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',body:new URLSearchParams({secret:test?.secretKey??env.TURNSTILE_SECRET_KEY,response:token}),signal:AbortSignal.timeout(12000)});if(!r.ok)throw new Rejection('unavailable',503);const v=await r.json();if(!validReferralTurnstileProof(v,{test,token,hostname:url.hostname,action}))throw new Rejection('challenge',403)}
 export async function throttle(request,env,purpose){const ip=request.headers.get('CF-Connecting-IP');if(!ip)throw new Rejection('unavailable',503);const bucket=Math.floor(Date.now()/3600000),key=await digest(env,'rate',purpose+':'+ip+':'+bucket);const row=await database(env).prepare('INSERT INTO form_rate_limits(id,count,expires_at) VALUES(?,1,?) ON CONFLICT(id) DO UPDATE SET count=count+1 RETURNING count').bind(key,(bucket+1)*3600000).first();if(row.count>5)throw new Rejection('rate',429)}
@@ -41,7 +42,7 @@ async function verifiedSubscriber(env,item){
 }
 
 export async function reconcileReferrals(env){
- if(!enabled(env)||env.REFERRALS_AUTOMATION_ENABLED!=='true'||!env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID)return;
+ if(!referralAutomationReady(env))return;
  const preview=referralTest(env),origin=preview?.origin??ORIGIN;
  await verifyNewsletter(env.GETRESPONSE_API_KEY,env.GETRESPONSE_CAMPAIGN_ID,fetch,preview?.campaignName);
  const db=database(env),timestamp=Date.now();

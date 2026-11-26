@@ -8,6 +8,7 @@ import {cajitaPrice,handleCajita,handleStripeWebhook} from '../server/cajita.js'
 import {fixture,policy} from './helpers/launch-fixture.mjs';
 import {controlledTestBoundary} from '../server/controlled-test.js';
 import {onRequest as reconcileTestRequest} from '../functions/api/referrals/reconcile-test.js';
+import {onRequest as reconcileProductionRequest} from '../functions/api/referrals/reconcile.js';
 import {publicSettings} from '../server/settings.js';
 import {referralTurnstileTest,validReferralTurnstileProof} from '../server/referral-turnstile.js';
 const page=readFileSync(new URL('../recomienda/index.html',import.meta.url),'utf8');
@@ -89,6 +90,18 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   return Response.json(session);
  };
  t.mock.method(globalThis,'fetch',fetcher);
+ if(!preview){
+  const secret='production-simulation-only-at-least-32-characters';
+  const production={...env,SITE_LIVE:'true',CONTROLLED_TEST_MODE:'false',REFERRALS_CRON_SECRET:secret};
+  const request=(credential,host=origin)=>new Request(host+'/api/referrals/reconcile',{
+   method:'POST',headers:{Authorization:'Bearer '+credential},
+  });
+  assert.equal((await reconcileProductionRequest({request:request(secret),env:production})).status,204);
+  assert.equal((await reconcileProductionRequest({request:request(secret+'x'),env:production})).status,403);
+  assert.equal((await reconcileProductionRequest({request:request(secret,shop),env:production})).status,404);
+  assert.equal((await reconcileProductionRequest({request:request(secret),env:{...production,CONTROLLED_TEST_MODE:'true'}})).status,404);
+  assert.equal((await reconcileProductionRequest({request:request(secret),env:{...production,RESEND_API_KEY:''}})).status,503);
+ }
  if(preview){
   const protectedRequest=await controlledTestBoundary(new Request(origin+'/recomienda/'),env);
   assert.equal(protectedRequest.status,401);
