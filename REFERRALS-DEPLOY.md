@@ -26,4 +26,6 @@ El servidor calcula el total, rechaza totales desactualizados y valida el destin
 
 Los enlaces de acceso al panel duran siete días. Los cupones se asocian al correo autenticado. La conciliación periódica conserva pendientes cuando falla la verificación y la cola de correo registra la aceptación de Resend. Si una creación de Checkout queda indeterminada, reintenta con el mismo identificador. Antes de liberar una reserva sin webhook, verifica en Stripe el estado de la sesión asociada.
 
+El endpoint de compra fija la versión de API de Stripe y limita Checkout a tarjeta con `allowed_payment_method_types`. Si configuras el cron desde el panel de Cloudflare, pulsa **Save** después de **Add** y recarga la página para comprobar que la expresión quedó guardada. Cuando se propague, verifica el resultado de la ejecución en Observability y el estado de la recomendación en D1.
+
 La página recuperada incluye un marcador de vídeo. El archivo o URL del vídeo sigue pendiente.
