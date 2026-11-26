@@ -37,3 +37,9 @@ D1 liquida el pedido y sus cupones en la misma operación. Si falla un correo, S
 El aviso administrativo incluye la referencia de D1 y la sesión de Checkout. Desde esa sesión consulta el cliente y el pago asociado en Stripe. El pago contiene los datos de envío y los metadatos de referencia, modalidad de entrega y número de cupones. El envío del correo y su entrega al buzón son comprobaciones distintas.
 
 El vídeo se incorporará en `recomienda` cuando esté disponible el material definitivo.
+
+### Evidencia de la fase final
+
+- Stripe Sandbox rechazó la tarjeta de prueba y D1 mantuvo el pedido abierto sin correos. El reintento en la misma sesión liquidó 55,40 € (40 € de producto y 15,40 € de transporte) e inscribió dos aceptaciones. Resend marcó como entregados el aviso a Pedidos y la confirmación al cliente de prueba.
+- A 390 píxeles, el desglose de envío de la cajita mostró 55,40 € sin desplazamiento horizontal. En escritorio se completó el pago en Stripe Sandbox.
+- La regresión local cubre expiración firmada, liberación de la reserva, deduplicación de cupones y recuperación de un fallo parcial de Resend sin repetir el correo aceptado.
