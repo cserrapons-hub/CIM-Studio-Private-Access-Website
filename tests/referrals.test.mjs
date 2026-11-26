@@ -18,7 +18,7 @@ test('Cajita price changes at midnight in Mallorca',()=>{
  assert.equal(cajitaPrice(Date.parse('2026-12-31T22:59:59.999Z')),4000);
  assert.equal(cajitaPrice(Date.parse('2026-12-31T23:00:00.000Z')),6000);
 });
-test('referral landing includes a personal link request and dashboard',()=>{assert.match(page,/id="referral-form"/);assert.match(page,/id="dashboard"/);assert.match(page,/id="signup-form"/);assert.match(page,/id="video-frame"/)});
+test('referral landing includes its forms and dashboard without an unavailable video',()=>{assert.match(page,/id="referral-form"/);assert.match(page,/id="dashboard"/);assert.match(page,/id="signup-form"/);assert.doesNotMatch(page,/id="video-frame"/)});
 test('attribution accepts a personal link or the referrer email',()=>{assert.match(client,/referralCode/);assert.match(client,/referrerEmail/);assert.match(client,/\/api\/subscribe/);assert.match(client,/\/api\/referrals\/link/);assert.match(client,/\/api\/referrals\/dashboard/)});
 test('D1 schema separates pending signups and unused coupons',()=>{assert.match(migration,/referral_signups/);assert.match(migration,/referral_coupons/);assert.match(migration,/redeemed_at/);assert.match(migration,/UNIQUE\(source_subject_hash,kind\)/)});
 test('disabled referral service fails closed',async()=>{const req=new Request('https://cimstudio.es/api/referrals/link',{method:'POST'});const result=await handleReferralLink(req,{});assert.equal(result.status,503);const dashboard=await handleReferralDashboard(new Request('https://cimstudio.es/api/referrals/dashboard'),{});assert.equal(dashboard.status,503);await recordReferralSignup({}, {email:'person@example.com',referralCode:'a'.repeat(24),requestId:'test'})});
@@ -41,7 +41,7 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   STRIPE_WEBHOOK_SECRET:'whsec_simulated',
  });
  if(preview)Object.assign(env,{REFERRALS_TEST_MODE:'true',CONTROLLED_TEST_ORIGIN:origin,
-  REFERRALS_TEST_EMAILS:[owner,referred,other].join(','),REFERRALS_TURNSTILE_TEST:'true'});
+  REFERRALS_TEST_EMAILS:[owner,referred,other,'pedidos@cimstudio.es'].join(','),REFERRALS_TURNSTILE_TEST:'true',CAJITA_ORDER_EMAILS_ENABLED:'true'});
  const siteverify=referralTurnstileTest(env,origin);
  const token=action=>preview?'XXXX.DUMMY.TOKEN.XXXX':action;
  const post=(base,path,data)=>new Request(base+path,{
@@ -49,6 +49,7 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   body:JSON.stringify(data),
  });
  const mail=[],sessions=new Map(),confirmed=new Set(),stripeCalls=[],contactDetails=new Map();
+ let retryOrderConfirmation=preview;
  const fetcher=async(url,options)=>{
   if(url.includes('siteverify')){
    if(preview){
@@ -73,7 +74,12 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
    return new Response(null,{status:202});
   }
   if(url==='https://api.resend.com/emails'){
-   mail.push(JSON.parse(options.body));
+   const message=JSON.parse(options.body);
+   if(retryOrderConfirmation&&message.subject.includes('Confirmación de compra')){
+    retryOrderConfirmation=false;
+    return new Response(null,{status:503});
+   }
+   mail.push(message);
    return Response.json({id:'simulation-'+mail.length});
   }
   assert.equal(url,'https://api.stripe.com/v1/checkout/sessions');
@@ -192,7 +198,18 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
  assert.equal(stripeShipping.get('payment_intent_data[shipping][address][country]'),'ES');
  assert.equal(stripeShipping.has('shipping_address_collection[allowed_countries][0]'),false);
  assert.equal((await webhook(second,'completed',{payment_status:'paid',amount_total:1})).status,409);
- for(let i=0;i<2;i++)assert.equal((await webhook(second,'completed',{payment_status:'paid'})).status,204);
+ const payment={payment_status:'paid',customer_details:{email:referred}};
+ if(preview){
+  assert.equal((await webhook(second,'completed',payment)).status,503);
+  assert.equal(rows('cajita_order_mail').length,1);
+  assert.equal(rows('cajita_orders').find(order=>order.id===second).state,'paid');
+ }
+ for(let i=0;i<2;i++)assert.equal((await webhook(second,'completed',payment)).status,204);
+ if(preview){
+  assert.equal(rows('cajita_order_mail').length,2);
+  assert.deepEqual(mail.slice(-2).map(message=>message.to),[['pedidos@cimstudio.es'],[referred]]);
+  assert.match(mail.at(-1).text,/Transporte: 15,40/);
+ }
  assert.equal(rows('referral_coupons').filter(coupon=>coupon.redeemed_at).length,2);
  assert.equal((await (await dashboard()).json()).availableCoupons,0);
 });

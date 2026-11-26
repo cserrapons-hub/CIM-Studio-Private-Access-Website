@@ -1,5 +1,6 @@
 import {json,readJson,hash,Rejection} from './forms.js';
 import {ORIGIN,ownerForToken,throttle} from './referrals.js';
+import {sendCajitaOrderEmails} from './cajita-mail.js';
 
 const UUID=/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
 const cutoff=Date.parse('2027-01-01T00:00:00+01:00');
@@ -27,7 +28,7 @@ function shippingDetails(raw){
 const checkoutMode=(env,origin)=>{
  if(!env.FORMS_DB||!/^whsec_/.test(env.STRIPE_WEBHOOK_SECRET||'')||!(env.AUDIT_HASH_SECRET?.length>=32))return null;
  if(origin===ORIGIN){
-  return env.CAJITA_LIVE_ENABLED==='true'&&env.CAJITA_LIVE_VERIFIED==='true'&&
+  return env.CAJITA_LIVE_ENABLED==='true'&&env.CAJITA_LIVE_VERIFIED==='true'&&env.CAJITA_ORDER_EMAILS_ENABLED==='true'&&env.RESEND_API_KEY&&env.MAIL_FROM&&
    /^(sk|rk)_live_/.test(env.STRIPE_SECRET_KEY||'')?'live':null;
  }
  return origin!=='https://www.cimstudio.es'&&origin===env.CAJITA_TEST_ORIGIN&&env.CAJITA_TEST_ENABLED==='true'&&
@@ -80,6 +81,8 @@ export async function handleCajita(request,env){
    'line_items[0][price_data][unit_amount]':String(order.subtotal),
    'line_items[0][price_data][product_data][name]':'Cajita CIM Studio · dos tazitas artesanales',
    'line_items[0][quantity]':'1','metadata[order_id]':id, 'metadata[delivery]':delivery,
+   'payment_intent_data[metadata][order_id]':id,'payment_intent_data[metadata][delivery]':delivery,
+   'payment_intent_data[metadata][coupon_count]':String(count),
    success_url:origin+'/cajita/?resultado=recibido',cancel_url:origin+'/cajita/?resultado=cancelado',
   });
   if(destination){
@@ -140,8 +143,9 @@ export async function handleStripeWebhook(request,env){
   const session=event.data?.object,id=session?.metadata?.order_id;
   if(!UUID.test(id||'')||session.livemode!==event.livemode||!session.id?.startsWith(event.livemode?'cs_live_':'cs_test_'))return new Response(null,{status:204});
   const db=env.FORMS_DB,order=await db.prepare('SELECT * FROM cajita_orders WHERE id=?').bind(id).first();
-  if(!order||order.live!==Number(event.livemode)||order.state!=='open'||(order.stripe_session&&session.id!==order.stripe_session))return new Response(null,{status:204});
   const paid=event.type==='checkout.session.completed';
+  if(!order||order.origin!==new URL(request.url).origin||order.live!==Number(event.livemode)||(order.state!=='open'&&!(paid&&order.state==='paid'))||
+   (order.stripe_session&&session.id!==order.stripe_session))return new Response(null,{status:204});
   if(paid&&(session.payment_status!=='paid'||session.currency!=='eur'||session.amount_total!==order.subtotal+order.shipping))
    return json({error:'invalid'},409);
   if(!paid&&session.status!=='expired')return json({error:'invalid'},409);
@@ -152,6 +156,10 @@ export async function handleStripeWebhook(request,env){
    .bind(new Date().toISOString(),id,session.id));
   statements.push(db.prepare('DELETE FROM cajita_reservations WHERE order_id IN (SELECT id FROM cajita_orders WHERE id=? AND state=? AND stripe_session=?)').bind(id,state,session.id));
   await db.batch(statements);
+  if(paid&&env.CAJITA_ORDER_EMAILS_ENABLED==='true'){
+   const settled=await db.prepare("SELECT * FROM cajita_orders WHERE id=? AND stripe_session=? AND state='paid'").bind(id,session.id).first();
+   if(settled)await sendCajitaOrderEmails(env,settled,session);
+  }
   return new Response(null,{status:204});
  }catch{return json({error:'unavailable'},503);}
 }

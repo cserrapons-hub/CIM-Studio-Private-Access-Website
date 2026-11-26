@@ -36,3 +36,9 @@ CREATE TABLE IF NOT EXISTS cajita_shipping_destinations (
   order_id TEXT PRIMARY KEY REFERENCES cajita_orders(id),
   address_hash TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS cajita_order_mail (
+  order_id TEXT NOT NULL REFERENCES cajita_orders(id),
+  kind TEXT NOT NULL CHECK(kind IN ('studio','customer')),
+  accepted_at TEXT NOT NULL,
+  PRIMARY KEY(order_id,kind)
+);

@@ -28,4 +28,18 @@ Los enlaces de acceso al panel duran siete días. Los cupones se asocian al corr
 
 El endpoint de compra fija la versión de API de Stripe y limita Checkout a tarjeta con `allowed_payment_method_types`. Si configuras el cron desde el panel de Cloudflare, pulsa **Save** después de **Add** y recarga la página para comprobar que la expresión quedó guardada. Cuando se propague, verifica el resultado de la ejecución en Observability y el estado de la recomendación en D1.
 
-La página recuperada incluye un marcador de vídeo. El archivo o URL del vídeo sigue pendiente.
+## Gestión de pedidos
+
+Aplica de nuevo `referrals-migration.sql` para crear `cajita_order_mail` en pruebas y producción. Configura `CAJITA_ORDER_EMAILS_ENABLED=true` después de la migración. En Sandbox usa el proyecto privado y los buzones de la lista permitida, que debe incluir `pedidos@cimstudio.es`. En producción verifica el aviso a Pedidos y la confirmación al cliente, además de la firma y del estado del pedido.
+
+D1 liquida el pedido y sus cupones en la misma operación. Si falla un correo, Stripe puede reenviar el evento de pago. Cada destinatario tiene una marca de aceptación en D1 y una clave de idempotencia en Resend. La devolución de cupones reservados requiere que Stripe confirme la caducidad. Un intento de pago rechazado puede reintentarse en la misma sesión. No prepara el pedido, no envía correos y no consume el cupón.
+
+El aviso administrativo incluye la referencia de D1 y la sesión de Checkout. Desde esa sesión consulta el cliente y el pago asociado en Stripe. El pago contiene los datos de envío y los metadatos de referencia, modalidad de entrega y número de cupones. El envío del correo y su entrega al buzón son comprobaciones distintas.
+
+El vídeo se incorporará en `recomienda` cuando esté disponible el material definitivo.
+
+### Evidencia de la fase final
+
+- Stripe Sandbox rechazó la tarjeta de prueba y D1 mantuvo el pedido abierto sin correos. El reintento en la misma sesión liquidó 55,40 € (40 € de producto y 15,40 € de transporte) e inscribió dos aceptaciones. Resend marcó como entregados el aviso a Pedidos y la confirmación al cliente de prueba.
+- A 390 píxeles, el desglose de envío de la cajita mostró 55,40 € sin desplazamiento horizontal. En escritorio se completó el pago en Stripe Sandbox.
+- La regresión local cubre expiración firmada, liberación de la reserva, deduplicación de cupones y recuperación de un fallo parcial de Resend sin repetir el correo aceptado.
