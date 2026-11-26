@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Cajita de dos tazitas · CIM Studio</title>
+<link rel="stylesheet" href="/recomienda/recomienda.css">
+<script src="/cajita/checkout.js" defer></script>
+</head>
+<body>
+<header class="site-header"><a href="/"><img src="/assets/cim-studio-logo-ink.png" alt="CIM Studio"></a><nav><a href="/recomienda/">Recomendaciones</a></nav></header>
+<main><section class="signup">
+<h1>Cajita de dos tazitas artesanales</h1>
+<p><strong id="price"></strong></p>
+<p>Recogida gratuita en el taller de Sa Pobla. Envío a Mallorca, resto de Baleares y Península por 15,40 € IVA incluido por cajita.</p>
+<p class="fine">Los cupones se aplican al producto. El envío se suma después del descuento.</p>
+<p><a href="/recomienda/#mi-enlace">Solicita tu enlace privado para aplicar tus descuentos</a>.</p>
+<form id="checkout" hidden>
+<label for="delivery">Entrega</label>
+<select id="delivery" name="delivery"><option value="pickup">Recogida gratuita en Sa Pobla</option><option value="shipping">Envío a Baleares o Península</option></select>
+<fieldset id="shipping-address" disabled hidden>
+<legend>Dirección de envío en España</legend>
+<label for="recipient">Nombre y apellidos</label>
+<input id="recipient" name="recipient" autocomplete="shipping name" maxlength="100" required>
+<label for="address">Calle, número, piso y puerta</label>
+<input id="address" name="address" autocomplete="shipping street-address" maxlength="200" required>
+<label for="city">Localidad</label>
+<input id="city" name="city" autocomplete="shipping address-level2" maxlength="100" required>
+<label for="postal">Código postal</label>
+<input id="postal" name="postal" autocomplete="shipping postal-code" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" required>
+<p class="fine">Envíos disponibles en Baleares y Península.</p>
+</fieldset>
+<label for="count">Descuentos de 5 €</label>
+<select id="count" name="count"><option value="0">Sin descuentos</option></select>
+<dl aria-live="polite">
+<dt>Precio de la cajita</dt><dd id="product-price"></dd>
+<dt>Descuento en el producto</dt><dd id="discount"></dd>
+<dt>Producto con descuento</dt><dd id="subtotal"></dd>
+<dt>Transporte</dt><dd id="shipping-price"></dd>
+<dt><strong>Total IVA incluido</strong></dt><dd><strong id="total"></strong></dd>
+</dl>
+<button type="submit">Continuar a Stripe</button>
+</form>
+<p id="status" role="status" aria-live="polite"></p>
+</section></main>
+</body>
+</html>

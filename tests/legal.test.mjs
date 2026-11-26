@@ -60,7 +60,7 @@ test('approved documents retain identity, purpose separation, manual Founders an
 });
 
 test('review document and source reproduce the same approved ES/EN text and unchanged consents',()=>{
- const md=readFileSync('PUBLIC-LEGAL-REVIEW.md','utf8');
+ const md=readFileSync('PUBLIC-LEGAL-REVIEW.md','utf8').replace(/\r\n/g,'\n');
  for(const [lang,label] of [['es','ESPAÑOL'],['en','ENGLISH']]){
   const section=md.split('# '+label+'\n')[1].split('\n# ')[0];
   const headings=[...section.matchAll(/^## ([1-5])\. (.+)$/gm)];

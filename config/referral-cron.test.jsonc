@@ -1,0 +1,9 @@
+{
+  "name": "cim-referral-cron-test",
+  "main": "../workers/referral-cron-test.js",
+  "compatibility_date": "2026-11-17",
+  "workers_dev": false,
+  "preview_urls": false,
+  "keep_vars": true,
+  "triggers": { "crons": ["*/5 * * * *"] }
+}
