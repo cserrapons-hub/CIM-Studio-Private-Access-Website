@@ -23,14 +23,21 @@ export async function ownerForToken(env,token){if(!tokenOk(token))throw new Reje
 async function verifiedSubscriber(env,item){
  const address=await decrypt(env,item.email_cipher,item.subject_hash);
  const contacts=await readGetResponse(fetch,env.GETRESPONSE_API_KEY,'/contacts?'+new URLSearchParams({
-  'query[email]':address,'query[campaignId]':env.GETRESPONSE_CAMPAIGN_ID,perPage:'100'
+  'query[email]':address,'query[campaignId]':env.GETRESPONSE_CAMPAIGN_ID,additionalFlags:'exactMatch',perPage:'100'
  }),'contacts');
  if(!Array.isArray(contacts)||contacts.length>=100)throw new Rejection('unavailable',503);
- return contacts.some(contact=>contact?.email?.trim().toLowerCase()===address&&
+ const matches=contacts.filter(contact=>contact?.email?.trim().toLowerCase()===address&&
+  contact.campaign?.campaignId===env.GETRESPONSE_CAMPAIGN_ID);
+ const [match]=matches;
+ if(matches.length!==1||typeof match.contactId!=='string'||!/^[a-zA-Z0-9_-]{1,120}$/.test(match.contactId))return false;
+ // The contact detail endpoint supplies the active contact and its custom fields.
+ const contact=await readGetResponse(fetch,env.GETRESPONSE_API_KEY,'/contacts/'+encodeURIComponent(match.contactId),'contacts');
+ return contact?.contactId===match.contactId&&contact.email?.trim().toLowerCase()===address&&
   contact.campaign?.campaignId===env.GETRESPONSE_CAMPAIGN_ID&&
   (contact.status===undefined||contact.status==='active')&&
   Date.parse(contact.createdOn)>=Math.floor(Date.parse(item.accepted_at)/1000)*1000-60000&&
-  contact.customFieldValues?.some(field=>field.customFieldId===env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID&&field.value?.includes('profesional')));
+  Array.isArray(contact.customFieldValues)&&contact.customFieldValues.some(field=>
+   field.customFieldId===env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID&&Array.isArray(field.value)&&field.value.includes('profesional'));
 }
 
 export async function reconcileReferrals(env){

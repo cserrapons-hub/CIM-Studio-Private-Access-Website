@@ -47,7 +47,7 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   method:'POST',headers:{Origin:base,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1'},
   body:JSON.stringify(data),
  });
- const mail=[],sessions=new Map(),confirmed=new Set(),stripeCalls=[];
+ const mail=[],sessions=new Map(),confirmed=new Set(),stripeCalls=[],contactDetails=new Map();
  const fetcher=async(url,options)=>{
   if(url.includes('siteverify')){
    if(preview){
@@ -60,11 +60,13 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
   if(url.includes('/campaigns/'))return Response.json({campaignId:campaign,name:preview?'cim_studio_referral_test':'cim_studio_newsletter',optinTypes:{api:'double'}});
   if(url.includes('/contacts?')){
    const email=new URL(url).searchParams.get('query[email]');
-   return Response.json(confirmed.has(email)?[{
-    email,campaign:{campaignId:campaign},createdOn:new Date().toISOString(),
-    customFieldValues:[{customFieldId:env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID,value:['profesional']}],
-   }]:[]);
+   if(!confirmed.has(email))return Response.json([]);
+   const contactId='simulation_'+[...confirmed].indexOf(email);
+   const summary={contactId,email,campaign:{campaignId:campaign},createdOn:new Date().toISOString()};
+   contactDetails.set(contactId,{...summary,customFieldValues:[{customFieldId:env.GETRESPONSE_SUBSCRIBER_TYPE_FIELD_ID,value:['profesional']}]});
+   return Response.json([summary]);
   }
+  if(url.includes('/contacts/'))return Response.json(contactDetails.get(url.split('/').at(-1)));
   if(url==='https://api.getresponse.com/v3/contacts'){
    assert.equal(JSON.parse(options.body).campaign.campaignId,campaign);
    return new Response(null,{status:202});
