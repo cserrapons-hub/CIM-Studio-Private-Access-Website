@@ -7,6 +7,7 @@ export const cajitaPrice=(at=Date.now())=>at<cutoff?4000:6000;
 const SHIPPING_CENTS=1540;
 const COUPON_CENTS=500;
 const MAX_COUPONS=3;
+const STRIPE_API_VERSION='2026-11-18.endive';
 
 function shippingDetails(raw){
  const postal=typeof raw?.postal_code==='string'?raw.postal_code.trim():'';
@@ -74,7 +75,7 @@ export async function handleCajita(request,env){
    throw new Rejection('conflict',409);
   if(Date.now()-order.created_at>=23*3600000)throw new Rejection('conflict',409);
   const params=new URLSearchParams({
-   mode:'payment',locale:'es','payment_method_types[0]':'card','adaptive_pricing[enabled]':'false',
+   mode:'payment',locale:'es','allowed_payment_method_types[0]':'card','adaptive_pricing[enabled]':'false',
    'line_items[0][price_data][currency]':'eur',
    'line_items[0][price_data][unit_amount]':String(order.subtotal),
    'line_items[0][price_data][product_data][name]':'Cajita CIM Studio · dos tazitas artesanales',
@@ -92,7 +93,7 @@ export async function handleCajita(request,env){
   }
   const response=await fetch('https://api.stripe.com/v1/checkout/sessions',{
    method:'POST',redirect:'manual',signal:AbortSignal.timeout(12000),body:params,
-   headers:{Authorization:'Bearer '+env.STRIPE_SECRET_KEY,'Idempotency-Key':'cajita/'+id},
+   headers:{Authorization:'Bearer '+env.STRIPE_SECRET_KEY,'Stripe-Version':STRIPE_API_VERSION,'Idempotency-Key':'cajita/'+id},
   });
   if(!response.ok)throw new Rejection('unavailable',503);
   const session=await response.json();

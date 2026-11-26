@@ -74,6 +74,9 @@ test('referral, newsletter acceptance, DOI, email, test payment and coupon settl
    return Response.json({id:'simulation-'+mail.length});
   }
   assert.equal(url,'https://api.stripe.com/v1/checkout/sessions');
+  assert.equal(options.headers['Stripe-Version'],'2026-11-18.endive');
+  assert.equal(options.body.get('allowed_payment_method_types[0]'),'card');
+  assert.equal(options.body.has('payment_method_types[0]'),false);
   stripeCalls.push(options.body);
   const orderId=options.body.get('metadata[order_id]');
   const id='cs_test_'+orderId;
