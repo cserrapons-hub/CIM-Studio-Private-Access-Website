@@ -9,14 +9,14 @@
  const motion=matchMedia('(prefers-reduced-motion: reduce)');
  function centreCue(){
   if(!cue||!logo||!photo)return;
-  const logoBox=logo.getBoundingClientRect(),photoBox=(innerWidth>1100?document.querySelector('.editorial-v2 .photograph-frame'):photo).getBoundingClientRect(),cueBox=cue.getBoundingClientRect(),pathBox=cue.querySelector('path').getBoundingClientRect(),parentBox=cue.offsetParent.getBoundingClientRect();
+  const logoBox=logo.getBoundingClientRect(),photoBox=(innerWidth>600?document.querySelector('.editorial-v2 .photograph-frame'):photo).getBoundingClientRect(),cueBox=cue.getBoundingClientRect(),pathBox=cue.querySelector('path').getBoundingClientRect(),parentBox=cue.offsetParent.getBoundingClientRect();
   const visibleCentre=(pathBox.top+pathBox.bottom)/2-cueBox.top;
   const top=(logoBox.bottom+photoBox.top)/2-parentBox.top-visibleCentre-(motion.matches?0:4);
   cue.style.setProperty('--header-scroll-top',top+'px');
  }
  if(cue&&logo&&photo){const observer=new ResizeObserver(centreCue);for(const element of [logo,photo,cue,cue.offsetParent])observer.observe(element);logo.addEventListener('load',centreCue);addEventListener('resize',centreCue);motion.addEventListener('change',centreCue);centreCue();}
  // Names revealed on hover must also be reachable by keyboard on the trial desktop layout.
- const desktopNames=matchMedia('(min-width:1101px) and (hover:hover) and (pointer:fine)');
+ const desktopNames=matchMedia('(min-width:601px) and (hover:hover) and (pointer:fine)');
  function focusableNames(){for(const figure of document.querySelectorAll('.photograph')){
   if(desktopNames.matches)figure.setAttribute('tabindex','0');
   else{figure.removeAttribute('tabindex');if(document.activeElement===figure)figure.blur();}
